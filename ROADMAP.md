@@ -1,3 +1,17 @@
+# Search-first product pivot
+
+- [x] Confirm RetroNomad as the primary search destination for buyers
+- [x] Reframe manual listing checker as a secondary utility
+- [x] Define customer-facing hierarchy: Search -> Filter -> Compare -> Alert
+- [x] Define PALScout as the UK/European classification engine under search results
+- [ ] Design the search-results data model and result-card fields
+- [ ] Define user search filters for launch scope
+- [ ] Build a marketplace-source abstraction that can accept authorised inventory providers later
+- [ ] Keep eBay integration disabled until legitimate developer access is available
+- [ ] Connect trusted pricing only after release classification
+- [ ] Add saved searches / target-price alerts after backend infrastructure exists
+
+
 # RetroNomad Roadmap
 
 Last updated: 23 September 2026
@@ -331,6 +345,6 @@ At every milestone:
 
 # Immediate next action
 
-**While waiting for PriceCharting's licensing response, browser-smoke-test the public analyser with real listing URLs/text/photos now that PALScout compatibility and URL ingestion have been hardened.**
+**While waiting for PriceCharting's licensing response, design the search-first RetroNomad experience: launch filters, result-card data model and marketplace-source abstraction, while keeping the existing analyser as a secondary utility.**
 
 Do not purchase a normal PriceCharting API subscription for RetroNomad public use unless a suitable commercial agreement is confirmed.
