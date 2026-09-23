@@ -584,3 +584,21 @@ Decision:
 
 The richer manual listing analyser remains separate for now because it has photo/OCR/gallery-specific UI evidence. It should be migrated later by adapting that evidence into the shared core rather than maintaining permanently divergent rules.
 
+
+
+## Scaffold deployment architecture — 23 September 2026
+
+For the first authenticated backend deployment, serve the static RetroNomad application and account API from one Cloudflare Worker application.
+
+Reasons:
+- same-origin requests preserve the existing Secure + HttpOnly + SameSite=Lax session model
+- no session token needs to be exposed to JavaScript
+- Workers Static Assets can serve the current static app beside Worker API routes
+- D1 can be bound directly to the same Worker
+- a temporary workers.dev hostname is sufficient for scaffold testing before a custom domain is chosen
+
+The existing GitHub Pages deployment remains a local-only prototype and does not have account sync enabled.
+
+Permanent deployment rule:
+Do not weaken session-cookie security or move session tokens into localStorage merely to make GitHub Pages talk cross-site to the account backend.
+
