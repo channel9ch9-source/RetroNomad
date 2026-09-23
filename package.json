@@ -1,0 +1,14 @@
+{
+  "name": "retronomad",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build:cloudflare": "node scripts/build-cloudflare.mjs",
+    "prepare:cloudflare": "node scripts/prepare-cloudflare.mjs",
+    "db:migrate": "wrangler d1 migrations apply DB --remote --config .wrangler.deploy.jsonc",
+    "deploy:cloudflare": "wrangler deploy --config .wrangler.deploy.jsonc"
+  },
+  "devDependencies": {
+    "wrangler": "^4.0.0"
+  }
+}
