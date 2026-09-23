@@ -13,7 +13,7 @@ h1{margin:0 0 8px;font-size:clamp(28px,5vw,46px)}p{color:var(--muted);line-heigh
 .note,.status{font-size:13px;color:var(--muted);margin-top:8px}.good{color:var(--good)}.warn{color:var(--warn)}.bad{color:var(--bad)}
 .stats{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:10px;margin-top:14px}.stat{border:1px solid var(--line);border-radius:12px;padding:12px}.stat span{display:block;color:var(--muted);font-size:12px}.stat b{display:block;margin-top:4px;font-size:22px}
 .progress{height:9px;background:#0e151f;border:1px solid var(--line);border-radius:999px;overflow:hidden;margin-top:14px}.bar{height:100%;width:0;background:var(--accent)}
-.tablewrap{overflow:auto;margin-top:14px;border:1px solid var(--line);border-radius:12px}table{border-collapse:collapse;width:100%;min-width:1050px;font-size:13px}th,td{padding:9px 10px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}th{position:sticky;top:0;background:#151e2a;color:#bac8da}.pill{display:inline-block;padding:3px 7px;border-radius:999px;border:1px solid var(--line);white-space:nowrap}.pill.MATCHED{color:var(--good)}.pill.AMBIGUOUS,.pill.WEAK_MATCH{color:var(--warn)}.pill.NO_PAL_MATCH,.pill.IDENTIFIER_CONFLICT,.pill.ERROR,.pill.PRICE_ERROR{color:var(--bad)}
+.tablewrap{overflow:auto;margin-top:14px;border:1px solid var(--line);border-radius:12px}table{border-collapse:collapse;width:100%;min-width:1050px;font-size:13px}th,td{padding:9px 10px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}th{position:sticky;top:0;background:#151e2a;color:#bac8da}.pill{display:inline-block;padding:3px 7px;border-radius:999px;border:1px solid var(--line);white-space:nowrap}.pill.MATCHED{color:var(--good)}.pill.AMBIGUOUS,.pill.WEAK_MATCH,.pill.PLATFORM_MISMATCH,.pill.REGION_MISMATCH{color:var(--warn)}.pill.NO_RESULTS,.pill.IDENTIFIER_CONFLICT,.pill.ERROR,.pill.PRICE_ERROR{color:var(--bad)}
 .small{font-size:12px;color:var(--muted)}@media(max-width:760px){.row{grid-template-columns:1fr}.stats{grid-template-columns:repeat(2,1fr)}}
 </style>
 </head>
@@ -21,7 +21,7 @@ h1{margin:0 0 8px;font-size:clamp(28px,5vw,46px)}p{color:var(--muted);line-heigh
 <div class="wrap">
   <div class="top"><div class="brand">RetroNomad · internal validation</div><a href="analyze.html">Back to analyser</a></div>
   <h1>Pricing v1 coverage lab</h1>
-  <p>Runs the 100-title launch catalogue against RetroTechCollector using the same safety principle as the analyser: PAL + exact platform, strong title agreement, and no ambiguous top match. Known release barcodes are preferred; title search is used when no safe numeric barcode exists.</p>
+  <p>Runs the 100-title launch catalogue against RetroTechCollector using the same safety principle as the analyser. Diagnostic v2 deliberately records raw catalogue candidates before applying platform/PAL filters so a provider naming mismatch cannot be mistaken for missing coverage. Known release barcodes are preferred; title search is used when no safe numeric barcode exists.</p>
 
   <div class="panel">
     <div class="row">
@@ -45,7 +45,7 @@ h1{margin:0 0 8px;font-size:clamp(28px,5vw,46px)}p{color:var(--muted);line-heigh
       <div class="stat"><span>Completed</span><b id="completed">0/100</b></div>
       <div class="stat"><span>Safe matches</span><b id="matched">0</b></div>
       <div class="stat"><span>Ambiguous / weak</span><b id="review">0</b></div>
-      <div class="stat"><span>No PAL match</span><b id="missing">0</b></div>
+      <div class="stat"><span>No safe PAL match</span><b id="missing">0</b></div>
       <div class="stat"><span>Errors</span><b id="errors">0</b></div>
     </div>
     <div class="tablewrap">
@@ -122,21 +122,41 @@ function forget(){
 }
 async function runOne(item,index){
   const k=key(), upc=preferredBarcode(item), providerPlatform=platformName(item.platform);
-  const path=upc?"/catalogue?upc="+encodeURIComponent(upc)+"&category=GAME&limit=20":"/catalogue?search="+encodeURIComponent(item.game)+"&platform="+encodeURIComponent(providerPlatform)+"&category=GAME&limit=20";
-  const base={index:index+1,game:item.game,platform:item.platform,seed:upc?("UPC "+upc):"title",queryMethod:upc?"upc":"title"};
+  // Diagnostic v2 intentionally avoids an exact platform query parameter.
+  // We need to see the provider's raw platform/region labels before filtering them.
+  const path=upc?"/catalogue?upc="+encodeURIComponent(upc)+"&category=GAME&limit=20":"/catalogue?search="+encodeURIComponent(item.game)+"&category=GAME&limit=20";
+  const base={index:index+1,game:item.game,platform:item.platform,providerPlatformExpected:providerPlatform,seed:upc?("UPC "+upc):"title",queryMethod:upc?"upc":"title"};
   try{
     const cat=await pacedJson(path,k);
-    const rows=(cat.data||[]).filter(r=>r.platform===providerPlatform&&String(r.region||"").toUpperCase().includes("PAL"));
-    if(!rows.length)return {...base,status:"NO_PAL_MATCH",note:"Provider returned no PAL row on the exact platform"};
+    const rawRows=Array.isArray(cat.data)?cat.data:[];
+    const rawCandidates=rawRows.slice(0,5).map(r=>({masterItemId:r.masterItemId??null,name:r.name||"",platform:r.platform||null,region:r.region??null,upc:r.upc||null}));
+    const diag={rawCount:rawRows.length,rawCandidates};
+    if(!rawRows.length)return {...base,...diag,status:"NO_RESULTS",note:"Provider returned no catalogue rows for this query"};
+
+    const platformRows=rawRows.filter(r=>r.platform===providerPlatform);
+    if(!platformRows.length){
+      const observed=[...new Set(rawRows.map(r=>r.platform).filter(Boolean))];
+      const first=rawRows[0]||{};
+      return {...base,...diag,status:"PLATFORM_MISMATCH",providerName:first.name||"",region:first.region||"",masterItemId:first.masterItemId||null,observedPlatforms:observed,note:"Catalogue rows were returned, but none used expected platform label '"+providerPlatform+"'. Observed: "+(observed.join(", ")||"blank")};
+    }
+
+    const rows=platformRows.filter(r=>String(r.region||"").toUpperCase().includes("PAL"));
+    if(!rows.length){
+      const observed=[...new Set(platformRows.map(r=>r.region==null?"<null>":String(r.region)))];
+      const first=platformRows[0]||{};
+      return {...base,...diag,platformMatchCount:platformRows.length,status:"REGION_MISMATCH",providerName:first.name||"",region:first.region||"",masterItemId:first.masterItemId||null,observedRegions:observed,note:"Exact-platform rows were returned, but none had a PAL region label. Observed: "+(observed.join(", ")||"blank")};
+    }
+
     rows.sort((a,b)=>candidateScore(b,item)-candidateScore(a,item));
     const best=rows[0],bestScore=candidateScore(best,item),secondScore=rows[1]?candidateScore(rows[1],item):-1;
-    if(bestScore<80)return {...base,status:upc?"IDENTIFIER_CONFLICT":"WEAK_MATCH",providerName:best.name||"",region:best.region||"",masterItemId:best.masterItemId||null,note:"Best candidate does not agree strongly enough with the classified title"};
-    if(secondScore>=bestScore-5)return {...base,status:"AMBIGUOUS",providerName:best.name||"",region:best.region||"",masterItemId:best.masterItemId||null,note:"Two PAL candidates score too closely to auto-select"};
+    const matchedDiag={...diag,platformMatchCount:platformRows.length,palMatchCount:rows.length};
+    if(bestScore<80)return {...base,...matchedDiag,status:upc?"IDENTIFIER_CONFLICT":"WEAK_MATCH",providerName:best.name||"",region:best.region||"",masterItemId:best.masterItemId||null,note:"Best candidate does not agree strongly enough with the classified title"};
+    if(secondScore>=bestScore-5)return {...base,...matchedDiag,status:"AMBIGUOUS",providerName:best.name||"",region:best.region||"",masterItemId:best.masterItemId||null,note:"Two PAL candidates score too closely to auto-select"};
     let price;
     try{price=await pacedJson("/prices/"+encodeURIComponent(best.masterItemId),k)}
-    catch(e){return {...base,status:"PRICE_ERROR",providerName:best.name||"",region:best.region||"",masterItemId:best.masterItemId||null,note:"Catalogue matched safely but price fetch failed: "+e.message,httpStatus:e.status||null}}
+    catch(e){return {...base,...matchedDiag,status:"PRICE_ERROR",providerName:best.name||"",region:best.region||"",masterItemId:best.masterItemId||null,note:"Catalogue matched safely but price fetch failed: "+e.message,httpStatus:e.status||null}}
     const p=price.data||{}, available=["loose","cib","new","boxOnly","manualOnly"].filter(x=>Number(p[x])>0);
-    return {...base,status:"MATCHED",providerName:best.name||"",region:best.region||"",masterItemId:best.masterItemId||null,providerUpc:best.upc||null,score:bestScore,priceBuckets:available,priceSnapshotDate:(p.scrapeDate||"").slice(0,10)||null,note:available.length?("Price fields available: "+available.join(", ")):"Safe catalogue match; no positive price buckets"};
+    return {...base,...matchedDiag,status:"MATCHED",providerName:best.name||"",region:best.region||"",masterItemId:best.masterItemId||null,providerUpc:best.upc||null,score:bestScore,priceBuckets:available,priceSnapshotDate:(p.scrapeDate||"").slice(0,10)||null,note:available.length?("Price fields available: "+available.join(", ")):"Safe catalogue match; no positive price buckets"};
   }catch(e){
     return {...base,status:"ERROR",note:e.message,httpStatus:e.status||null,errorCode:e.code||null,haltSuggested:e.status===429||e.status===503};
   }
@@ -150,8 +170,8 @@ function render(){
   const ordered=items.map((it,i)=>map.get(it.game+"\u0000"+it.platform)||{index:i+1,game:it.game,platform:it.platform,seed:preferredBarcode(it)?("UPC "+preferredBarcode(it)):"title",status:"PENDING"});
   $("#rows").innerHTML=ordered.map(rowHtml).join("");
   const done=results.length,matched=results.filter(r=>r.status==="MATCHED").length;
-  const review=results.filter(r=>["AMBIGUOUS","WEAK_MATCH","IDENTIFIER_CONFLICT"].includes(r.status)).length;
-  const missing=results.filter(r=>r.status==="NO_PAL_MATCH").length;
+  const review=results.filter(r=>["AMBIGUOUS","WEAK_MATCH","IDENTIFIER_CONFLICT","PLATFORM_MISMATCH","REGION_MISMATCH"].includes(r.status)).length;
+  const missing=results.filter(r=>["NO_RESULTS","PLATFORM_MISMATCH","REGION_MISMATCH"].includes(r.status)).length;
   const errors=results.filter(r=>["ERROR","PRICE_ERROR"].includes(r.status)).length;
   $("#completed").textContent=done+"/"+items.length;$("#matched").textContent=matched;$("#review").textContent=review;$("#missing").textContent=missing;$("#errors").textContent=errors;
   $("#bar").style.width=(items.length?Math.round(done/items.length*100):0)+"%";
@@ -180,7 +200,7 @@ async function run(){
 }
 function stop(){stopRequested=true;setRunStatus("Stopping after the current request…","warn")}
 function exportReport(){
-  const report={generatedAt:new Date().toISOString(),provider:"RetroTechCollector Developer API",method:"RetroNomad Pricing v1 coverage lab",keyIncluded:false,launchTitles:items.length,summary:summary(),results:results};
+  const report={generatedAt:new Date().toISOString(),provider:"RetroTechCollector Developer API",method:"RetroNomad Pricing v1 coverage lab diagnostic v2",keyIncluded:false,launchTitles:items.length,summary:summary(),results:results};
   const blob=new Blob([JSON.stringify(report,null,2)],{type:"application/json"}),url=URL.createObjectURL(blob),a=document.createElement("a");
   a.href=url;a.download="retronomad-pricing-coverage-"+new Date().toISOString().slice(0,10)+".json";a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);
 }
