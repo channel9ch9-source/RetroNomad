@@ -29,7 +29,13 @@
 - [x] Add D1/SQLite persistence schema for server-side hunts, matches, monitor runs and notification queue
 - [x] Add Cloudflare Worker-style scheduler scaffold with health/admin-test endpoints
 - [x] Regression-test new-match deduplication, paused hunts and alert-request rules
-- [ ] Add authenticated account ownership + browser-to-backend Saved Hunt sync
+- [x] Build passwordless account/session implementation
+- [x] Build authenticated browser-to-backend Saved Hunt sync
+- [x] Add deletion tombstones so multi-device sync cannot resurrect removed hunts
+- [x] Add Account UI + wishlist sync controls + search save/sync hook
+- [ ] Deploy/configure the account backend on a suitable same-site/custom-domain setup
+- [ ] Configure transactional sign-in email delivery + abuse/rate controls
+- [ ] Update privacy/account-data policy before enabling public accounts
 - [ ] Add server-compatible PALScout + matcher execution
 - [ ] Connect an authorised live marketplace inventory adapter
 - [ ] Enable autonomous scheduled monitoring only after auth + live inventory are configured
