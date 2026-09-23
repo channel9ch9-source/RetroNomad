@@ -207,6 +207,23 @@ Diagnostic v3 now:
 
 Next action: run diagnostic v3 over the 100 launch titles and use that report to decide whether RetroTechCollector is viable enough to keep.
 
+## PALScout compatibility verdict
+
+Added to the public analyser on 23 September 2026.
+
+PALScout now gives a dedicated hardware-compatibility result separately from the existing UK-market/release classification.
+
+Launch behaviour:
+- target is a standard, unmodified UK/European console for the detected launch platform (PS1, PS2 or Dreamcast)
+- recognised PAL-family identifier evidence can produce a PAL-compatible verdict
+- explicit NTSC-U / NTSC-J evidence produces a not-PAL-compatible verdict unless stronger PAL identifier evidence creates a conflict/review state
+- generic PAL wording without stronger identifier evidence remains provisional
+- a French/German/Spanish/Italian PAL copy can be hardware-compatible even though it is not a UK-market copy
+- packaging/language, UK collector-market identity and hardware compatibility are intentionally separate questions
+- modified consoles, import adapters and similar workarounds are outside the launch compatibility verdict
+
+This makes the first user-facing PALScout question explicit: “Will this copy run on ordinary UK/European PAL hardware?”
+
 ## Pricing v1 diagnostic v3 result and provider decision
 
 Third real-key run: 23 September 2026.
