@@ -162,6 +162,18 @@ Proceed only when:
 - [x] Redesign homepage messaging/layout around the simple customer journey: check compatibility → identify exact release → check completeness → compare value
 - [ ] Add concise examples showing UK/EU, US and Japanese release use cases
 
+# PALScout compatibility QA
+
+- [x] Add PAL/NTSC compatibility verdict
+- [x] Test UK exact PAL, continental PAL, NTSC-U, NTSC-J and unknown-region cases
+- [x] Fix PAL+NTSC conflict handling so mixed evidence becomes review
+- [x] Fix common negated wording such as "UK PAL - not NTSC-US"
+- [x] Use PlayStation serial prefixes as region evidence without treating PAL-Europe as UK-specific
+- [x] Run serial-prefix regression cases for SLES/SCES, SLUS/SCUS and Japan/Asia-family prefixes
+- [x] Restore listing URL ingestion helpers that had been dropped from the current analyser
+- [x] Smoke-test eBay URL item-ID/title parsing and Vinted source detection
+- [ ] Browser smoke-test the public analyser with real user-style listing URLs/text/photos
+
 # Active milestone — Find a release-safe licensed pricing source
 
 ## PriceCharting commercial route
@@ -315,6 +327,6 @@ At every milestone:
 
 # Immediate next action
 
-**While waiting for PriceCharting's licensing response, test the redesigned homepage + PALScout analyser together with representative UK/PAL and NTSC examples, then refine any confusing compatibility wording.**
+**While waiting for PriceCharting's licensing response, browser-smoke-test the public analyser with real listing URLs/text/photos now that PALScout compatibility and URL ingestion have been hardened.**
 
 Do not purchase a normal PriceCharting API subscription for RetroNomad public use unless a suitable commercial agreement is confirmed.
