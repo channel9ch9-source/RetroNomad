@@ -179,6 +179,34 @@ Interpretation:
 
 Next action: rerun the updated coverage lab with the same limited developer key and inspect the exported diagnostic JSON before changing production platform/region mappings.
 
+## Pricing v1 diagnostic v2 result
+
+Second real-key run: 23 September 2026.
+
+Result:
+- 100/100 titles attempted
+- 91 NO_RESULTS
+- 5 PLATFORM_MISMATCH
+- 4 REGION_MISMATCH
+- 0 safe matches under the old catalogue-first/PAL-required logic
+
+What this established:
+- RetroTechCollector's observed PS1 platform label is `Sony PlayStation`, not the originally assumed `PlayStation`.
+- Valid Dreamcast catalogue rows can have `region: null`; null must not be silently treated as PAL.
+- 71 of 72 UPC/EAN **catalogue** lookups returned no row. The one UPC catalogue hit was Rez.
+- 28 titles used title search; only a minority returned candidate catalogue rows.
+- The provider documentation states that `/prices` also supports UPC and title filters and returns pricing rows with a UPC field. Therefore catalogue coverage alone is not enough to judge pricing-provider fit.
+
+Diagnostic v3 now:
+- tests `/prices?upc=` first when RetroNomad has a safe barcode
+- falls back to `/prices?search=`
+- recognises observed platform aliases (including `Sony PlayStation`)
+- fetches catalogue detail by `masterItemId` to inspect region separately
+- distinguishes exact UPC price matches, PAL title-price matches, region-unknown title matches, catalogue-only rows and no provider match
+- never treats a title-only match with unknown/non-PAL region as safe PAL pricing
+
+Next action: run diagnostic v3 over the 100 launch titles and use that report to decide whether RetroTechCollector is viable enough to keep.
+
 ## Pricing v1
 
 Goal: only attach price data after the listing has been classified into the correct release/completeness bucket.
