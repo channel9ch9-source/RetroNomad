@@ -127,7 +127,9 @@
  }
  function detectBundle(text,platform){
   const n=norm(text),mentions=canonicalMentions(text,platform),raw=String(text||"").toLowerCase(),bundleWords=/\b(bundle|job lot|joblot|collection|multi game|multiple games|games lot|game lot|lot of)\b/.test(n),joiner=/\s(?:&|\+|and)\s/.test(raw);
-  return{isBundle:mentions.length>=2&&(bundleWords||joiner),games:mentions};
+  const seriesPair=/final fantasy\s*(?:vii|7)\s*(?:&|\+|and)\s*(?:viii|8)|final fantasy\s*(?:viii|8)\s*(?:&|\+|and)\s*(?:vii|7)/i.test(raw);
+  if(seriesPair){if(!mentions.includes("Final Fantasy VII"))mentions.push("Final Fantasy VII");if(!mentions.includes("Final Fantasy VIII"))mentions.push("Final Fantasy VIII");}
+  return{isBundle:mentions.length>=2&&(bundleWords||joiner||seriesPair),games:mentions};
  }
  function compatibility(region,hit,itemType,bundle){
   if(itemType!=="GAME")return{state:"review",label:"Compatibility not assessed for non-game item"};
@@ -151,10 +153,13 @@
  }
  function classifyListing(listing={},options={}){
   const text=listingText(listing),ids=[...(Array.isArray(listing.identifiers)?listing.identifiers:[]),...(listing.identifier?[listing.identifier]:[]),...extractIdentifierCandidates(text)];
-  const uniqueIds=[...new Set(ids.filter(Boolean))],platformSignal=detectPlatformSignal(text),seedPlatform=options.platform||listing.platform||platformSignal.value||"",hits=findEvidence(text,uniqueIds),hit=hits[0]||null,game=detectGame(text,seedPlatform,hit),platform=hit?.[1]||seedPlatform||game?.p||"",region=detectRegionSignal(text+" "+uniqueIds.join(" ")),itemType=detectItemType(text),bundle=detectBundle(text,platform),complete=detectCompletenessSignal(text),edition=hit?.[2]&&hit[2]!=="original"?hit[2][0].toUpperCase()+hit[2].slice(1):detectEdition(text),english=detectEnglishFriendly(text,listing.englishFriendly),condition=detectCondition(text),compat=compatibility(region,hit,itemType,bundle),market=inferMarket(game,hit,region,english),review=[],conflicts=[];
+  const uniqueIds=[...new Set(ids.filter(Boolean))],platformSignal=detectPlatformSignal(text),seedPlatform=options.platform||listing.platform||platformSignal.value||"",hits=findEvidence(text,uniqueIds),hit=hits[0]||null;
+  const titleGame=detectGame(text,seedPlatform,null),game=detectGame(text,seedPlatform,hit),platform=hit?.[1]||seedPlatform||game?.p||"",region=detectRegionSignal(text+" "+uniqueIds.join(" ")),itemType=detectItemType(text),bundle=detectBundle(text,platform),complete=detectCompletenessSignal(text),edition=hit?.[2]&&hit[2]!=="original"?hit[2][0].toUpperCase()+hit[2].slice(1):detectEdition(text),english=detectEnglishFriendly(text,listing.englishFriendly),condition=detectCondition(text),compat=compatibility(region,hit,itemType,bundle),market=inferMarket(game,hit,region,english),review=[],conflicts=[];
   if(!game)review.push("Game identity is not confirmed.");
   if(!platform)review.push("Platform is not confirmed.");
   if(platformSignal.confidence==="Conflict")conflicts.push(platformSignal.reason);
+  if(hit&&titleGame&&titleGame.t!==hit[0])conflicts.push("Identifier evidence conflicts with the listing title game.");
+  if(hit&&platformSignal.value&&platformSignal.value!==hit[1])conflicts.push("Identifier evidence conflicts with the listing platform wording.");
   if(compat.state==="review")review.push(compat.label);
   if(!market)review.push("Exact release market is not confirmed.");
   if(complete.value==="unknown")review.push("Completeness is not confirmed.");
