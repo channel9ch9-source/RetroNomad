@@ -220,14 +220,16 @@ function setRtcStatus(text,kind=""){
  const el=document.querySelector("#rtcStatus");if(!el)return;el.textContent=text;el.className="providerstatus "+kind;
 }
 function rtcKey(){return (document.querySelector("#rtcApiKey")?.value||sessionStorage.getItem(RTC_KEY_SESSION)||"").trim();}
-function rtcPlatformName(p){return{"PS1":"PlayStation","PS2":"PlayStation 2","Dreamcast":"Sega Dreamcast"}[p]||p||"";}
+function rtcPlatformAliases(p){return{"PS1":["Sony PlayStation","PlayStation"],"PS2":["Sony PlayStation 2","PlayStation 2"],"Dreamcast":["Sega Dreamcast"]}[p]||[p||""];}
+function rtcPlatformMatches(row,p){return rtcPlatformAliases(p).includes(row.platform||"");}
+function rtcBarcodeEquivalent(a,b){const x=String(a||"").replace(/\D/g,""),y=String(b||"").replace(/\D/g,"");if(!x||!y)return false;if(x===y)return true;if(x.length===13&&x[0]==="0"&&x.slice(1)===y)return true;if(y.length===13&&y[0]==="0"&&y.slice(1)===x)return true;return false;}
 function rtcBucketField(bucket){return{"CIB":"cib","Loose":"loose","New":"new","Box Only":"boxOnly","Manual Only":"manualOnly"}[bucket]||"";}
 function normalisedTitleForPrice(s){return norm(s).replace(/\b(platinum|directors cut|director s cut|special edition|limited edition|black label)\b/g," ").replace(/\s+/g," ").trim();}
 function rtcCandidateScore(row,ctx){
  let s=0;const a=normalisedTitleForPrice(row.name||""),b=normalisedTitleForPrice(ctx.game||"");
  if(a===b)s+=100;else if(a.includes(b)||b.includes(a))s+=55;
  if((row.region||"").toUpperCase().includes("PAL"))s+=25;
- if((row.platform||"")===rtcPlatformName(ctx.platform))s+=20;
+ if(rtcPlatformMatches(row,ctx.platform))s+=20;
  const ed=norm(ctx.edition||"");
  if(ed.includes("platinum")&&/platinum/i.test(row.name||""))s+=20;
  if(ed.includes("director")&&/director/i.test(row.name||""))s+=20;
@@ -274,25 +276,42 @@ async function fetchRtcPricingReference(force=false){
  if(ctx.status!=="READY"){setRtcStatus("Automatic pricing is gated until classification is Comparison-ready.","warn");return false;}
  const bucket=ctx.bucket||inferredPriceBucket(ctx.text,ctx.complete,ctx.condition),field=rtcBucketField(bucket);
  if(!field){setRtcStatus("No automatic provider bucket for "+bucket+". Use a manual/condition-specific reference for this copy.","warn");return false;}
- let key=rtcKey();
+ const key=rtcKey();
  if(!key){setRtcStatus("Connect your RetroTechCollector developer key to fetch pricing automatically.","warn");return false;}
  const fetchKey=[ctx.game,ctx.platform,ctx.release,ctx.edition,bucket,ctx.identifier||""].join("|");
  if(!force&&rtcLastAutoKey===fetchKey&&rtcLastMatch)return true;
  setRtcStatus("Matching "+ctx.game+" to the pricing catalogue…","warn");
  try{
-   const platform=rtcPlatformName(ctx.platform),upc=numericBarcode(ctx.identifier||"");
-   let query;
-   if(upc)query="/catalogue?upc="+encodeURIComponent(upc)+"&category=GAME&limit=20";
-   else query="/catalogue?search="+encodeURIComponent(ctx.game)+"&platform="+encodeURIComponent(platform)+"&category=GAME&limit=20";
-   const cat=await rtcJson(query,key),rows=(cat.data||[]).filter(r=>(!platform||r.platform===platform)&&String(r.region||"").toUpperCase().includes("PAL"));
-   if(!rows.length)throw new Error("No PAL catalogue match returned");
-   rows.sort((a,b)=>rtcCandidateScore(b,ctx)-rtcCandidateScore(a,ctx));
-   const best=rows[0],bestScore=rtcCandidateScore(best,ctx),second=rows[1]?rtcCandidateScore(rows[1],ctx):-1;
-   if(bestScore<80)throw new Error(upc?"Barcode lookup conflicts with the classified game; verify the identifier manually":"Catalogue match is too weak to price automatically");
-   if(second>=bestScore-5)throw new Error(upc?"Barcode lookup returned multiple similarly strong PAL matches; verify the release manually":"Multiple PAL catalogue matches are too similar; verify the release manually");
-   const p=await rtcJson("/prices/"+encodeURIComponent(best.masterItemId),key),price=p.data||{};
+   const upc=numericBarcode(ctx.identifier||"");
+   let best=null,price=null,matchBasis="",matchRegion=null;
+
+   if(upc){
+     const exact=await rtcJson("/prices?upc="+encodeURIComponent(upc)+"&limit=20",key);
+     const rows=(exact.data||[]).filter(r=>String(r.category||"GAME").toUpperCase()==="GAME"&&rtcPlatformMatches(r,ctx.platform)&&rtcBarcodeEquivalent(r.upc,upc));
+     if(!rows.length)throw new Error("Provider has no exact price record for this PAL/UK barcode; title fallback is intentionally blocked");
+     rows.sort((a,b)=>rtcCandidateScore(b,ctx)-rtcCandidateScore(a,ctx));
+     best=rows[0];
+     const bestScore=rtcCandidateScore(best,ctx),second=rows[1]?rtcCandidateScore(rows[1],ctx):-1;
+     if(bestScore<80)throw new Error("Exact barcode result conflicts with the classified game; verify the identifier manually");
+     if(second>=bestScore-5)throw new Error("Exact barcode lookup returned multiple similarly strong matches; verify the release manually");
+     price=best;matchBasis="exact barcode";
+   }else{
+     const title=await rtcJson("/prices?search="+encodeURIComponent(ctx.game)+"&limit=20",key);
+     const rows=(title.data||[]).filter(r=>String(r.category||"GAME").toUpperCase()==="GAME"&&rtcPlatformMatches(r,ctx.platform));
+     if(!rows.length)throw new Error("Provider has no title/platform price candidate");
+     rows.sort((a,b)=>rtcCandidateScore(b,ctx)-rtcCandidateScore(a,ctx));
+     best=rows[0];
+     const bestScore=rtcCandidateScore(best,ctx),second=rows[1]?rtcCandidateScore(rows[1],ctx):-1;
+     if(bestScore<80)throw new Error("Catalogue match is too weak to price automatically");
+     if(second>=bestScore-5)throw new Error("Multiple provider matches are too similar; verify the release manually");
+     const detail=(await rtcJson("/catalogue/"+encodeURIComponent(best.masterItemId),key)).data||{};
+     matchRegion=detail.region||null;
+     if(!String(matchRegion||"").toUpperCase().includes("PAL"))throw new Error("Provider title match does not explicitly identify a PAL release");
+     price=best;matchBasis="title + explicit PAL catalogue region";
+   }
+
    const usd=Number(price[field]);
-   if(!(usd>0))throw new Error("Provider has no "+bucket+" price for this item");
+   if(!(usd>0))throw new Error("Provider has no "+bucket+" price for this exact matched item");
    const fx=await usdToGbp(usd),gbp=Math.round(fx.value*100)/100;
    document.querySelector("#refType").value="market";document.querySelector("#refBasis").value="item";
    document.querySelector("#refCondition").value=bucket;document.querySelector("#refLow").value="";document.querySelector("#refHigh").value="";
@@ -301,11 +320,11 @@ async function fetchRtcPricingReference(force=false){
    const priceDate=(price.scrapeDate||"").slice(0,10)||fx.date||new Date().toISOString().slice(0,10);
    document.querySelector("#refDate").value=priceDate;
    document.querySelector("#refUrl").value="https://retrotechcollector.app";
-   rtcLastAutoKey=fetchKey;rtcLastMatch={masterItemId:best.masterItemId,name:best.name,platform:best.platform,region:best.region,upc:best.upc||"",bucket,usd,gbp,fxRate:fx.rate,fxDate:fx.date,priceDate};
+   rtcLastAutoKey=fetchKey;rtcLastMatch={masterItemId:best.masterItemId,name:best.name,platform:best.platform,region:matchRegion,upc:best.upc||"",bucket,usd,gbp,fxRate:fx.rate,fxDate:fx.date,priceDate,matchBasis};
    document.querySelector("#pricingProvider").textContent="RetroTechCollector · automatic";
-   document.querySelector("#pricingProviderMatch").textContent=best.name+" · "+(best.region||"region unknown")+" · #"+best.masterItemId;
-   setRtcStatus("Loaded "+bucket+" reference: $"+usd.toFixed(2)+" → £"+gbp.toFixed(2)+" using USD→GBP "+Number(fx.rate).toFixed(4)+" ("+(fx.date||"latest reference")+").","good");
-   setRefStoreStatus("Automatic provider reference loaded. Review the matched title/region before saving.","good");
+   document.querySelector("#pricingProviderMatch").textContent=best.name+" · "+matchBasis+" · #"+best.masterItemId;
+   setRtcStatus("Loaded "+bucket+" reference from "+matchBasis+": $"+usd.toFixed(2)+" → £"+gbp.toFixed(2)+" using USD→GBP "+Number(fx.rate).toFixed(4)+" ("+(fx.date||"latest reference")+").","good");
+   setRefStoreStatus("Automatic provider reference loaded from a release-safe match. Review before saving.","good");
    renderPricingV1({...ctx,bucket});return true;
  }catch(e){
    rtcLastMatch=null;document.querySelector("#pricingProviderMatch").textContent="No safe automatic match";
