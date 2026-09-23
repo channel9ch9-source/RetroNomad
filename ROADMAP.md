@@ -154,6 +154,14 @@ Proceed only when:
 
 ---
 
+# Product clarity work while pricing response is pending
+
+- [x] Add a dedicated PALScout compatibility verdict to the analyser
+- [x] Separate PAL hardware compatibility from UK-market/country classification
+- [x] Keep NTSC-U/NTSC-J, PAL territory, language/package and collector-market signals distinct
+- [ ] Redesign homepage messaging/layout around the simple customer journey: check compatibility → identify exact release → check completeness → compare value
+- [ ] Add concise examples showing UK/EU, US and Japanese release use cases
+
 # Active milestone — Find a release-safe licensed pricing source
 
 ## PriceCharting commercial route
@@ -307,6 +315,6 @@ At every milestone:
 
 # Immediate next action
 
-**While waiting for PriceCharting's licensing response, improve the public product positioning around PALScout compatibility + exact-release identification, without changing the core classifier/pricing architecture.**
+**While waiting for PriceCharting's licensing response, redesign the homepage around PALScout compatibility first, followed by exact-release identification, completeness and value.**
 
 Do not purchase a normal PriceCharting API subscription for RetroNomad public use unless a suitable commercial agreement is confirmed.
