@@ -17,6 +17,7 @@
 // tokens in localStorage.
 
 import { runHunt } from "./monitor-core.js";
+import { evaluateNormalizedCandidates } from "./search-engine.js";
 import {
   normalizeEmail, validEmail, randomToken, sha256Hex, isoAfterMinutes,
   isoAfterDays, sessionTokenFromRequest, sessionCookie, clearSessionCookie,
@@ -432,13 +433,24 @@ async function persistNotification(env, item) {
   ).bind(queueId(item.huntId, item.source, item.externalId), item.huntId, item.source, item.externalId, JSON.stringify(item.payload), new Date().toISOString()).run();
 }
 
-async function searchAuthorisedInventory(target, env) {
+async function fetchAuthorisedCandidates(target, env) {
   if (!env.MARKETPLACE_PROVIDER || env.MARKETPLACE_PROVIDER === "disabled") {
     const e = new Error("No authorised marketplace inventory provider is configured.");
     e.code = "provider_not_configured";
     throw e;
   }
-  throw Object.assign(new Error("Configured marketplace provider has no adapter implementation yet."), { code: "provider_adapter_missing" });
+
+  // Future provider adapters must return the normalised marketplace-listing
+  // contract. They must not perform release classification themselves.
+  throw Object.assign(
+    new Error("Configured marketplace provider has no authorised adapter implementation yet."),
+    { code: "provider_adapter_missing" }
+  );
+}
+
+async function searchAuthorisedInventory(target, env) {
+  const candidates = await fetchAuthorisedCandidates(target, env);
+  return evaluateNormalizedCandidates(target, candidates);
 }
 
 async function runOne(env, hunt) {
@@ -496,6 +508,7 @@ export default {
         databaseConfigured: Boolean(env.DB),
         appOriginConfigured: Boolean(env.APP_ORIGIN),
         authEmailConfigured: Boolean(env.AUTH_EMAIL_WEBHOOK_URL),
+        serverClassificationReady: true,
         marketplaceConfigured: Boolean(env.MARKETPLACE_PROVIDER && env.MARKETPLACE_PROVIDER !== "disabled"),
         notificationsConfigured: Boolean(env.NOTIFICATION_PROVIDER && env.NOTIFICATION_PROVIDER !== "disabled")
       }, 200, env, request);
