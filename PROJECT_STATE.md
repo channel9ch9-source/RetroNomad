@@ -459,3 +459,25 @@ Compatibility -> Region -> Exact release -> Edition -> Completeness
 
 The listing analyser remains a useful secondary checker/debugging utility, but future development should not treat manual URL/text/photo submission as the main consumer experience.
 
+
+
+## Reaffirmed original product concept
+
+User restated the original concept from the prior chat on 23 September 2026.
+
+RetroNomad is a **Retro Game Hunting Assistant** with one app containing:
+1. Deal Finder
+2. Wishlist + price alerts
+3. "Should I buy this?" listing analysis
+4. Photo / Lot Analyzer later
+
+Build order:
+- Phase 1: Deal Finder + Wishlist alerts
+- Phase 2: "Should I buy this?" analysis
+- Phase 3: Photo / Lot Analyzer
+- Phase 4: More marketplaces + advanced collector features
+
+This is consistent with the newly confirmed search-first direction. The current listing analyser should be treated as enabling technology and a future secondary utility, not the main consumer product.
+
+PALScout remains the UK/European release-intelligence layer underneath Deal Finder, alerts and listing analysis.
+
