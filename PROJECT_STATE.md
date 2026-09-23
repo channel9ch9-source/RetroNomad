@@ -645,3 +645,36 @@ Important limitation:
 - no scheduled background checks or real notifications exist yet.
 - autonomous alerts require both backend infrastructure and an authorised live marketplace source.
 
+
+
+## Alert backend foundation
+
+Completed 23 September 2026.
+
+New files:
+- `backend/schema.sql`
+- `backend/monitor-core.js`
+- `backend/alerts-worker.js`
+- `ALERTS_BACKEND_V1.md`
+
+The backend architecture is provider-neutral:
+
+Saved Hunt -> scheduler -> authorised marketplace adapter -> PALScout -> target matcher -> new MATCH detection -> notification queue -> future notification delivery.
+
+Persistence now covers server-side saved hunts, qualifying matches, monitor-run audit records and the notification queue.
+
+Monitor rules:
+- only ACTIVE hunts run
+- only MATCH results can become qualifying matches
+- REVIEW and FILTERED never trigger alerts
+- listings are deduplicated by source + external ID
+- only newly qualifying listings can create a notification event
+- a repeated sighting of the same listing does not create a duplicate alert
+- hunts without alert preference do not queue notifications
+- PAUSED hunts are skipped
+
+Regression QA passed for first-match notification, repeat-run deduplication, REVIEW/FILTERED exclusion, alert preference and paused-hunt skipping.
+
+The Worker shell currently exposes readiness information and an admin-only future run hook. Public hunt sync remains intentionally disabled until real account authentication and ownership exist.
+
+This code is infrastructure only and is not deployed. Real monitoring still requires authenticated hunt ownership, server-side PALScout/matcher execution, an authorised live inventory source and a notification provider.
