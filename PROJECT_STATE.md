@@ -2,7 +2,15 @@
 
 Last updated: 23 September 2026
 
-This file is the durable handoff for the RetroNomad project. A new ChatGPT conversation should read this file before changing the product.
+This file is the durable handoff for the RetroNomad project.
+
+A new working session should read, in order:
+1. `PROJECT_STATE.md`
+2. `DECISIONS.md`
+3. `ROADMAP.md`
+4. `PRICING_V1.md`
+
+The repository is the authoritative project handoff. Chat memory is supplementary and should not be treated as the sole record of product decisions.
 
 ## Product
 
@@ -260,6 +268,15 @@ PALScout is not the parent brand because the product is intended to expand globa
 7. Add authorised marketplace discovery/connectors.
 8. Expand reference data to NTSC-U, NTSC-J and more platforms.
 9. Add accounts/cloud persistence only when a backend exists.
+
+## Durable project records
+
+- `PROJECT_STATE.md`: current product state, implementation status and key evidence
+- `DECISIONS.md`: durable product/architecture decisions and rationale, including the eBay developer-access history
+- `ROADMAP.md`: completed milestones, active milestone, blockers and exit criteria
+- `PRICING_V1.md`: detailed Pricing v1 provider and security rules
+
+When a substantial session changes the project, update the relevant durable record before ending the session.
 
 ## Accuracy/transparency requirements
 
