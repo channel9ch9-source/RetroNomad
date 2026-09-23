@@ -388,3 +388,30 @@ When a substantial session changes the project, update the relevant durable reco
 - 'Comparison-ready' means classification is ready; it does not mean the price is good.
 - Unknown/ambiguous evidence must become Needs review.
 - If a provider has no price or the mapping is ambiguous, show that honestly.
+
+
+## Homepage product-positioning refresh
+
+Completed 23 September 2026.
+
+The public homepage now leads with the concrete buyer problem rather than abstract release classification.
+
+Primary customer journey:
+1. Check whether the physical copy appears compatible with standard UK/European hardware.
+2. Identify the exact regional/physical release.
+3. Check completeness and condition evidence.
+4. Compare value only when a trusted release-safe pricing source is available.
+
+Brand structure:
+- RetroNomad remains the global parent product.
+- PALScout is presented prominently as the UK/European compatibility + release-intelligence layer.
+- US/NTSC-U and Japan/NTSC-J are shown as planned future regional intelligence layers.
+
+Accuracy/marketing changes:
+- removed the previous illustrative marketplace-results count that could imply automatic listing discovery is already live
+- homepage now states that users submit listing URLs/text/photos today
+- marketplace discovery is clearly marked planned
+- exact-release valuation is clearly marked in development
+- PAL compatibility is explicitly separated from UK-market identity and packaging/language
+- compatibility scope is explicitly standard, unmodified UK/European hardware
+
