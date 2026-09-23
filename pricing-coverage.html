@@ -13,7 +13,7 @@ h1{margin:0 0 8px;font-size:clamp(28px,5vw,46px)}p{color:var(--muted);line-heigh
 .note,.status{font-size:13px;color:var(--muted);margin-top:8px}.good{color:var(--good)}.warn{color:var(--warn)}.bad{color:var(--bad)}
 .stats{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:10px;margin-top:14px}.stat{border:1px solid var(--line);border-radius:12px;padding:12px}.stat span{display:block;color:var(--muted);font-size:12px}.stat b{display:block;margin-top:4px;font-size:22px}
 .progress{height:9px;background:#0e151f;border:1px solid var(--line);border-radius:999px;overflow:hidden;margin-top:14px}.bar{height:100%;width:0;background:var(--accent)}
-.tablewrap{overflow:auto;margin-top:14px;border:1px solid var(--line);border-radius:12px}table{border-collapse:collapse;width:100%;min-width:1050px;font-size:13px}th,td{padding:9px 10px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}th{position:sticky;top:0;background:#151e2a;color:#bac8da}.pill{display:inline-block;padding:3px 7px;border-radius:999px;border:1px solid var(--line);white-space:nowrap}.pill.MATCHED{color:var(--good)}.pill.AMBIGUOUS,.pill.WEAK_MATCH,.pill.PLATFORM_MISMATCH,.pill.REGION_MISMATCH{color:var(--warn)}.pill.NO_RESULTS,.pill.IDENTIFIER_CONFLICT,.pill.ERROR,.pill.PRICE_ERROR{color:var(--bad)}
+.tablewrap{overflow:auto;margin-top:14px;border:1px solid var(--line);border-radius:12px}table{border-collapse:collapse;width:100%;min-width:1050px;font-size:13px}th,td{padding:9px 10px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}th{position:sticky;top:0;background:#151e2a;color:#bac8da}.pill{display:inline-block;padding:3px 7px;border-radius:999px;border:1px solid var(--line);white-space:nowrap}.pill.UPC_PRICE_MATCH,.pill.TITLE_PRICE_PAL{color:var(--good)}.pill.AMBIGUOUS,.pill.WEAK_MATCH,.pill.TITLE_PRICE_REGION_UNKNOWN,.pill.CATALOGUE_ONLY{color:var(--warn)}.pill.NO_PROVIDER_MATCH,.pill.IDENTIFIER_CONFLICT,.pill.UPC_PRICE_PLATFORM_MISMATCH,.pill.TITLE_PRICE_NON_PAL,.pill.ERROR{color:var(--bad)}
 .small{font-size:12px;color:var(--muted)}@media(max-width:760px){.row{grid-template-columns:1fr}.stats{grid-template-columns:repeat(2,1fr)}}
 </style>
 </head>
@@ -21,7 +21,7 @@ h1{margin:0 0 8px;font-size:clamp(28px,5vw,46px)}p{color:var(--muted);line-heigh
 <div class="wrap">
   <div class="top"><div class="brand">RetroNomad · internal validation</div><a href="analyze.html">Back to analyser</a></div>
   <h1>Pricing v1 coverage lab</h1>
-  <p>Runs the 100-title launch catalogue against RetroTechCollector using the same safety principle as the analyser. Diagnostic v2 deliberately records raw catalogue candidates before applying platform/PAL filters so a provider naming mismatch cannot be mistaken for missing coverage. Known release barcodes are preferred; title search is used when no safe numeric barcode exists.</p>
+  <p>Runs the 100-title launch catalogue against RetroTechCollector. Diagnostic v3 tests the provider's actual pricing endpoint first, uses exact UPC/EAN where available, falls back to title-price search, recognises observed provider platform aliases, then checks catalogue region separately. This is a provider-fit test; region-unknown title matches are not treated as safe PAL pricing.</p>
 
   <div class="panel">
     <div class="row">
@@ -67,13 +67,14 @@ const MIN_CALL_GAP_MS=1250;
 let connected=false, stopRequested=false, running=false, lastCallAt=0, results=[];
 
 const $=s=>document.querySelector(s);
-function platformName(p){return {PS1:"PlayStation",PS2:"PlayStation 2",Dreamcast:"Sega Dreamcast"}[p]||p||""}
+function platformAliases(p){return {PS1:["Sony PlayStation","PlayStation"],PS2:["Sony PlayStation 2","PlayStation 2"],Dreamcast:["Sega Dreamcast"]}[p]||[p||""]}
+function platformMatches(row,item){return platformAliases(item.platform).includes(row.platform||"")}
 function norm(s){return String(s||"").toLowerCase().replace(/[’']/g,"").replace(/[^a-z0-9]+/g," ").trim().replace(/\bvii\b/g,"7").replace(/\bviii\b/g,"8").replace(/\bix\b/g,"9").replace(/\biii\b/g,"3").replace(/\bii\b/g,"2")}
 function candidateScore(row,item){
   let n=0,a=norm(row.name),b=norm(item.game);
   if(a===b)n+=100;else if(a.includes(b)||b.includes(a))n+=55;
   if(String(row.region||"").toUpperCase().includes("PAL"))n+=25;
-  if(row.platform===platformName(item.platform))n+=20;
+  if(platformMatches(row,item))n+=20;
   return n;
 }
 function evidenceRank(r){
@@ -121,42 +122,64 @@ function forget(){
   sessionStorage.removeItem(SESSION_KEY);$("#key").value="";connected=false;setConnection("Developer key forgotten from this browser tab.",""); 
 }
 async function runOne(item,index){
-  const k=key(), upc=preferredBarcode(item), providerPlatform=platformName(item.platform);
-  // Diagnostic v2 intentionally avoids an exact platform query parameter.
-  // We need to see the provider's raw platform/region labels before filtering them.
-  const path=upc?"/catalogue?upc="+encodeURIComponent(upc)+"&category=GAME&limit=20":"/catalogue?search="+encodeURIComponent(item.game)+"&category=GAME&limit=20";
-  const base={index:index+1,game:item.game,platform:item.platform,providerPlatformExpected:providerPlatform,seed:upc?("UPC "+upc):"title",queryMethod:upc?"upc":"title"};
+  const k=key(),upc=preferredBarcode(item),aliases=platformAliases(item.platform);
+  const base={index:index+1,game:item.game,platform:item.platform,providerPlatformExpected:aliases,seed:upc?("UPC "+upc):"title",queryMethod:upc?"upc_then_title":"title"};
+  const priceShape=r=>({masterItemId:r.masterItemId??null,name:r.name||"",platform:r.platform||null,upc:r.upc||null,loose:r.loose??null,cib:r.cib??null,new:r.new??null,boxOnly:r.boxOnly??null,manualOnly:r.manualOnly??null,scrapeDate:r.scrapeDate||null});
+  const catShape=r=>({masterItemId:r.masterItemId??null,name:r.name||"",platform:r.platform||null,region:r.region??null});
+  const buckets=r=>["loose","cib","new","boxOnly","manualOnly"].filter(x=>Number(r[x])>0);
+  async function detail(id){
+    try{return (await pacedJson("/catalogue/"+encodeURIComponent(id),k)).data||{}}
+    catch(e){return {_detailError:e.message}}
+  }
+  function choose(rows){
+    const pr=rows.filter(r=>platformMatches(r,item));
+    pr.sort((a,b)=>candidateScore(b,item)-candidateScore(a,item));
+    const best=pr[0]||null,score=best?candidateScore(best,item):-1,second=pr[1]?candidateScore(pr[1],item):-1;
+    return {platformRows:pr,best,score,second};
+  }
   try{
-    const cat=await pacedJson(path,k);
-    const rawRows=Array.isArray(cat.data)?cat.data:[];
-    const rawCandidates=rawRows.slice(0,5).map(r=>({masterItemId:r.masterItemId??null,name:r.name||"",platform:r.platform||null,region:r.region??null,upc:r.upc||null}));
-    const diag={rawCount:rawRows.length,rawCandidates};
-    if(!rawRows.length)return {...base,...diag,status:"NO_RESULTS",note:"Provider returned no catalogue rows for this query"};
-
-    const platformRows=rawRows.filter(r=>r.platform===providerPlatform);
-    if(!platformRows.length){
-      const observed=[...new Set(rawRows.map(r=>r.platform).filter(Boolean))];
-      const first=rawRows[0]||{};
-      return {...base,...diag,status:"PLATFORM_MISMATCH",providerName:first.name||"",region:first.region||"",masterItemId:first.masterItemId||null,observedPlatforms:observed,note:"Catalogue rows were returned, but none used expected platform label '"+providerPlatform+"'. Observed: "+(observed.join(", ")||"blank")};
+    let upcPriceRows=[];
+    if(upc){
+      const p=await pacedJson("/prices?upc="+encodeURIComponent(upc)+"&limit=20",k);
+      upcPriceRows=Array.isArray(p.data)?p.data:[];
+      if(upcPriceRows.length){
+        const pick=choose(upcPriceRows);
+        const diag={upcPriceRawCount:upcPriceRows.length,upcPriceCandidates:upcPriceRows.slice(0,5).map(priceShape)};
+        if(!pick.best){
+          return {...base,...diag,status:"UPC_PRICE_PLATFORM_MISMATCH",observedPlatforms:[...new Set(upcPriceRows.map(r=>r.platform).filter(Boolean))],note:"Exact UPC/EAN price query returned rows, but none matched an allowed platform label"};
+        }
+        if(pick.score<120){
+          return {...base,...diag,status:"IDENTIFIER_CONFLICT",providerName:pick.best.name||"",masterItemId:pick.best.masterItemId||null,providerUpc:pick.best.upc||null,score:pick.score,note:"UPC/EAN price result does not strongly agree with the classified title/platform"};
+        }
+        if(pick.second>=pick.score-5){
+          return {...base,...diag,status:"AMBIGUOUS",providerName:pick.best.name||"",masterItemId:pick.best.masterItemId||null,providerUpc:pick.best.upc||null,score:pick.score,note:"UPC/EAN price query returned multiple similarly strong candidates"};
+        }
+        const d=await detail(pick.best.masterItemId),available=buckets(pick.best);
+        return {...base,...diag,status:"UPC_PRICE_MATCH",providerName:pick.best.name||"",region:d.region??null,masterItemId:pick.best.masterItemId||null,providerUpc:pick.best.upc||null,score:pick.score,priceBuckets:available,priceSnapshotDate:(pick.best.scrapeDate||"").slice(0,10)||null,catalogueDetail:catShape(d),note:"Exact UPC/EAN price query matched title + platform"+(d.region==null?"; catalogue region is unknown":"; catalogue region "+d.region)};
+      }
     }
 
-    const rows=platformRows.filter(r=>String(r.region||"").toUpperCase().includes("PAL"));
-    if(!rows.length){
-      const observed=[...new Set(platformRows.map(r=>r.region==null?"<null>":String(r.region)))];
-      const first=platformRows[0]||{};
-      return {...base,...diag,platformMatchCount:platformRows.length,status:"REGION_MISMATCH",providerName:first.name||"",region:first.region||"",masterItemId:first.masterItemId||null,observedRegions:observed,note:"Exact-platform rows were returned, but none had a PAL region label. Observed: "+(observed.join(", ")||"blank")};
+    const titlePrice=await pacedJson("/prices?search="+encodeURIComponent(item.game)+"&limit=20",k);
+    const priceRows=Array.isArray(titlePrice.data)?titlePrice.data:[];
+    if(priceRows.length){
+      const pick=choose(priceRows);
+      const diag={upcPriceRawCount:upc?upcPriceRows.length:null,titlePriceRawCount:priceRows.length,titlePriceCandidates:priceRows.slice(0,8).map(priceShape)};
+      if(pick.best){
+        if(pick.score<120)return {...base,...diag,status:"WEAK_MATCH",providerName:pick.best.name||"",masterItemId:pick.best.masterItemId||null,providerUpc:pick.best.upc||null,score:pick.score,note:"Title price result matched platform but not the classified title strongly enough"};
+        if(pick.second>=pick.score-5)return {...base,...diag,status:"AMBIGUOUS",providerName:pick.best.name||"",masterItemId:pick.best.masterItemId||null,providerUpc:pick.best.upc||null,score:pick.score,note:"Multiple title-price candidates score too closely"};
+        const d=await detail(pick.best.masterItemId),available=buckets(pick.best),reg=String(d.region||"").toUpperCase();
+        const status=reg.includes("PAL")?"TITLE_PRICE_PAL":(d.region==null?"TITLE_PRICE_REGION_UNKNOWN":"TITLE_PRICE_NON_PAL");
+        return {...base,...diag,status,providerName:pick.best.name||"",region:d.region??null,masterItemId:pick.best.masterItemId||null,providerUpc:pick.best.upc||null,score:pick.score,priceBuckets:available,priceSnapshotDate:(pick.best.scrapeDate||"").slice(0,10)||null,catalogueDetail:catShape(d),note:reg.includes("PAL")?"Strong title/platform price match with PAL catalogue metadata":(d.region==null?"Strong title/platform price match, but provider catalogue region is null":"Strong title/platform price match, but provider catalogue region is not PAL")};
+      }
     }
 
-    rows.sort((a,b)=>candidateScore(b,item)-candidateScore(a,item));
-    const best=rows[0],bestScore=candidateScore(best,item),secondScore=rows[1]?candidateScore(rows[1],item):-1;
-    const matchedDiag={...diag,platformMatchCount:platformRows.length,palMatchCount:rows.length};
-    if(bestScore<80)return {...base,...matchedDiag,status:upc?"IDENTIFIER_CONFLICT":"WEAK_MATCH",providerName:best.name||"",region:best.region||"",masterItemId:best.masterItemId||null,note:"Best candidate does not agree strongly enough with the classified title"};
-    if(secondScore>=bestScore-5)return {...base,...matchedDiag,status:"AMBIGUOUS",providerName:best.name||"",region:best.region||"",masterItemId:best.masterItemId||null,note:"Two PAL candidates score too closely to auto-select"};
-    let price;
-    try{price=await pacedJson("/prices/"+encodeURIComponent(best.masterItemId),k)}
-    catch(e){return {...base,...matchedDiag,status:"PRICE_ERROR",providerName:best.name||"",region:best.region||"",masterItemId:best.masterItemId||null,note:"Catalogue matched safely but price fetch failed: "+e.message,httpStatus:e.status||null}}
-    const p=price.data||{}, available=["loose","cib","new","boxOnly","manualOnly"].filter(x=>Number(p[x])>0);
-    return {...base,...matchedDiag,status:"MATCHED",providerName:best.name||"",region:best.region||"",masterItemId:best.masterItemId||null,providerUpc:best.upc||null,score:bestScore,priceBuckets:available,priceSnapshotDate:(p.scrapeDate||"").slice(0,10)||null,note:available.length?("Price fields available: "+available.join(", ")):"Safe catalogue match; no positive price buckets"};
+    const cat=await pacedJson("/catalogue?search="+encodeURIComponent(item.game)+"&category=GAME&limit=20",k);
+    const catRows=Array.isArray(cat.data)?cat.data:[],catPick=choose(catRows);
+    const diag={upcPriceRawCount:upc?upcPriceRows.length:null,titlePriceRawCount:priceRows.length,catalogueTitleRawCount:catRows.length,catalogueTitleCandidates:catRows.slice(0,8).map(catShape)};
+    if(catPick.best){
+      return {...base,...diag,status:"CATALOGUE_ONLY",providerName:catPick.best.name||"",region:catPick.best.region??null,masterItemId:catPick.best.masterItemId||null,score:catPick.score,note:"Matching catalogue item exists, but the provider price search returned no matching priced row"};
+    }
+    return {...base,...diag,status:"NO_PROVIDER_MATCH",observedPlatforms:[...new Set([...priceRows,...catRows].map(r=>r.platform).filter(Boolean))],note:"No matching priced or catalogue row on an allowed platform"};
   }catch(e){
     return {...base,status:"ERROR",note:e.message,httpStatus:e.status||null,errorCode:e.code||null,haltSuggested:e.status===429||e.status===503};
   }
@@ -169,17 +192,17 @@ function render(){
   const map=new Map(results.map(r=>[r.game+"\u0000"+r.platform,r]));
   const ordered=items.map((it,i)=>map.get(it.game+"\u0000"+it.platform)||{index:i+1,game:it.game,platform:it.platform,seed:preferredBarcode(it)?("UPC "+preferredBarcode(it)):"title",status:"PENDING"});
   $("#rows").innerHTML=ordered.map(rowHtml).join("");
-  const done=results.length,matched=results.filter(r=>r.status==="MATCHED").length;
-  const review=results.filter(r=>["AMBIGUOUS","WEAK_MATCH","IDENTIFIER_CONFLICT","PLATFORM_MISMATCH","REGION_MISMATCH"].includes(r.status)).length;
-  const missing=results.filter(r=>["NO_RESULTS","PLATFORM_MISMATCH","REGION_MISMATCH"].includes(r.status)).length;
-  const errors=results.filter(r=>["ERROR","PRICE_ERROR"].includes(r.status)).length;
+  const done=results.length,matched=results.filter(r=>["UPC_PRICE_MATCH","TITLE_PRICE_PAL"].includes(r.status)).length;
+  const review=results.filter(r=>["AMBIGUOUS","WEAK_MATCH","IDENTIFIER_CONFLICT","UPC_PRICE_PLATFORM_MISMATCH","TITLE_PRICE_REGION_UNKNOWN","TITLE_PRICE_NON_PAL"].includes(r.status)).length;
+  const missing=results.filter(r=>["CATALOGUE_ONLY","NO_PROVIDER_MATCH"].includes(r.status)).length;
+  const errors=results.filter(r=>r.status==="ERROR").length;
   $("#completed").textContent=done+"/"+items.length;$("#matched").textContent=matched;$("#review").textContent=review;$("#missing").textContent=missing;$("#errors").textContent=errors;
   $("#bar").style.width=(items.length?Math.round(done/items.length*100):0)+"%";
   $("#export").disabled=!results.length;
 }
 function summary(){
   const counts={};for(const r of results)counts[r.status]=(counts[r.status]||0)+1;
-  return {completed:results.length,total:items.length,statusCounts:counts,safeMatches:counts.MATCHED||0};
+  return {completed:results.length,total:items.length,statusCounts:counts,safeMatches:(counts.UPC_PRICE_MATCH||0)+(counts.TITLE_PRICE_PAL||0),exactUpcPriceMatches:counts.UPC_PRICE_MATCH||0,titlePalPriceMatches:counts.TITLE_PRICE_PAL||0};
 }
 async function run(){
   if(running)return;
@@ -200,7 +223,7 @@ async function run(){
 }
 function stop(){stopRequested=true;setRunStatus("Stopping after the current request…","warn")}
 function exportReport(){
-  const report={generatedAt:new Date().toISOString(),provider:"RetroTechCollector Developer API",method:"RetroNomad Pricing v1 coverage lab diagnostic v2",keyIncluded:false,launchTitles:items.length,summary:summary(),results:results};
+  const report={generatedAt:new Date().toISOString(),provider:"RetroTechCollector Developer API",method:"RetroNomad Pricing v1 coverage lab diagnostic v3",keyIncluded:false,launchTitles:items.length,summary:summary(),results:results};
   const blob=new Blob([JSON.stringify(report,null,2)],{type:"application/json"}),url=URL.createObjectURL(blob),a=document.createElement("a");
   a.href=url;a.download="retronomad-pricing-coverage-"+new Date().toISOString().slice(0,10)+".json";a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);
 }
