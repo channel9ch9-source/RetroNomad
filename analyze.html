@@ -288,8 +288,8 @@ async function fetchRtcPricingReference(force=false){
    if(!rows.length)throw new Error("No PAL catalogue match returned");
    rows.sort((a,b)=>rtcCandidateScore(b,ctx)-rtcCandidateScore(a,ctx));
    const best=rows[0],bestScore=rtcCandidateScore(best,ctx),second=rows[1]?rtcCandidateScore(rows[1],ctx):-1;
-   if(!upc&&bestScore<80)throw new Error("Catalogue match is too weak to price automatically");
-   if(!upc&&second>=bestScore-5)throw new Error("Multiple PAL catalogue matches are too similar; verify the release manually");
+   if(bestScore<80)throw new Error(upc?"Barcode lookup conflicts with the classified game; verify the identifier manually":"Catalogue match is too weak to price automatically");
+   if(second>=bestScore-5)throw new Error(upc?"Barcode lookup returned multiple similarly strong PAL matches; verify the release manually":"Multiple PAL catalogue matches are too similar; verify the release manually");
    const p=await rtcJson("/prices/"+encodeURIComponent(best.masterItemId),key),price=p.data||{};
    const usd=Number(price[field]);
    if(!(usd>0))throw new Error("Provider has no "+bucket+" price for this item");
