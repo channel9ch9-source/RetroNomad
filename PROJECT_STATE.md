@@ -610,3 +610,38 @@ Synthetic end-to-end QA:
 - price above delivered ceiling -> FILTERED
 
 No synthetic provider is registered in the public site. It was used only for implementation QA; the public search still correctly reports that no live source is connected.
+
+
+## Saved Hunts / wishlist foundation
+
+Completed 23 September 2026.
+
+New files:
+- `saved-hunts.js`
+- `saved-hunt.schema.json`
+- `wishlist.html`
+- `SAVED_HUNTS_V1.md`
+
+Saved Hunts now replace the earlier bare localStorage target prototype.
+
+Capabilities:
+- create a versioned Saved Hunt from a Deal Finder search target
+- prevent duplicate active targets
+- automatically migrate old `retronomad_saved_targets` data
+- list hunts in a dedicated wishlist page
+- pause / resume / archive / delete
+- record whether the user wants future alerts
+- reopen a hunt into `search.html?hunt=<id>`
+- export Saved Hunts as JSON
+- store foreground last-checked summaries when a live provider eventually runs
+- store/deduplicate matching-listing history by source + external ID
+
+Regression tests passed for save, duplicate prevention, pause state, alert preference, foreground check metadata, match-history deduplication and legacy migration.
+
+Important limitation:
+- Saved Hunts are browser-local.
+- monitoring state begins as NOT_RUNNING.
+- alert state is UNAVAILABLE_STATIC_BETA.
+- no scheduled background checks or real notifications exist yet.
+- autonomous alerts require both backend infrastructure and an authorised live marketplace source.
+
