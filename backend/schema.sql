@@ -1,8 +1,45 @@
 -- RetroNomad alerts/backend v1 persistence schema
 -- SQLite / Cloudflare D1 compatible.
--- Identity is external: owner_id comes from a future authenticated session.
+-- Includes passwordless account/session tables and Saved Hunt sync state.
 
 PRAGMA foreign_keys = ON;
+
+CREATE TABLE IF NOT EXISTS users (
+  id TEXT PRIMARY KEY,
+  email_norm TEXT NOT NULL UNIQUE,
+  email_display TEXT NOT NULL,
+  created_at TEXT NOT NULL,
+  last_login_at TEXT
+);
+
+CREATE TABLE IF NOT EXISTS auth_tokens (
+  id TEXT PRIMARY KEY,
+  email_norm TEXT NOT NULL,
+  email_display TEXT NOT NULL,
+  token_hash TEXT NOT NULL UNIQUE,
+  purpose TEXT NOT NULL CHECK (purpose IN ('LOGIN')),
+  return_to TEXT NOT NULL,
+  created_at TEXT NOT NULL,
+  expires_at TEXT NOT NULL,
+  used_at TEXT
+);
+
+CREATE INDEX IF NOT EXISTS idx_auth_tokens_email
+  ON auth_tokens(email_norm, expires_at);
+
+CREATE TABLE IF NOT EXISTS sessions (
+  id TEXT PRIMARY KEY,
+  user_id TEXT NOT NULL,
+  token_hash TEXT NOT NULL UNIQUE,
+  created_at TEXT NOT NULL,
+  expires_at TEXT NOT NULL,
+  last_seen_at TEXT NOT NULL,
+  revoked_at TEXT,
+  FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+);
+
+CREATE INDEX IF NOT EXISTS idx_sessions_user
+  ON sessions(user_id, expires_at);
 
 CREATE TABLE IF NOT EXISTS saved_hunts (
   id TEXT PRIMARY KEY,
@@ -13,14 +50,16 @@ CREATE TABLE IF NOT EXISTS saved_hunts (
   status TEXT NOT NULL CHECK (status IN ('ACTIVE','PAUSED','ARCHIVED')),
   alert_requested INTEGER NOT NULL DEFAULT 0 CHECK (alert_requested IN (0,1)),
   created_at TEXT NOT NULL,
+  client_updated_at TEXT NOT NULL,
   updated_at TEXT NOT NULL,
+  deleted_at TEXT,
   last_checked_at TEXT,
   last_check_json TEXT,
   next_check_at TEXT
 );
 
 CREATE INDEX IF NOT EXISTS idx_saved_hunts_owner
-  ON saved_hunts(owner_id, status, updated_at DESC);
+  ON saved_hunts(owner_id, deleted_at, status, updated_at DESC);
 
 CREATE INDEX IF NOT EXISTS idx_saved_hunts_due
   ON saved_hunts(status, alert_requested, next_check_at);
