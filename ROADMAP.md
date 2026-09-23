@@ -4,8 +4,12 @@
 - [x] Confirm RetroNomad as the primary search destination for buyers
 - [x] Reframe manual listing checker as a secondary utility
 - [x] Define PALScout as the UK/European classification engine under search results
-- [ ] Design the search form, launch filters and search-results card
-- [ ] Define the listing-normalisation / marketplace-source abstraction
+- [x] Add public search.html Phase 1 shell using the 100-game launch catalogue
+- [x] Add browser-local saved-target prototype without claiming active alerts
+- [x] Add marketplace-source.js provider registry and normalised listing schema
+- [x] Document the search/result contract in MARKETPLACE_V1.md
+- [x] Design the search form, launch filters and search-results card
+- [x] Define the listing-normalisation / marketplace-source abstraction
 - [ ] Keep eBay integration disabled until legitimate developer access is available
 - [ ] Connect a trusted release-safe pricing source after classification
 - [ ] Build saved searches / target-price alerts once backend infrastructure exists
