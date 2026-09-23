@@ -207,6 +207,41 @@ Diagnostic v3 now:
 
 Next action: run diagnostic v3 over the 100 launch titles and use that report to decide whether RetroTechCollector is viable enough to keep.
 
+## Pricing v1 diagnostic v3 result and provider decision
+
+Third real-key run: 23 September 2026.
+
+Result:
+- 100/100 titles attempted
+- 33 TITLE_PRICE_REGION_UNKNOWN
+- 62 NO_PROVIDER_MATCH
+- 4 WEAK_MATCH
+- 1 UPC_PRICE_MATCH
+- 1/100 safe matches
+- 0 title-price matches explicitly confirmed PAL
+
+Key interpretation:
+- RetroTechCollector is not viable as RetroNomad's primary UK/PAL pricing provider for the current 100-title launch scope.
+- The one release-safe exact identifier hit was Rez (Dreamcast), UPC/EAN 5060004761289.
+- Region-unknown title matches cannot be used as PAL pricing. In many cases the provider returned a different UPC from RetroNomad's PAL/EAN seed, showing that title fallback can cross into another regional release.
+- PS2 coverage was particularly poor in this launch test: no safe exact UPC/PAL title-price matches.
+- Provider documentation states RetroTechCollector's market values come from PriceCharting.
+
+Safety patch now live:
+- provider platform aliases updated (including `Sony PlayStation`)
+- exact-barcode pricing uses the price endpoint directly
+- exact barcode/equivalent barcode + title/platform agreement is required
+- if an exact PAL/UK barcode lookup misses, title fallback is blocked
+- title-only pricing is allowed only when the matched provider catalogue row explicitly says PAL
+- the serverless worker template enforces the same rules
+
+Provider direction:
+- RetroTechCollector remains only a limited possible exact-identifier supplemental source.
+- PriceCharting direct is the strongest next candidate because its public catalogue contains dedicated PAL products with PAL EAN/GTIN/model metadata.
+- PriceCharting's standard API/CSV terms are internal-use only; public third-party display requires a commercial licence and express written permission.
+- Do not integrate or expose a normal PriceCharting token without permission.
+- Manual Pricing v1 remains the safe fallback while licensed provider access is unresolved.
+
 ## Pricing v1
 
 Goal: only attach price data after the listing has been classified into the correct release/completeness bucket.
@@ -309,15 +344,15 @@ PALScout is not the parent brand because the product is intended to expand globa
 
 ## Roadmap from this point
 
-1. Run `pricing-coverage.html` with a real RetroTechCollector developer key and export the 100-title report. **This real-key run has not yet been completed.**
-2. Review every ambiguous, weak, missing and price-error row; fix mapping rules/data only where evidence supports the change, then rerun until the remaining gaps are understood rather than guessed away.
-3. Spot-check the normal analyser with real listings against a sample of successful provider matches.
-4. Ask/confirm provider terms for a production public shared-key integration.
-5. If approved, deploy the server-side pricing proxy with secret storage, cache and rate limiting.
-6. Add wishlist + target-price alerts.
-7. Add authorised marketplace discovery/connectors.
-8. Expand reference data to NTSC-U, NTSC-J and more platforms.
-9. Add accounts/cloud persistence only when a backend exists.
+1. Pricing-provider validation for RetroTechCollector is complete; retain it only for exact-identifier supplemental matches.
+2. Contact PriceCharting about a commercial/public-app licence for attributed PAL guide-price display.
+3. In parallel, continue researching region-aware physical-game pricing sources with documented API/licensing terms.
+4. Keep manual Pricing v1 as the default fallback until a licensed release-safe provider is available.
+5. Once a provider is approved, run the same 100-title launch coverage benchmark before production integration.
+6. Then validate full listing → classification → exact release → price → GBP conversion flow.
+7. Add wishlist + target-price alerts after backend/serverless infrastructure exists.
+8. Revisit authorised marketplace discovery, including eBay only if legitimate developer access becomes available.
+9. Expand to NTSC-U, NTSC-J and more platforms only after UK/PAL pricing is stable.
 
 ## Durable project records
 
