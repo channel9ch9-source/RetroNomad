@@ -1,7 +1,7 @@
 (function(){
  const cfg=window.RETRONOMAD_CONFIG||{};
- const enabled=cfg.accountSyncEnabled===true&&String(cfg.apiBase||"").trim()!=="";
- const base=String(cfg.apiBase||"").replace(/\/$/,"");
+ const enabled=cfg.accountSyncEnabled===true;
+ const base=String(cfg.apiBase||"").trim().replace(/\/$/,"");
 
  async function request(path,options={}){
   if(!enabled)throw Object.assign(new Error("Account sync backend is not deployed."),{code:"sync_not_configured"});
