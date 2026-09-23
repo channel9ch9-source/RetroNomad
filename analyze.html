@@ -142,19 +142,27 @@ function setImportStatus(kind,text){
  const el=document.querySelector("#importStatus");el.className="importstatus "+kind;el.textContent=text;
 }
 async function importListingUrl(){
- const input=document.querySelector("#listingUrl"), url=cleanUrlInput(input.value);
+ const input=document.querySelector("#listingUrl"), button=document.querySelector("#importListing"), url=cleanUrlInput(input.value);
  if(!url){setImportStatus("bad","Enter a valid http(s) listing URL.");return;}
  input.value=url; const source=detectListingSource(url); let itemId="",fallbackTitle="";
  if(source==="eBay"){const x=parseEbayUrl(url);itemId=x.id;fallbackTitle=x.title;}
  document.querySelector("#listingSource").textContent=source;
  document.querySelector("#listingItemId").textContent=itemId||"—";
- setImportStatus("warn","Importing public listing metadata…");
- let imported={title:"",desc:"",price:""}; let fetched=false;
+ if(button){button.disabled=true;button.textContent="Importing…";}
+ setImportStatus("warn","Trying to import public listing metadata…");
+ let imported={title:"",desc:"",price:""}; let fetched=false, timedOut=false, fetchError="";
+ const controller=new AbortController();
+ const timer=setTimeout(()=>{timedOut=true;controller.abort();},6000);
  try{
-   const res=await fetch(url,{method:"GET",mode:"cors",redirect:"follow",credentials:"omit",headers:{"Accept":"text/html,application/xhtml+xml"}});
+   const res=await fetch(url,{method:"GET",mode:"cors",redirect:"follow",credentials:"omit",signal:controller.signal,headers:{"Accept":"text/html,application/xhtml+xml"}});
    if(!res.ok)throw new Error("HTTP "+res.status);
    const html=await res.text(); imported=parseListingHtml(html,url); fetched=true;
- }catch(e){}
+ }catch(e){
+   fetchError=String(e?.message||e||"");
+ }finally{
+   clearTimeout(timer);
+   if(button){button.disabled=false;button.textContent="Import listing";}
+ }
  if(imported.title)document.querySelector("#title").value=imported.title;
  else if(fallbackTitle&&!document.querySelector("#title").value)document.querySelector("#title").value=fallbackTitle;
  if(imported.desc)document.querySelector("#desc").value=imported.desc;
@@ -165,9 +173,11 @@ async function importListingUrl(){
    setImportStatus("good","Imported "+got+" from "+source+(itemId?" · item "+itemId:"")+". Review the fields, then analyse.");
  }else if(source==="eBay"){
    const extra=fallbackTitle?" A title was recovered from the URL itself.":"";
-   setImportStatus("warn","eBay blocked direct browser metadata access on this request."+(itemId?" Item ID "+itemId+" was extracted.":"")+extra+" Full automatic eBay import needs an authorised server-side/API connection.");
+   const why=timedOut?"eBay did not allow the browser import to finish within 6 seconds.":"eBay blocked direct browser metadata access on this request.";
+   setImportStatus("warn",why+(itemId?" Item ID "+itemId+" was extracted.":"")+extra+" Paste the listing title/description or upload photos for analysis. Full automatic eBay import needs authorised API/server-side access.");
  }else{
-   setImportStatus("warn",source+" did not expose importable page metadata to this browser. You can still paste the listing details manually.");
+   const why=timedOut?(source+" did not return browser-accessible metadata within 6 seconds."):(source+" did not expose importable page metadata to this browser.");
+   setImportStatus("warn",why+" You can still paste the listing details manually or upload photos.");
  }
 }
 
