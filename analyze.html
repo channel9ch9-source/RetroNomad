@@ -1,6 +1,6 @@
 <!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="description" content="Analyse a retro-game listing with RetroNomad PALScout."><title>Listing Analyser — RetroNomad</title><style>
 :root{--bg:#090b0f;--panel:#111720;--panel2:#151d29;--text:#f7f8fb;--muted:#99a6b8;--line:#293447;--green:#94f7b2;--amber:#ffd977;--red:#ff9da6;--blue:#8cc8ff;--max:1120px}*{box-sizing:border-box}body{margin:0;background:radial-gradient(900px 480px at 50% -180px,rgba(83,127,196,.24),transparent 65%),var(--bg);color:var(--text);font:15px/1.5 system-ui,-apple-system,Segoe UI,sans-serif}a{color:inherit}.wrap{width:min(var(--max),calc(100% - 32px));margin:auto}nav{height:70px;display:flex;align-items:center;justify-content:space-between}.brand{display:flex;align-items:center;gap:10px;text-decoration:none;font-size:20px;font-weight:900}.mark{width:30px;height:30px;border:1px solid #39506a;border-radius:9px;display:grid;place-items:center;background:#111926;color:var(--green);font-size:12px}.navlinks{display:flex;gap:20px;color:var(--muted)}.navlinks a{text-decoration:none}.hero{padding:50px 0 30px}.kicker{font-size:12px;color:var(--green);font-weight:900;text-transform:uppercase;letter-spacing:.13em}h1{font-size:clamp(38px,6vw,62px);line-height:1;letter-spacing:-.055em;margin:10px 0 14px}.lead{color:var(--muted);font-size:18px;max-width:760px}.layout{display:grid;grid-template-columns:1fr .9fr;gap:18px;padding:20px 0 70px}.panel{background:linear-gradient(180deg,#121823,#0f141c);border:1px solid var(--line);border-radius:16px;padding:22px}.panel h2{margin:0 0 18px;font-size:21px}.field{margin-bottom:15px}.field label{display:block;font-size:12px;font-weight:800;color:#bac5d4;margin-bottom:6px}.field input,.field textarea,.field select{width:100%;background:#0b1017;border:1px solid var(--line);border-radius:9px;padding:11px 12px;color:var(--text);font:inherit}.field textarea{min-height:105px;resize:vertical}.row{display:grid;grid-template-columns:1fr 1fr;gap:12px}.check{display:flex;gap:9px;align-items:flex-start;color:#b9c4d2;font-size:13px;margin:12px 0}.check input{margin-top:3px}.btn{width:100%;border:0;border-radius:10px;padding:13px 15px;background:var(--text);color:#0b0d12;font-weight:900;font-size:15px;cursor:pointer}.btn.secondary{background:#172131;color:var(--text);border:1px solid var(--line)}.importrow{display:grid;grid-template-columns:1fr 150px;gap:9px}.importstatus{display:none;margin:-4px 0 15px;padding:11px 12px;border:1px solid var(--line);border-radius:9px;background:#0d141d;color:#9facbd;font-size:12px}.importstatus.good{display:block;border-color:#315b43;color:var(--green)}.importstatus.warn{display:block;border-color:#5d532d;color:var(--amber)}.importstatus.bad{display:block;border-color:#60404a;color:var(--red)}.photozone{border:1px dashed #3a475d;border-radius:12px;padding:14px;background:#0c121a}.photoactions{display:grid;grid-template-columns:1fr 150px;gap:9px;align-items:center}.photoactions input[type=file]{width:100%;color:#aeb8c6;font-size:13px}.photogrid{display:grid;grid-template-columns:repeat(2,1fr);gap:9px;margin-top:10px}.photocard{border:1px solid var(--line);border-radius:10px;overflow:hidden;background:#080d13}.photoimg{position:relative;aspect-ratio:1}.photoimg img{width:100%;height:100%;object-fit:cover}.photoimg>span{position:absolute;left:5px;right:5px;bottom:5px;background:rgba(0,0,0,.72);padding:3px 5px;border-radius:5px;color:#d8dee8;font-size:10px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.photomarks{padding:8px;display:flex;flex-wrap:wrap;gap:5px;border-top:1px solid var(--line)}.photomarks label,.gallerychecks label{display:flex;align-items:center;gap:5px;border:1px solid var(--line);border-radius:999px;padding:4px 7px;color:#aeb9c7;font-size:10px;cursor:pointer;background:#0d141d}.photomarks input,.gallerychecks input{accent-color:#9bf7b7}.gallerycheck{margin-top:11px;border:1px solid var(--line);border-radius:10px;padding:11px;background:#0d141d}.gallerycheck h5{margin:0 0 7px;font-size:12px}.gallerychecks{display:flex;flex-wrap:wrap;gap:6px}.gallerysummary{margin-top:9px;color:#91a0b4;font-size:11px}.ocrprogress{display:none;margin-top:9px;height:7px;background:#101722;border:1px solid var(--line);border-radius:999px;overflow:hidden}.ocrbar{height:100%;width:0;background:var(--green);transition:width .2s}.ocrtext{margin-top:10px;padding:10px 11px;border:1px solid var(--line);border-radius:9px;background:#0b1017;color:#8e9bad;font-size:11px;max-height:120px;overflow:auto;white-space:pre-wrap}.ocrchips{display:flex;flex-wrap:wrap;gap:5px;margin-top:8px}.ocrchip{font-size:11px;border:1px solid var(--line);border-radius:999px;padding:4px 7px;color:#c2ccd9}.ocrchip.good{border-color:#315b43;color:var(--green)}.ocrchip.warn{border-color:#5d532d;color:var(--amber)}.subnote{margin-top:11px;color:#6f7d91;font-size:12px}.empty{color:var(--muted);padding:22px 4px}.result{display:none}.verdict{border:1px solid var(--line);border-radius:13px;padding:18px;margin-bottom:14px;background:#101722}.verdict.ready{border-color:#315b43;background:#0f1914}.verdict.review{border-color:#5d532d;background:#19170e}.verdict.separate{border-color:#60404a;background:#1a1115}.verdict h3{margin:3px 0 5px;font-size:23px}.badge{display:inline-block;font-size:11px;font-weight:900;letter-spacing:.06em;padding:4px 7px;border-radius:999px;border:1px solid var(--line);color:var(--green)}.review .badge{color:var(--amber)}.separate .badge{color:var(--red)}.summarygrid{display:grid;grid-template-columns:1fr 1fr;gap:10px}.fact{border:1px solid var(--line);border-radius:11px;padding:13px;background:#0e141d}.fact span{display:block;font-size:11px;color:#758398;text-transform:uppercase;letter-spacing:.08em}.fact b{display:block;margin-top:4px}.evidencebox{margin-top:15px;border:1px solid var(--line);border-radius:12px;background:#0d141d;overflow:hidden}.evidencehead{padding:12px 14px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;gap:12px;align-items:center}.evidencehead h4{margin:0}.evrows{display:grid}.evrow{display:grid;grid-template-columns:145px 1fr;border-top:1px solid #202a39}.evrow:first-child{border-top:0}.evrow span{padding:9px 12px;color:#78869a;font-size:11px;text-transform:uppercase;letter-spacing:.06em}.evrow b{padding:9px 12px;font-size:13px;font-weight:700}.evgood{color:var(--green)}.evwarn{color:var(--amber)}.evbad{color:var(--red)}.reasons{margin-top:15px;border-top:1px solid var(--line);padding-top:14px}.reasons h4{margin:0 0 8px}.reasons ul{padding-left:19px;color:#aab5c4}.reasons li{margin:6px 0}.library{margin-top:14px;color:#738198;font-size:12px}.pricebox{margin-top:10px;font-size:13px;color:#aab5c4}.warning{margin-top:15px;padding:12px;border:1px solid #354258;border-radius:10px;color:#93a2b6;font-size:12px}.examples{margin-top:24px}.examples button{background:#121a26;color:#b8c4d2;border:1px solid var(--line);border-radius:999px;padding:7px 10px;margin:4px 4px 0 0;cursor:pointer}@media(max-width:800px){.layout{grid-template-columns:1fr}.row,.summarygrid,.importrow,.photoactions{grid-template-columns:1fr}.photogrid{grid-template-columns:repeat(2,1fr)}.navlinks{display:none}}
-</style></head><body><div class="wrap"><nav><a class="brand" href="index.html"><span class="mark">RN</span>RetroNomad</a><div class="navlinks"><a href="index.html">Home</a><a href="index.html#palscout">PALScout</a></div></nav><div class="hero"><div class="kicker">PALScout public beta</div><h1>Check a game listing.</h1><p class="lead">Paste a listing URL, text, or upload the gallery. RetroNomad can now separate seller claims from gallery-confirmed components, scan photos for identifiers, and flag visible condition issues before placing a copy into a comparison bucket.</p></div><div class="layout"><div class="panel"><h2>Listing details</h2>
+</style></head><body><div class="wrap"><nav><a class="brand" href="index.html"><span class="mark">RN</span>RetroNomad</a><div class="navlinks"><a href="index.html">Home</a><a href="index.html#palscout">PALScout</a></div></nav><div class="hero"><div class="kicker">PALScout public beta</div><h1>Check a game listing.</h1><p class="lead">Paste a listing URL, text, or upload the gallery. RetroNomad now blocks explicit foreign releases and bundles from UK comparison buckets, distinguishes bonus demo discs from demo products, and keeps seller claims separate from gallery-confirmed evidence.</p></div><div class="layout"><div class="panel"><h2>Listing details</h2>
 <div class="field"><label>Listing URL <span style="color:#748297;font-weight:500">(eBay + generic public pages)</span></label><div class="importrow"><input id="listingUrl" type="url" placeholder="https://www.ebay.co.uk/itm/..."><button class="btn secondary" id="importListing" type="button">Import listing</button></div></div><div id="importStatus" class="importstatus"></div>
 <div class="field"><label>Listing title</label><input id="title" placeholder="e.g. Final Fantasy VII PS1 PAL complete"></div>
 <div class="row"><div class="field"><label>Platform</label><select id="platform"><option value="">Auto / unknown</option><option>PS1</option><option>PS2</option><option>Dreamcast</option></select><div id="platformHint" class="subnote" style="margin-top:6px"></div></div><div class="field"><label>Completeness</label><select id="complete"><option value="unknown">Auto / unknown</option><option value="complete">Complete: game + case + manual</option><option value="no_manual">Missing manual</option><option value="disc_only">Disc only</option><option value="case_only">Case/artwork only</option></select><div id="completeHint" class="subnote" style="margin-top:6px"></div></div></div>
@@ -12,251 +12,75 @@
 <button class="btn" id="analyse">Analyse listing</button><div class="subnote">Analysis runs in your browser. URL import requests the public listing page directly from your browser; marketplaces may block that request.</div>
 <div class="examples"><span class="subnote">Try an example:</span><br><button data-ex="ff7">FFVII UK</button><button data-ex="sh">Silent Hill PAL</button><button data-ex="ror">Rule of Rose</button></div>
 </div>
-<div class="panel"><h2>RetroNomad result</h2><div id="empty" class="empty">Enter a listing on the left and run the analyser.</div><div id="result" class="result"><div id="verdict" class="verdict"><span id="badge" class="badge"></span><h3 id="verdictTitle"></h3><div id="verdictText" style="color:var(--muted)"></div></div><div class="summarygrid"><div class="fact"><span>Game</span><b id="game">—</b></div><div class="fact"><span>Platform</span><b id="plat">—</b></div><div class="fact"><span>Release signal</span><b id="market">—</b></div><div class="fact"><span>Detected edition</span><b id="edition">—</b></div><div class="fact"><span>Completeness</span><b id="comp">—</b></div><div class="fact"><span>Gallery completeness</span><b id="galleryComp">Not checked</b></div><div class="fact"><span>Condition</span><b id="conditionResult">Not assessed</b></div><div class="fact"><span>Confidence</span><b id="confidence">—</b></div><div class="fact"><span>Matched identifier</span><b id="matchedId">None</b></div><div class="fact"><span>Listing source</span><b id="listingSource">Manual entry</b></div><div class="fact"><span>Marketplace item ID</span><b id="listingItemId">—</b></div></div><div id="pricebox" class="pricebox"></div><div class="evidencebox"><div class="evidencehead"><h4>Evidence used</h4><span id="evidenceStrength" class="badge">NONE</span></div><div class="evrows"><div class="evrow"><span>Platform signal</span><b id="platformSignal">None</b></div><div class="evrow"><span>Completeness signal</span><b id="completeSignal">None</b></div><div class="evrow"><span>Edition signal</span><b id="editionSignal">None</b></div><div class="evrow"><span>Photo evidence</span><b id="photoSignal">No photos scanned</b></div><div class="evrow"><span>Gallery components</span><b id="galleryComponents">None confirmed</b></div><div class="evrow"><span>Condition evidence</span><b id="conditionSignal">No condition issues marked</b></div><div class="evrow"><span>Detected identifier</span><b id="detectedIds">None</b></div><div class="evrow"><span>Matched record</span><b id="evidenceRecord">None</b></div><div class="evrow"><span>What it proves</span><b id="evidenceProves">No identifier-level proof yet</b></div><div class="evrow"><span>Still needed</span><b id="evidenceNeeded">Game / release evidence</b></div></div></div><div class="reasons"><h4>Why</h4><ul id="reasons"></ul></div><div class="warning">This is a classification aid, not an authenticity guarantee or a price valuation. Deal scoring is intentionally disabled until RetroNomad has a trustworthy pricing source.</div></div><div class="library">Reference library: 100 launch titles + identifier-level PALScout evidence.</div></div></div></div>
+<div class="panel"><h2>RetroNomad result</h2><div id="empty" class="empty">Enter a listing on the left and run the analyser.</div><div id="result" class="result"><div id="verdict" class="verdict"><span id="badge" class="badge"></span><h3 id="verdictTitle"></h3><div id="verdictText" style="color:var(--muted)"></div></div><div class="summarygrid"><div class="fact"><span>Game</span><b id="game">—</b></div><div class="fact"><span>Platform</span><b id="plat">—</b></div><div class="fact"><span>Release signal</span><b id="market">—</b></div><div class="fact"><span>Detected edition</span><b id="edition">—</b></div><div class="fact"><span>Completeness</span><b id="comp">—</b></div><div class="fact"><span>Gallery completeness</span><b id="galleryComp">Not checked</b></div><div class="fact"><span>Condition</span><b id="conditionResult">Not assessed</b></div><div class="fact"><span>Confidence</span><b id="confidence">—</b></div><div class="fact"><span>Matched identifier</span><b id="matchedId">None</b></div><div class="fact"><span>Listing source</span><b id="listingSource">Manual entry</b></div><div class="fact"><span>Marketplace item ID</span><b id="listingItemId">—</b></div></div><div id="pricebox" class="pricebox"></div><div class="evidencebox"><div class="evidencehead"><h4>Evidence used</h4><span id="evidenceStrength" class="badge">NONE</span></div><div class="evrows"><div class="evrow"><span>Region signal</span><b id="regionSignal">None</b></div><div class="evrow"><span>Platform signal</span><b id="platformSignal">None</b></div><div class="evrow"><span>Completeness signal</span><b id="completeSignal">None</b></div><div class="evrow"><span>Edition signal</span><b id="editionSignal">None</b></div><div class="evrow"><span>Photo evidence</span><b id="photoSignal">No photos scanned</b></div><div class="evrow"><span>Gallery components</span><b id="galleryComponents">None confirmed</b></div><div class="evrow"><span>Condition evidence</span><b id="conditionSignal">No condition issues marked</b></div><div class="evrow"><span>Detected identifier</span><b id="detectedIds">None</b></div><div class="evrow"><span>Matched record</span><b id="evidenceRecord">None</b></div><div class="evrow"><span>What it proves</span><b id="evidenceProves">No identifier-level proof yet</b></div><div class="evrow"><span>Still needed</span><b id="evidenceNeeded">Game / release evidence</b></div></div></div><div class="reasons"><h4>Why</h4><ul id="reasons"></ul></div><div class="warning">This is a classification aid, not an authenticity guarantee or a price valuation. Deal scoring is intentionally disabled until RetroNomad has a trustworthy pricing source.</div></div><div class="library">Reference library: 100 launch titles + identifier-level PALScout evidence.</div></div></div></div>
 <script src="release-evidence.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/tesseract.js@7/dist/tesseract.min.js"></script>
 <script>
 const GAMES=[{"t":"Silent Hill","p":"PS1","s":"UK_VISUAL_REQUIRED","n":"SLES-01514 / 4988602555660 is shared across PAL territories; cover/manual evidence is needed."},{"t":"Final Fantasy VII","p":"PS1","s":"UK_EXACT","n":"Retained from verified v2 exact-UK identifier evidence."},{"t":"Final Fantasy VIII","p":"PS1","s":"UK_EXACT","n":"Retained from verified v2 exact-UK identifier evidence."},{"t":"Final Fantasy IX","p":"PS1","s":"UK_EXACT","n":"Retained from verified v2 exact-UK identifier evidence."},{"t":"Klonoa: Door to Phantomile","p":"PS1","s":"UK_EXACT","n":"Retained from verified v2 exact-UK identifier evidence."},{"t":"Castlevania: Symphony of the Night","p":"PS1","s":"UK_SHARED_PAL","n":"Original SLES-00524 / 4988602060652 is shared across UK and continental PAL variants; treat the documented shared release as UK-market compatible."},{"t":"Dino Crisis","p":"PS1","s":"UK_EXACT","n":"Retained from verified v2 exact-UK identifier evidence."},{"t":"Dino Crisis 2","p":"PS1","s":"UK_EXACT","n":"Retained from verified v2 exact-UK identifier evidence."},{"t":"Resident Evil","p":"PS1","s":"UK_EXACT","n":"Retained from verified v2 exact-UK identifier evidence."},{"t":"Resident Evil 2","p":"PS1","s":"UK_EXACT","n":"Retained from verified v2 exact-UK identifier evidence."},{"t":"Resident Evil 3: Nemesis","p":"PS1","s":"UK_EXACT","n":"Retained from verified v2 exact-UK identifier evidence."},{"t":"Metal Gear Solid","p":"PS1","s":"UK_EXACT","n":"Retained from verified v2 exact-UK identifier evidence."},{"t":"Parasite Eve II","p":"PS1","s":"UK_EXACT","n":"Retained from verified v2 exact-UK identifier evidence."},{"t":"Alundra","p":"PS1","s":"UK_EXACT","n":"Retained from verified v2 exact-UK identifier evidence."},{"t":"Suikoden","p":"PS1","s":"UK_SHARED_PAL","n":"SLES-00527 / 4988602029529 is shared across UK and other PAL territories."},{"t":"Suikoden II","p":"PS1","s":"UK_EXACT","n":"Retained from verified v2 exact-UK identifier evidence."},{"t":"Koudelka","p":"PS1","s":"UK_EXACT","n":"Retained from verified v2 exact-UK identifier evidence."},{"t":"Breath of Fire III","p":"PS1","s":"UK_SHARED_PAL","n":"SLES-01304 / 4014762800149 is documented for UK/Italy/Spain."},{"t":"Breath of Fire IV","p":"PS1","s":"UK_SHARED_PAL","n":"SLES-03552 / 5055060900000 is documented for UK/Italy/Spain."},{"t":"Ape Escape","p":"PS1","s":"UK_EXACT","n":"Retained from verified v2 exact-UK identifier evidence."},{"t":"Fear Effect","p":"PS1","s":"UK_EXACT","n":"Retained from verified v2 exact-UK identifier evidence."},{"t":"Tekken 3","p":"PS1","s":"UK_EXACT","n":"Retained from verified v2 exact-UK identifier evidence."},{"t":"Gran Turismo 2","p":"PS1","s":"UK_EXACT","n":"Retained from verified v2 exact-UK identifier evidence."},{"t":"Rival Schools: United by Fate","p":"PS1","s":"UK_EXACT","n":"Retained from verified v2 exact-UK identifier evidence."},{"t":"Final Fantasy VI","p":"PS1","s":"UK_EXACT","n":"Retained from verified v2 exact-UK identifier evidence."},{"t":"Final Fantasy Anthology","p":"PS1","s":"UK_EXACT","n":"Retained from verified v2 exact-UK identifier evidence."},{"t":"R-Type Delta","p":"PS1","s":"UK_EXACT","n":"Retained from verified v2 exact-UK identifier evidence."},{"t":"Tenchu 2: Birth of the Stealth Assassins","p":"PS1","s":"UK_EXACT","n":"Retained from verified v2 exact-UK identifier evidence."},{"t":"Grand Theft Auto","p":"PS1","s":"UK_EXACT","n":"Retained from verified v2 exact-UK identifier evidence."},{"t":"Tombi!","p":"PS1","s":"UK_SHARED_PAL","n":"SCES-01330 / 0711719734123 is a multi-country PAL release including the UK."},{"t":"Tombi! 2","p":"PS1","s":"UK_VISUAL_REQUIRED","n":"UK and Dutch copies can share SCES-02147; exact UK packaging requires cover/manual evidence."},{"t":"The Legend of Dragoon","p":"PS1","s":"UK_SHARED_PAL","n":"English PAL disc set is the useful UK-market bucket; serial identifies language set rather than a unique country."},{"t":"MediEvil","p":"PS1","s":"UK_EXACT","n":"UK-specific launch/reissue EANs have been added."},{"t":"MediEvil 2","p":"PS1","s":"UK_EXACT","n":"UK-specific EAN has been added."},{"t":"Street Fighter Alpha 3","p":"PS1","s":"EUROPE_UNRESOLVED","n":"PAL serial is known but the reference database still flags country/EAN details as unresolved."},{"t":"Crash Bandicoot 3: Warped","p":"PS1","s":"UK_EXACT","n":"UK-specific EAN has been added."},{"t":"Vagrant Story","p":"PS1","s":"UK_EXACT","n":"Retained from verified v2 exact-UK identifier evidence."},{"t":"Tomb Raider","p":"PS1","s":"UK_EXACT","n":"Retained from verified v2 exact-UK identifier evidence."},{"t":"Tomb Raider II","p":"PS1","s":"UK_EXACT","n":"Retained from verified v2 exact-UK identifier evidence."},{"t":"Fear Effect 2: Retro Helix","p":"PS1","s":"UK_EXACT","n":"UK-specific EAN has been added."},{"t":"Silent Hill 2","p":"PS2","s":"UK_VISUAL_REQUIRED","n":"Original EAN/package identifiers overlap with non-UK European/Nordic variants; English insert/package evidence is needed."},{"t":"Silent Hill 2: Director's Cut","p":"PS2","s":"UK_EXACT","n":"UK Director's Cut/Platinum packaging code and EAN are distinct."},{"t":"Silent Hill 3","p":"PS2","s":"UK_EXACT","n":"Verified UK reissue packaging/EAN gives exact UK evidence."},{"t":"Silent Hill 4: The Room","p":"PS2","s":"UK_EXACT","n":"Verified UK 2005 reissue code/EAN gives exact UK evidence."},{"t":"Rule of Rose","p":"PS2","s":"NO_OFFICIAL_UK_RETAIL","n":"505 Games cancelled the normal UK retail release. Rare English/British materials exist but must not be treated as a normal UK retail SKU."},{"t":"Haunting Ground","p":"PS2","s":"UK_COMPATIBLE_EU_ENGLISH","n":"General European release is documented; English packaging/gallery evidence is needed before calling an individual copy UK-market compatible."},{"t":"Kuon","p":"PS2","s":"UK_COMPATIBLE_EU_ENGLISH","n":"PAL release is multi-language; serial alone does not identify a UK package."},{"t":"Project Zero","p":"PS2","s":"UK_COMPATIBLE_EU_ENGLISH","n":"European serial/EAN is known, but exact UK packaging still needs positive visual evidence."},{"t":"Project Zero II: Crimson Butterfly","p":"PS2","s":"UK_SHARED_PAL","n":"Generic European release sits alongside separately coded French/German/Italian/Spanish variants; the generic release is the useful English/UK-market bucket."},{"t":"Project Zero 3: The Tormented","p":"PS2","s":"UK_VISUAL_REQUIRED","n":"Reference sources disagree on PAL EANs; require packaging evidence rather than guessing."},{"t":"Forbidden Siren","p":"PS2","s":"UK_SHARED_PAL","n":"Documented as a European/British edition; shared release is suitable for the UK-market bucket."},{"t":"Forbidden Siren 2","p":"PS2","s":"UK_EXACT","n":"UK-specific barcode evidence added."},{"t":"God Hand","p":"PS2","s":"UK_VISUAL_REQUIRED","n":"PAL serial is shared and current reference sites conflict on European EANs; require cover/package evidence."},{"t":"Shin Megami Tensei: Persona 3 FES","p":"PS2","s":"UK_COMPATIBLE_EU_ENGLISH","n":"English European package is identifiable, but not uniquely UK from the serial/EAN alone."},{"t":"Shin Megami Tensei: Persona 4","p":"PS2","s":"UK_EXACT","n":"UK product barcode / 'Only for Sale in the UK' packaging evidence added."},{"t":"Def Jam: Fight for NY","p":"PS2","s":"UK_COMPATIBLE_EU_ENGLISH","n":"English/French PAL SKU is the relevant UK-market release but is not country-unique."},{"t":"The Warriors","p":"PS2","s":"UK_COMPATIBLE_EU_ENGLISH","n":"European multi-language PS2 SKU is used in the UK; not country-unique from serial/EAN alone."},{"t":"Shadow of the Colossus","p":"PS2","s":"UK_COMPATIBLE_EU_ENGLISH","n":"European multi-language EAN is used by UK copies; packaging is not country-unique."},{"t":"Resident Evil: Code Veronica X","p":"PS2","s":"UK_EXACT","n":"UK/English EAN is distinguishable from Spanish and other variants."},{"t":"Marvel vs. Capcom 2: New Age of Heroes","p":"PS2","s":"UK_COMPATIBLE_EU_ENGLISH","n":"English European EAN is widely used for UK copies, but it is a Europe release rather than a country-unique SKU."},{"t":"ICO","p":"PS2","s":"UK_EXACT","n":"UK retail EAN evidence added."},{"t":"Okami","p":"PS2","s":"UK_EXACT","n":"UK release EAN evidence added."},{"t":"Shin Megami Tensei: Lucifer's Call","p":"PS2","s":"UK_COMPATIBLE_EU_ENGLISH","n":"European multi-language release is the relevant UK-market SKU; identifier alone is not country proof."},{"t":"Shin Megami Tensei: Digital Devil Saga","p":"PS2","s":"UK_EXACT","n":"UK product EAN evidence added."},{"t":"Shin Megami Tensei: Digital Devil Saga 2","p":"PS2","s":"UK_EXACT","n":"UK Collector's Edition EAN evidence added."},{"t":"Resident Evil 4","p":"PS2","s":"UK_EXACT","n":"UK Limited Edition EAN/product evidence added."},{"t":"Resident Evil Outbreak","p":"PS2","s":"UK_COMPATIBLE_EU_ENGLISH","n":"PAL-EUR release is known; exact UK packaging is not isolated by the serial."},{"t":"Resident Evil Outbreak File #2","p":"PS2","s":"UK_EXACT","n":"UK product EAN evidence added."},{"t":"Devil May Cry","p":"PS2","s":"UK_COMPATIBLE_EU_ENGLISH","n":"PAL multi-language SKU is the relevant UK-market release but is not country-unique."},{"t":"Devil May Cry 3: Special Edition","p":"PS2","s":"UK_EXACT","n":"UK product EAN evidence added."},{"t":"Metal Gear Solid 2: Substance","p":"PS2","s":"UK_COMPATIBLE_EU_ENGLISH","n":"European two-disc release is the relevant UK-market SKU; serials are not country-specific."},{"t":"Metal Gear Solid 3: Subsistence","p":"PS2","s":"UK_EXACT","n":"UK three-disc product EAN evidence added."},{"t":"Gregory Horror Show","p":"PS2","s":"UK_COMPATIBLE_EU_ENGLISH","n":"European release is English-capable and sold in the UK, but the identifier is not uniquely UK."},{"t":"Obscure","p":"PS2","s":"UK_EXACT","n":"UK product EAN evidence added."},{"t":"Obscure II","p":"PS2","s":"UK_COMPATIBLE_EU_ENGLISH","n":"PAL release recognised; packaging evidence remains useful because multiple regional packaging variants exist."},{"t":"Killer7","p":"PS2","s":"UK_COMPATIBLE_EU_ENGLISH","n":"European multi-language release is UK-market compatible but not uniquely UK."},{"t":"Viewtiful Joe","p":"PS2","s":"UK_COMPATIBLE_EU_ENGLISH","n":"European PAL release recognised; exact country packaging is not established by serial alone."},{"t":"TimeSplitters 2","p":"PS2","s":"UK_EXACT","n":"UK product EAN / ELSPA package evidence added."},{"t":"TimeSplitters: Future Perfect","p":"PS2","s":"UK_EXACT","n":"BBFC-labelled UK/EU package EAN evidence added."},{"t":"Castlevania: Curse of Darkness","p":"PS2","s":"UK_COMPATIBLE_EU_ENGLISH","n":"European release is the UK-market SKU but serial/EAN is not country-unique."},{"t":"Shenmue","p":"Dreamcast","s":"UK_COMPATIBLE_EU_ENGLISH","n":"European -50 release is the UK-market release, but product code is not country-unique."},{"t":"Shenmue II","p":"Dreamcast","s":"UK_SHARED_PAL","n":"MK-51184-50 / 5060004761302 is explicitly documented for UK, France, Germany and Spain."},{"t":"Skies of Arcadia","p":"Dreamcast","s":"UK_COMPATIBLE_EU_ENGLISH","n":"Single European SKU/EAN is the UK-market release but not country-unique."},{"t":"Power Stone","p":"Dreamcast","s":"UK_VISUAL_REQUIRED","n":"Multiple European language-group product codes exist; exact UK package should be resolved from cover/manual language."},{"t":"Power Stone 2","p":"Dreamcast","s":"UK_VISUAL_REQUIRED","n":"Multiple European language-group product codes exist; exact UK package should be resolved from cover/manual language."},{"t":"Project Justice: Rival Schools 2","p":"Dreamcast","s":"UK_COMPATIBLE_EU_ENGLISH","n":"Single European SKU/EAN is used in the UK; not a country-unique code."},{"t":"Cannon Spike","p":"Dreamcast","s":"UK_COMPATIBLE_EU_ENGLISH","n":"European SKU/EAN is used for UK copies; seller/gallery evidence can confirm the English package."},{"t":"Marvel vs. Capcom 2","p":"Dreamcast","s":"UK_COMPATIBLE_EU_ENGLISH","n":"Single European SKU/EAN is used for UK copies; not country-unique."},{"t":"Street Fighter III: 3rd Strike","p":"Dreamcast","s":"UK_COMPATIBLE_EU_ENGLISH","n":"Single European SKU/EAN is the relevant UK-market release."},{"t":"JoJo's Bizarre Adventure","p":"Dreamcast","s":"UK_COMPATIBLE_EU_ENGLISH","n":"European SKU/EAN is seen on UK copies but is not country-unique."},{"t":"Resident Evil: Code Veronica","p":"Dreamcast","s":"UK_EXACT","n":"Retained from verified v2 exact-UK identifier evidence."},{"t":"Resident Evil 2","p":"Dreamcast","s":"UK_SHARED_PAL","n":"T-7004D-61 is shared by UK/Spain/Italy."},{"t":"Resident Evil 3: Nemesis","p":"Dreamcast","s":"UK_SHARED_PAL","n":"T-7021D-56 is shared by UK/Italy."},{"t":"Dino Crisis","p":"Dreamcast","s":"UK_EXACT","n":"Retained from verified v2 exact-UK identifier evidence."},{"t":"Sonic Adventure","p":"Dreamcast","s":"UK_SHARED_PAL","n":"Documented PAL variants explicitly include UK in shared country groups."},{"t":"Sonic Adventure 2","p":"Dreamcast","s":"UK_COMPATIBLE_EU_ENGLISH","n":"Single European SKU/EAN is the UK-market release but not country-unique."},{"t":"Crazy Taxi","p":"Dreamcast","s":"UK_COMPATIBLE_EU_ENGLISH","n":"Single European SKU/EAN is the UK-market release but not country-unique."},{"t":"Jet Set Radio","p":"Dreamcast","s":"UK_COMPATIBLE_EU_ENGLISH","n":"Single European SKU/EAN is the UK-market release but not country-unique."},{"t":"Grandia II","p":"Dreamcast","s":"UK_EXACT","n":"Retained from verified v2 exact-UK identifier evidence."},{"t":"Rez","p":"Dreamcast","s":"UK_COMPATIBLE_EU_ENGLISH","n":"Single European SKU/EAN is used by UK copies but is not country-unique."}];
-const aliases={"ff7":"Final Fantasy VII","ffvii":"Final Fantasy VII","final fantasy 7":"Final Fantasy VII","ff8":"Final Fantasy VIII","ffviii":"Final Fantasy VIII","final fantasy 8":"Final Fantasy VIII","ff9":"Final Fantasy IX","ffix":"Final Fantasy IX","final fantasy 9":"Final Fantasy IX","sh1":"Silent Hill","silent hill 1":"Silent Hill","sh2":"Silent Hill 2","sh3":"Silent Hill 3","sh4":"Silent Hill 4: The Room","mgs":"Metal Gear Solid","mgs2":"Metal Gear Solid 2: Substance","mgs3":"Metal Gear Solid 3: Subsistence","re2":"Resident Evil 2","re3":"Resident Evil 3: Nemesis","re4":"Resident Evil 4","code veronica":"Resident Evil: Code Veronica","sotc":"Shadow of the Colossus"};
+const aliases={"klonoa":"Klonoa: Door to Phantomile","ff7":"Final Fantasy VII","ffvii":"Final Fantasy VII","final fantasy 7":"Final Fantasy VII","ff8":"Final Fantasy VIII","ffviii":"Final Fantasy VIII","final fantasy 8":"Final Fantasy VIII","ff9":"Final Fantasy IX","ffix":"Final Fantasy IX","final fantasy 9":"Final Fantasy IX","sh1":"Silent Hill","silent hill 1":"Silent Hill","sh2":"Silent Hill 2","sh3":"Silent Hill 3","sh4":"Silent Hill 4: The Room","mgs":"Metal Gear Solid","mgs2":"Metal Gear Solid 2: Substance","mgs3":"Metal Gear Solid 3: Subsistence","re2":"Resident Evil 2","re3":"Resident Evil 3: Nemesis","re4":"Resident Evil 4","code veronica":"Resident Evil: Code Veronica","sotc":"Shadow of the Colossus"};
 function norm(s){return (s||"").toLowerCase().replace(/[’']/g,"").replace(/[^a-z0-9]+/g," ").trim().replace(/\bvii\b/g,"7").replace(/\bviii\b/g,"8").replace(/\bix\b/g,"9").replace(/\biii\b/g,"3").replace(/\bii\b/g,"2");}
 function scoreTitle(text,g){const a=norm(text), b=norm(g.t); if(a.includes(b)) return 100+b.length; let score=0; for(const w of b.split(" ")){if(w.length>2&&a.includes(w))score+=w.length;} return score;}
-function detectGame(text,platform){const n=norm(text); for(const [a,t] of Object.entries(aliases)){if(n.includes(norm(a))){const c=GAMES.filter(g=>g.t===t&&(!platform||g.p===platform));if(c.length)return c[0];}}
- let pool=GAMES.filter(g=>!platform||g.p===platform); let best=null,bs=0; for(const g of pool){const s=scoreTitle(text,g);if(s>bs){best=g;bs=s;}} return bs>=8?best:null;}
-
-
-let photoFiles=[];
-let photoOcrText="";
-let photoOcrCandidates=[];
-let photoSignals=[];
-let galleryPhotoEvidence=[];
-function revokePhotoPreviews(){
- document.querySelectorAll("#photoGrid img[data-object-url]").forEach(img=>{try{URL.revokeObjectURL(img.dataset.objectUrl);}catch(e){}});
-}
-function renderPhotoPreviews(){
- revokePhotoPreviews();
- const grid=document.querySelector("#photoGrid");grid.innerHTML="";
- document.querySelector("#galleryChecklist").style.display=photoFiles.length?"block":"none";
- photoFiles.forEach((file,i)=>{
-   if(!galleryPhotoEvidence[i])galleryPhotoEvidence[i]={disc:false,manual:false,case:false,barcode:false,condition:false};
-   const card=document.createElement("div");card.className="photocard";
-   const imgWrap=document.createElement("div");imgWrap.className="photoimg";
-   const img=document.createElement("img");const u=URL.createObjectURL(file);img.src=u;img.dataset.objectUrl=u;img.alt="Listing photo "+(i+1);
-   const label=document.createElement("span");label.textContent=(i+1)+". "+file.name;
-   imgWrap.append(img,label);card.appendChild(imgWrap);
-   const marks=document.createElement("div");marks.className="photomarks";
-   [["disc","Disc"],["manual","Manual"],["case","Case / cover"],["barcode","Barcode / spine"],["condition","Visible issue"]].forEach(([key,text])=>{
-     const lab=document.createElement("label"),cb=document.createElement("input");cb.type="checkbox";cb.checked=!!galleryPhotoEvidence[i][key];
-     cb.addEventListener("change",()=>{galleryPhotoEvidence[i][key]=cb.checked;updateGallerySummary();});
-     lab.append(cb,document.createTextNode(text));marks.appendChild(lab);
-   });
-   card.appendChild(marks);grid.appendChild(card);
- });
- updateGallerySummary();
- document.querySelector("#photoHint").textContent=photoFiles.length?(photoFiles.length+" photo"+(photoFiles.length===1?"":"s")+" ready. Mark visible components after inspecting each image; OCR suggestions are separate."):"Best results: clear photos of the back cover, spine, disc label and barcode.";
-}
-function aggregateGalleryEvidence(){
- const g={disc:false,manual:false,case:false,barcode:false,photoIssue:false,allDiscs:false,english:false,issues:[]};
- for(const x of galleryPhotoEvidence){if(!x)continue;g.disc=g.disc||x.disc;g.manual=g.manual||x.manual;g.case=g.case||x.case;g.barcode=g.barcode||x.barcode;g.photoIssue=g.photoIssue||x.condition;}
- g.allDiscs=!!document.querySelector("#allDiscsShown")?.checked;
- g.english=!!document.querySelector("#galleryEnglish")?.checked;
- if(document.querySelector("#issueCase")?.checked)g.issues.push("case damage");
- if(document.querySelector("#issueDisc")?.checked)g.issues.push("disc damage / scratches");
- if(document.querySelector("#issuePaper")?.checked)g.issues.push("cover / manual wear");
- if(document.querySelector("#issueWriting")?.checked)g.issues.push("stickers / writing");
- if(g.photoIssue&&!g.issues.length)g.issues.push("unspecified visible issue");
- return g;
-}
-function galleryCompletenessSignal(g){
- if(!photoFiles.length)return{value:"unknown",confidence:"None",reason:"No gallery evidence supplied"};
- if(g.case&&g.manual&&g.allDiscs)return{value:"complete",confidence:"High",reason:"Case/cover, manual and all game discs are gallery-confirmed"};
- const missing=[];
- if(!g.case)missing.push("case/cover");
- if(!g.manual)missing.push("manual");
- if(!g.allDiscs)missing.push("all game discs");
- const seen=[g.case&&"case/cover",g.manual&&"manual",(g.disc||g.allDiscs)&&"disc(s)",g.barcode&&"barcode/spine"].filter(Boolean);
- return{value:"unknown",confidence:seen.length?"Medium":"None",reason:seen.length?("Gallery confirms "+seen.join(", ")+"; not enough to prove complete because "+missing.join(", ")+" "+(missing.length===1?"is":"are")+" unconfirmed."):"No required components confirmed from the gallery"};
-}
-function conditionSummary(g){
- if(!photoFiles.length)return{label:"Not assessed",issues:[]};
- if(g.issues.length)return{label:"Review — "+g.issues.join(", "),issues:g.issues};
- return{label:"No issues marked (not proof of mint condition)",issues:[]};
-}
-function updateGallerySummary(){
- const box=document.querySelector("#gallerySummary");if(!box)return;
- const g=aggregateGalleryEvidence(),parts=[];
- if(g.case)parts.push("case/cover");
- if(g.manual)parts.push("manual");
- if(g.disc)parts.push("disc(s)");
- if(g.allDiscs)parts.push("all discs");
- if(g.barcode)parts.push("barcode/spine");
- if(g.english)parts.push("English/UK packaging");
- const cond=conditionSummary(g);
- box.textContent=parts.length?("Confirmed: "+parts.join(", ")+(cond.issues.length?". Condition flags: "+cond.issues.join(", ")+".":".")):"Nothing confirmed yet. Not seeing an item in a photo is not treated as evidence that it is missing.";
-}
-function cleanOcrText(text){
- return (text||"").replace(/[|]/g,"I").replace(/\r/g,"").replace(/[ \t]+/g," ").replace(/\n{3,}/g,"\n\n").trim();
-}
-function extractOcrCandidates(text){
- const out=extractIdentifierCandidates(text),seen=new Set(out.map(normId));
- const flexSerial=/(?:SLES|SCES|SLUS|SCUS|SLPS|SLPM|SCPS|SCPM|MK|T)\s*[-:]?\s*[A-Z0-9]{4,8}(?:\s*[-:]?\s*[A-Z0-9]{1,3})?/gi;
- for(const m of (text||"").matchAll(flexSerial)){const v=m[0].replace(/\s+/g,"").replace(/:/g,"-");const k=normId(v);if(k&&!seen.has(k)){seen.add(k);out.push(v);}}
- const lines=(text||"").split(/\n/);
- for(const line of lines){
-   const digits=line.replace(/[^0-9]/g,"");
-   if(digits.length>=11&&digits.length<=14&&!seen.has(digits)){seen.add(digits);out.push(digits);}
+function canonicalMentions(text,platform){
+ const n=norm(text), found=[];
+ const push=t=>{const g=GAMES.find(x=>x.t===t&&(!platform||x.p===platform));if(g&&!found.includes(t))found.push(t);};
+ const explicit=[
+  ["final fantasy 7","Final Fantasy VII"],["ff7","Final Fantasy VII"],["ffvii","Final Fantasy VII"],
+  ["final fantasy 8","Final Fantasy VIII"],["ff8","Final Fantasy VIII"],["ffviii","Final Fantasy VIII"],
+  ["final fantasy 9","Final Fantasy IX"],["ff9","Final Fantasy IX"],["ffix","Final Fantasy IX"],
+  ["klonoa","Klonoa: Door to Phantomile"],
+  ["silent hill 2 directors cut","Silent Hill 2: Director's Cut"],["silent hill 2 director s cut","Silent Hill 2: Director's Cut"],
+  ["metal gear solid 3 subsistence","Metal Gear Solid 3: Subsistence"],["mgs3 subsistence","Metal Gear Solid 3: Subsistence"]
+ ];
+ for(const [a,t] of explicit)if(n.includes(norm(a)))push(t);
+ for(const g of GAMES){
+   const gn=norm(g.t);
+   if(gn.length>=6&&n.includes(gn))push(g.t);
  }
- return out;
+ return found;
 }
-function detectPhotoSignals(text){
- const n=norm(text),out=[];
- if(/only for sale in the uk|uk only|for sale in uk/.test(n))out.push({label:"UK sales wording",kind:"good"});
- if(/\bbbfc\b/.test(n))out.push({label:"BBFC text",kind:"warn"});
- if(/\belspa\b/.test(n))out.push({label:"ELSPA text",kind:"warn"});
- if(/\bpal\b/.test(n))out.push({label:"PAL text",kind:"good"});
- if(/\bplatinum\b/.test(n))out.push({label:"Platinum text",kind:"warn"});
- if(/\bmanual\b|instruction booklet|instructions/.test(n))out.push({label:"Manual wording",kind:"good"});
- if(/\bdisc\b|\bdisk\b/.test(n))out.push({label:"Disc wording",kind:"good"});
- if(/\benglish\b/.test(n))out.push({label:"English wording",kind:"good"});
- return out;
+function detectBundleSignal(text,platform){
+ const n=norm(text), mentions=canonicalMentions(text,platform);
+ const bundleWords=/\b(bundle|job lot|joblot|collection|multi game|multiple games|games lot|game lot|lot of)\b/.test(n);
+ const joiner=/\s(?:&|\+|and)\s/.test((text||"").toLowerCase());
+ if(mentions.length>=2&&(bundleWords||joiner))return{isBundle:true,games:mentions,reason:"Multiple supported game titles are explicitly listed"};
+ if(bundleWords&&mentions.length>=2)return{isBundle:true,games:mentions,reason:"Bundle wording plus multiple supported titles"};
+ return{isBundle:false,games:mentions,reason:"No multi-title bundle signal"};
 }
-function renderPhotoSignals(){
- const chips=document.querySelector("#ocrChips");chips.innerHTML="";
- for(const x of photoSignals){const s=document.createElement("span");s.className="ocrchip "+x.kind;s.textContent=x.label;chips.appendChild(s);}
- for(const id of photoOcrCandidates){const s=document.createElement("span");s.className="ocrchip good";s.textContent=id;chips.appendChild(s);}
- const out=document.querySelector("#ocrText");
- if(photoOcrText){out.style.display="block";out.textContent=photoOcrText;}else{out.style.display="none";out.textContent="";}
-}
-function photoEvidenceSummary(){
- if(!photoFiles.length)return"No photos supplied";
- const bits=[];
- if(photoOcrText){
-   if(photoOcrCandidates.length)bits.push("OCR identifier"+(photoOcrCandidates.length>1?"s":"")+": "+photoOcrCandidates.join(", "));
-   if(photoSignals.length)bits.push(photoSignals.map(x=>x.label).join(", "));
-   if(!photoOcrCandidates.length&&!photoSignals.length)bits.push("OCR completed; no useful release text detected");
- }else bits.push("Photos added; OCR not run");
- const g=aggregateGalleryEvidence(),confirmed=[g.case&&"case",g.manual&&"manual",(g.disc||g.allDiscs)&&"disc(s)",g.barcode&&"barcode/spine"].filter(Boolean);
- if(confirmed.length)bits.push("confirmed visible: "+confirmed.join(", "));
- return bits.join(" · ");
-}
-async function scanListingPhotos(){
- if(!photoFiles.length){document.querySelector("#photoHint").textContent="Choose at least one image first.";return;}
- const btn=document.querySelector("#scanPhotos"),progress=document.querySelector("#ocrProgress"),bar=document.querySelector("#ocrBar"),hint=document.querySelector("#photoHint");
- btn.disabled=true;progress.style.display="block";bar.style.width="2%";photoOcrText="";photoOcrCandidates=[];photoSignals=[];
- if(typeof Tesseract==="undefined"){hint.textContent="OCR library could not load. Check the browser connection and try again.";btn.disabled=false;return;}
- let worker=null;
- try{
-   worker=await Tesseract.createWorker("eng",1,{logger:m=>{if(m.progress!=null){const base=photoFiles.length?Math.floor((m.progress/photoFiles.length)*90):0;bar.style.width=Math.min(92,Math.max(3,base))+"%";}}});
-   const texts=[];
-   for(let i=0;i<photoFiles.length;i++){
-     hint.textContent="Scanning photo "+(i+1)+" of "+photoFiles.length+"…";
-     const r=await worker.recognize(photoFiles[i]);
-     texts.push("[Photo "+(i+1)+"]\n"+cleanOcrText(r.data&&r.data.text));
-     bar.style.width=Math.round(((i+1)/photoFiles.length)*95)+"%";
+function detectGame(text,platform){
+ const n=norm(text);
+ // Prevent release-family collisions: Snake Eater is not Subsistence.
+ if(/\bmetal gear solid 3\b/.test(n)&&/\bsnake eater\b/.test(n)&&!/\bsubsistence\b/.test(n))return null;
+ if(/\bmgs3\b/.test(n)&&/\bsnake eater\b/.test(n)&&!/\bsubsistence\b/.test(n))return null;
+ const mentions=canonicalMentions(text,platform);
+ if(mentions.length===1){
+   const g=GAMES.find(x=>x.t===mentions[0]&&(!platform||x.p===platform));if(g)return g;
+ }
+ for(const [a,t] of Object.entries(aliases)){
+   if(n.includes(norm(a))){
+     if(t==="Metal Gear Solid 3: Subsistence"&&!/subsistence/.test(n))continue;
+     const c=GAMES.filter(g=>g.t===t&&(!platform||g.p===platform));if(c.length)return c[0];
    }
-   photoOcrText=texts.join("\n\n");
-   photoOcrCandidates=extractOcrCandidates(photoOcrText);
-   photoSignals=detectPhotoSignals(photoOcrText);
-   renderPhotoSignals();updateAutoHints();bar.style.width="100%";
-   hint.textContent="Photo scan complete. OCR is candidate evidence: verify important serials/barcodes against the actual image.";
- }catch(e){
-   hint.textContent="Photo OCR failed in this browser. The images were not uploaded; you can still classify the listing from text.";
- }finally{
-   if(worker){try{await worker.terminate();}catch(e){}}
-   btn.disabled=false;setTimeout(()=>{progress.style.display="none";bar.style.width="0";},800);
  }
-}
-function cleanUrlInput(value){
- let v=(value||"").trim();
- if(!v)return"";
- if(!/^https?:\/\//i.test(v))v="https://"+v;
- try{const u=new URL(v);u.hash="";return u.toString();}catch(e){return"";}
-}
-function detectListingSource(url){
- try{
-   const h=new URL(url).hostname.toLowerCase().replace(/^www\./,"");
-   if(h==="ebay.co.uk"||h.endsWith(".ebay.co.uk")||h==="ebay.com"||h.endsWith(".ebay.com"))return"eBay";
-   if(h==="etsy.com"||h.endsWith(".etsy.com"))return"Etsy";
-   if(h==="vinted.co.uk"||h.endsWith(".vinted.co.uk")||h==="vinted.com"||h.endsWith(".vinted.com"))return"Vinted";
-   return h||"Web";
- }catch(e){return"Unknown";}
-}
-function parseEbayUrl(url){
- try{
-   const u=new URL(url); const p=decodeURIComponent(u.pathname); let id="";
-   const m=p.match(/\/itm\/(?:[^/]+\/)?(\d{9,15})(?:[/?]|$)/i)||p.match(/\/(\d{9,15})(?:[/?]|$)/);
-   if(m)id=m[1];
-   if(!id){for(const k of ["item","itemid","itemId","id"]){const v=u.searchParams.get(k);if(v&&/^\d{9,15}$/.test(v)){id=v;break;}}}
-   let slug="";
-   const seg=p.split("/").filter(Boolean); const itm=seg.findIndex(x=>x.toLowerCase()==="itm");
-   if(itm>=0&&seg[itm+1]&&!/^\d+$/.test(seg[itm+1]))slug=seg[itm+1];
-   const title=slug?slug.replace(/[-_]+/g," ").replace(/\s+/g," ").trim():"";
-   return{id,title};
- }catch(e){return{id:"",title:""};}
-}
-function metaContent(doc,selector){const el=doc.querySelector(selector);return el?(el.getAttribute("content")||el.textContent||"").trim():"";}
-function firstJsonLdProduct(doc){
- const nodes=[...doc.querySelectorAll('script[type="application/ld+json"]')];
- const products=[];
- function walk(x){
-   if(!x)return;
-   if(Array.isArray(x)){x.forEach(walk);return;}
-   if(typeof x!=="object")return;
-   const t=x["@type"];
-   if(t==="Product"||(Array.isArray(t)&&t.includes("Product")))products.push(x);
-   if(x["@graph"])walk(x["@graph"]);
+ let pool=GAMES.filter(g=>!platform||g.p===platform),best=null,bs=0;
+ for(const g of pool){
+   if(g.t==="Metal Gear Solid 3: Subsistence"&&/snake eater/.test(n)&&!/subsistence/.test(n))continue;
+   const s=scoreTitle(text,g);if(s>bs){best=g;bs=s;}
  }
- for(const n of nodes){try{walk(JSON.parse(n.textContent));}catch(e){}}
- return products[0]||null;
+ return bs>=8?best:null;
 }
-function numPrice(v){
- if(v==null)return"";
- const s=String(v).replace(/,/g,"").match(/\d+(?:\.\d{1,2})?/);
- return s?s[0]:"";
-}
-function parseListingHtml(html,url){
- const doc=new DOMParser().parseFromString(html,"text/html"), p=firstJsonLdProduct(doc);
- let title=(p&&p.name)||metaContent(doc,'meta[property="og:title"]')||metaContent(doc,'meta[name="twitter:title"]')||doc.title||"";
- let desc=(p&&p.description)||metaContent(doc,'meta[property="og:description"]')||metaContent(doc,'meta[name="description"]')||"";
- let price="";
- if(p&&p.offers){
-   const o=Array.isArray(p.offers)?p.offers[0]:p.offers;
-   if(o)price=numPrice(o.price||(o.priceSpecification&&o.priceSpecification.price));
- }
- if(!price)price=numPrice(metaContent(doc,'meta[property="product:price:amount"]')||metaContent(doc,'meta[itemprop="price"]'));
- title=title.replace(/\s*[|\-–—]\s*eBay\s*$/i,"").trim();
- return{title,desc,price};
-}
-function setImportStatus(kind,text){
- const el=document.querySelector("#importStatus");el.className="importstatus "+kind;el.textContent=text;
-}
-async function importListingUrl(){
- const input=document.querySelector("#listingUrl"), url=cleanUrlInput(input.value);
- if(!url){setImportStatus("bad","Enter a valid http(s) listing URL.");return;}
- input.value=url; const source=detectListingSource(url); let itemId="",fallbackTitle="";
- if(source==="eBay"){const x=parseEbayUrl(url);itemId=x.id;fallbackTitle=x.title;}
- document.querySelector("#listingSource").textContent=source;
- document.querySelector("#listingItemId").textContent=itemId||"—";
- setImportStatus("warn","Importing public listing metadata…");
- let imported={title:"",desc:"",price:""}; let fetched=false;
- try{
-   const res=await fetch(url,{method:"GET",mode:"cors",redirect:"follow",credentials:"omit",headers:{"Accept":"text/html,application/xhtml+xml"}});
-   if(!res.ok)throw new Error("HTTP "+res.status);
-   const html=await res.text(); imported=parseListingHtml(html,url); fetched=true;
- }catch(e){}
- if(imported.title)document.querySelector("#title").value=imported.title;
- else if(fallbackTitle&&!document.querySelector("#title").value)document.querySelector("#title").value=fallbackTitle;
- if(imported.desc)document.querySelector("#desc").value=imported.desc;
- if(imported.price&&!document.querySelector("#price").value)document.querySelector("#price").value=imported.price;
- updateAutoHints();
- if(fetched&&(imported.title||imported.desc||imported.price)){
-   const got=[imported.title&&"title",imported.desc&&"description",imported.price&&"price"].filter(Boolean).join(", ");
-   setImportStatus("good","Imported "+got+" from "+source+(itemId?" · item "+itemId:"")+". Review the fields, then analyse.");
- }else if(source==="eBay"){
-   const extra=fallbackTitle?" A title was recovered from the URL itself.":"";
-   setImportStatus("warn","eBay blocked direct browser metadata access on this request."+(itemId?" Item ID "+itemId+" was extracted.":"")+extra+" Full automatic eBay import needs an authorised server-side/API connection.");
- }else{
-   setImportStatus("warn",source+" did not expose importable page metadata to this browser. You can still paste the listing details manually.");
- }
+function detectRegionSignal(text){
+ const raw=(text||"").toLowerCase(),n=norm(text);
+ const foreign=[];
+ if(/\b(ntsc[\s-]*j|jpn|japan|japanese|jp version|japanese version)\b/.test(raw))foreign.push("NTSC-J / Japan");
+ if(/\b(ntsc[\s-]*(u\/?c|u|us)|usa|u\.s\.|us version|american version|north american)\b/.test(raw))foreign.push("NTSC-U/C / North America");
+ if(/\b(pal[\s-]*(fr|fra)|french version|version francaise|france)\b/.test(raw))foreign.push("PAL France");
+ if(/\b(pal[\s-]*(it|ita)|italian version|italy|italia)\b/.test(raw))foreign.push("PAL Italy");
+ if(/\b(pal[\s-]*(de|ger)|german version|germany|deutsch)\b/.test(raw))foreign.push("PAL Germany");
+ if(/\b(pal[\s-]*(es|spa)|spanish version|spain|espana|españa)\b/.test(raw))foreign.push("PAL Spain");
+ if(foreign.length)return{kind:"foreign",label:[...new Set(foreign)].join(", "),confidence:"High"};
+ if(/\b(uk pal|pal uk|uk version|british version|english uk|only for sale in the uk)\b/.test(raw))return{kind:"uk_claim",label:"UK / British seller wording",confidence:"Medium"};
+ if(/\bpal\b/.test(n))return{kind:"pal_generic",label:"Generic PAL wording",confidence:"Low"};
+ return{kind:"unknown",label:"No explicit territory wording",confidence:"None"};
 }
 function detectPlatformSignal(text){
  const n=norm(text); const hits=[];
@@ -272,14 +96,27 @@ function detectCompletenessSignal(text){
  const n=norm(text);
  if(/\b(case only|box only|artwork only|cover only|empty case|no game)\b/.test(n))return{value:"case_only",confidence:"High",reason:"Case/artwork-only wording detected"};
  if(/\b(disc only|disk only|loose disc|loose disk|no case)\b/.test(n))return{value:"disc_only",confidence:"High",reason:"Disc-only / loose-disc wording detected"};
- if(/\b(no manual|without manual|manual missing|missing manual|manual not included)\b/.test(n))return{value:"no_manual",confidence:"High",reason:"Missing-manual wording detected"};
- if(/\b(complete in box|cib|complete with manual|complete w manual|case and manual|manual and case|includes manual)\b/.test(n))return{value:"complete",confidence:"High",reason:"Explicit complete/manual wording detected"};
- if(!/\b(incomplete|not complete|missing|without)\b/.test(n)&&/\bcomplete\b/.test(n))return{value:"complete",confidence:"Medium",reason:"Seller describes the item as complete; manual/case are not independently proven"};
+ if(/\b(no manual|without manual|manual missing|missing manual|manual not included|no booklet|without booklet)\b/.test(n))return{value:"no_manual",confidence:"High",reason:"Missing-manual wording detected"};
+ const strongComplete=[
+  /\bcomplete in box\b/,/\bcib\b/,/\bcomplete with (?:the )?manual\b/,/\bcomplete w manual\b/,
+  /\bboxed (?:copy )?(?:with|and) (?:the )?manual\b/,/\bwith (?:the )?manual (?:and|with) (?:the )?(?:box|case)\b/,
+  /\b(?:box|case) (?:and|with) (?:the )?manual\b/,/\bmanual (?:and|with) (?:the )?(?:box|case)\b/,
+  /\bmanual included\b/,/\bincludes (?:the )?manual\b/,/\binstruction booklet included\b/,
+  /\b\d+ discs? (?:and|with|&) (?:the )?manual\b/,/\ball \d+ discs? (?:and|with|&) (?:the )?manual\b/
+ ];
+ if(strongComplete.some(r=>r.test(n)))return{value:"complete",confidence:"High",reason:"Box/manual or full-disc/manual wording supports a complete copy"};
+ if(!/\b(incomplete|not complete|missing|without)\b/.test(n)&&/\bcomplete\b/.test(n))return{value:"complete",confidence:"Medium",reason:"Seller describes the item as complete; gallery confirmation is still stronger"};
  return{value:"unknown",confidence:"None",reason:"Completeness is not stated clearly enough"};
 }
-function detectEdition(text){
+function detectBonusDemo(text){
  const n=norm(text);
- if(/\b(demo|demo disc|promotional|promo copy|not for resale)\b/.test(n))return"Demo / promo";
+ return /\b(with|includes?|including|bonus|plus) (?:a )?(?:bonus )?demo(?: disc)?\b/.test(n)||/\bdemo disc included\b/.test(n);
+}
+function detectEdition(text){
+ const n=norm(text),bonusDemo=detectBonusDemo(text);
+ const demoMain=/\b(demo only|demo disc only|promotional copy|promo copy|not for resale|standalone demo|playable demo)\b/.test(n)
+   ||(!bonusDemo&&/^.*\bdemo(?: disc)?\b.*$/i.test(n)&&!/\bcomplete\b/.test(n));
+ if(demoMain)return"Demo / promo";
  if(/\bplatinum\b/.test(n))return"Platinum";
  if(/\b(greatest hits|essentials|value series|white label)\b/.test(n))return"Budget / reissue";
  if(/\b(directors cut|director s cut)\b/.test(n))return"Director's Cut";
@@ -359,9 +196,9 @@ function renderEvidencePanel(ev,candidates,complete,english,explicitId){
  else hint.textContent="No identifier detected in the listing text yet.";
 }
 function analyse(){
- const title=document.querySelector("#title").value.trim(),desc=document.querySelector("#desc").value.trim(),identifier=document.querySelector("#identifier").value.trim(),selectedPlatform=document.querySelector("#platform").value,selectedComplete=document.querySelector("#complete").value,english=document.querySelector("#english").checked,listingUrl=cleanUrlInput(document.querySelector("#listingUrl").value); const listingSource=listingUrl?detectListingSource(listingUrl):"Manual entry"; const ebayMeta=listingSource==="eBay"?parseEbayUrl(listingUrl):{id:"",title:""}; const listingText=title+" "+desc; const augmentedText=listingText+" "+photoOcrText; const text=augmentedText+" "+identifier; const platformSignal=detectPlatformSignal(augmentedText); const completeSignal=detectCompletenessSignal(augmentedText); const gallery=aggregateGalleryEvidence(); const galleryComplete=galleryCompletenessSignal(gallery); const platform=selectedPlatform||platformSignal.value; const completeSource=selectedComplete!=="unknown"?"manual":(galleryComplete.value==="complete"?"gallery":(completeSignal.value!=="unknown"?"text":"unknown")); const complete=selectedComplete!=="unknown"?selectedComplete:(galleryComplete.value==="complete"?"complete":completeSignal.value); const effectiveEnglish=english||gallery.english; const condition=conditionSummary(gallery); const textCandidates=extractIdentifierCandidates(listingText); const candidates=[...new Set([...textCandidates,...photoOcrCandidates])]; let evidenceHits=findEvidence(augmentedText,identifier); if(!identifier&&evidenceHits.length===0&&candidates.length){for(const cand of candidates){evidenceHits=findEvidence("",cand);if(evidenceHits.length)break;}} const ev=evidenceHits[0]||null; let game=ev?(GAMES.find(g=>g.t===ev[0]&&g.p===ev[1])||{t:ev[0],p:ev[1],s:ev[5],n:"Matched from identifier evidence."}):detectGame(text,platform); let edition=detectEdition(text); if(ev&&ev[2]&&ev[2]!=="original") edition=ev[2][0].toUpperCase()+ev[2].slice(1); const reasons=[]; let cls="review",badge="NEEDS REVIEW",head="More evidence needed",copy="RetroNomad cannot safely place this listing into a comparison bucket yet.",confidence="Low";
+ const title=document.querySelector("#title").value.trim(),desc=document.querySelector("#desc").value.trim(),identifier=document.querySelector("#identifier").value.trim(),selectedPlatform=document.querySelector("#platform").value,selectedComplete=document.querySelector("#complete").value,english=document.querySelector("#english").checked,listingUrl=cleanUrlInput(document.querySelector("#listingUrl").value); const listingSource=listingUrl?detectListingSource(listingUrl):"Manual entry"; const ebayMeta=listingSource==="eBay"?parseEbayUrl(listingUrl):{id:"",title:""}; const listingText=title+" "+desc; const augmentedText=listingText+" "+photoOcrText; const text=augmentedText+" "+identifier; const regionSignal=detectRegionSignal(listingText); const platformSignal=detectPlatformSignal(augmentedText); const bundleSignal=detectBundleSignal(listingText,selectedPlatform||platformSignal.value); const completeSignal=detectCompletenessSignal(augmentedText); const gallery=aggregateGalleryEvidence(); const galleryComplete=galleryCompletenessSignal(gallery); const platform=selectedPlatform||platformSignal.value; const completeSource=selectedComplete!=="unknown"?"manual":(galleryComplete.value==="complete"?"gallery":(completeSignal.value!=="unknown"?"text":"unknown")); const complete=selectedComplete!=="unknown"?selectedComplete:(galleryComplete.value==="complete"?"complete":completeSignal.value); const effectiveEnglish=english||gallery.english; const condition=conditionSummary(gallery); const textCandidates=extractIdentifierCandidates(listingText); const candidates=[...new Set([...textCandidates,...photoOcrCandidates])]; let evidenceHits=findEvidence(augmentedText,identifier); if(!identifier&&evidenceHits.length===0&&candidates.length){for(const cand of candidates){evidenceHits=findEvidence("",cand);if(evidenceHits.length)break;}} const ev=evidenceHits[0]||null; let game=ev?(GAMES.find(g=>g.t===ev[0]&&g.p===ev[1])||{t:ev[0],p:ev[1],s:ev[5],n:"Matched from identifier evidence."}):detectGame(text,platform); let edition=detectEdition(text); if(ev&&ev[2]&&ev[2]!=="original") edition=ev[2][0].toUpperCase()+ev[2].slice(1); const reasons=[]; let cls="review",badge="NEEDS REVIEW",head="More evidence needed",copy="RetroNomad cannot safely place this listing into a comparison bucket yet.",confidence="Low";
  if(!title&&!identifier){alert("Add a listing title or identifier first.");return;}
- if(listingUrl) reasons.push("Listing source: "+listingSource+(ebayMeta.id?" · item "+ebayMeta.id:"")+".");
+ if(listingUrl) reasons.push("Listing source: "+listingSource+(ebayMeta.id?" · item "+ebayMeta.id:"")+"."); if(regionSignal.kind!=="unknown") reasons.push("Region signal: "+regionSignal.label+" ("+regionSignal.confidence.toLowerCase()+" confidence)."); if(bundleSignal.isBundle) reasons.push("Bundle detected: "+bundleSignal.games.join(" + ")+"."); if(detectBonusDemo(listingText)) reasons.push("A demo disc appears to be bonus/included content, not the main item edition.");
  if(photoOcrText){reasons.push("Photo OCR scanned "+photoFiles.length+" image"+(photoFiles.length===1?"":"s")+"; OCR is treated as candidate evidence and should be visually verified."); if(photoSignals.some(x=>x.label==="UK sales wording"))reasons.push("Photo text contains UK-specific sales wording."); if(photoOcrCandidates.length)reasons.push("Photo OCR identifier candidate"+(photoOcrCandidates.length>1?"s":"")+": "+photoOcrCandidates.join(", ")+".");}
  if(photoFiles.length){reasons.push(galleryComplete.reason+"."); if(gallery.english)reasons.push("User confirmed English/UK packaging is visibly present in the gallery."); if(condition.issues.length)reasons.push("Visible condition issue"+(condition.issues.length>1?"s":"")+": "+condition.issues.join(", ")+".");}
  if(!selectedPlatform&&platformSignal.value) reasons.push("Platform inferred from listing text: "+platformSignal.value+" ("+platformSignal.confidence.toLowerCase()+" confidence)."); if(!selectedPlatform&&platformSignal.confidence==="Conflict") reasons.push(platformSignal.reason+"."); if(selectedPlatform&&platformSignal.value&&selectedPlatform!==platformSignal.value) reasons.push("Manual platform selection "+selectedPlatform+" overrides the text-inferred "+platformSignal.value+".");
@@ -371,19 +208,23 @@ function analyse(){
  if(!game){head="Outside launch library";badge="NOT YET SUPPORTED";copy="This title was not confidently matched to the current 100-game launch library.";reasons.push("No sufficiently strong title match was found.");}
  else{
    confidence=ev?"High":"Medium"; reasons.push((ev?"Identifier resolved":"Title matched")+" "+game.t+" ("+game.p+").");
-   if(ev&&ev[5]==="NON_UK_EXACT"){cls="separate";badge="NON-UK EXACT";head="Exact non-UK release identified";copy="This identifier belongs in a non-UK comparison bucket.";confidence="High";reasons.push("Do not compare this copy against a UK-exact release.");}
-   else if(ev&&ev[5]==="UK_EXACT"&&complete==="complete"&&edition!=="Demo / promo"){cls="ready";badge="COMPARISON-READY";head="Exact UK identifier confirmed";copy="The identifier directly supports the UK release and the copy is marked complete.";confidence=completeSource==="text"?"Medium":"High";}
-   else if(ev&&(ev[5]==="UK_SHARED_PAL"||ev[5]==="PAL_SHARED")&&complete==="complete"&&edition!=="Demo / promo"){cls="ready";badge="COMPARISON-READY";head="Shared PAL identifier confirmed";copy="The identifier resolves this listing to a documented shared PAL bucket and the copy is marked complete.";confidence=completeSource==="text"?"Medium":"High";}
-   else if(ev&&ev[5]==="UK_COMPATIBLE_EU_ENGLISH"&&effectiveEnglish&&complete==="complete"&&edition!=="Demo / promo"){cls="ready";badge="COMPARISON-READY";head="UK-compatible European release confirmed";copy="The identifier plus English/UK packaging evidence resolves the listing to the intended comparison bucket.";confidence="High";}
-   else if(ev&&ev[5]==="UK_VISUAL_REQUIRED"&&!effectiveEnglish){reasons.push("This identifier alone is not enough; positive packaging/gallery evidence is still required.");}
-   if(edition==="Demo / promo"){cls="separate";badge="SEPARATE";head="Do not compare with normal retail copies";copy="The text suggests a demo or promotional item.";confidence="High";reasons.push("Demo/promo wording was detected.");}
+   if(bundleSignal.isBundle){cls="separate";badge="BUNDLE";head="Multi-game bundle";copy="This listing contains multiple games and must be analysed as separate items or a dedicated bundle bucket.";confidence="High";}
+   else if(regionSignal.kind==="foreign"&&ev&&ev[5]==="UK_EXACT"){cls="review";badge="REGION CONFLICT";head="Territory evidence conflicts";copy="The seller text explicitly describes a foreign release, but the identifier matches a UK-exact record. Verify the physical identifier/gallery before comparing.";confidence="High";reasons.push("Exact UK identifier prevents an automatic foreign classification, but the conflict blocks Comparison-ready.");}
+   else if(regionSignal.kind==="foreign"&&(!ev||ev[5]!=="NON_UK_EXACT")){cls="separate";badge="FOREIGN REGION";head="Explicit non-UK release";copy="The listing explicitly identifies a non-UK territory and must stay out of the UK/PAL comparison bucket.";confidence="High";}
+
+   if(cls==="review"&&ev&&ev[5]==="NON_UK_EXACT"){cls="separate";badge="NON-UK EXACT";head="Exact non-UK release identified";copy="This identifier belongs in a non-UK comparison bucket.";confidence="High";reasons.push("Do not compare this copy against a UK-exact release.");}
+   else if(cls==="review"&&ev&&ev[5]==="UK_EXACT"&&complete==="complete"&&edition!=="Demo / promo"){cls="ready";badge="COMPARISON-READY";head="Exact UK identifier confirmed";copy="The identifier directly supports the UK release and the copy is marked complete.";confidence=completeSource==="text"?"Medium":"High";}
+   else if(cls==="review"&&ev&&(ev[5]==="UK_SHARED_PAL"||ev[5]==="PAL_SHARED")&&complete==="complete"&&edition!=="Demo / promo"){cls="ready";badge="COMPARISON-READY";head="Shared PAL identifier confirmed";copy="The identifier resolves this listing to a documented shared PAL bucket and the copy is marked complete.";confidence=completeSource==="text"?"Medium":"High";}
+   else if(cls==="review"&&ev&&ev[5]==="UK_COMPATIBLE_EU_ENGLISH"&&effectiveEnglish&&complete==="complete"&&edition!=="Demo / promo"){cls="ready";badge="COMPARISON-READY";head="UK-compatible European release confirmed";copy="The identifier plus English/UK packaging evidence resolves the listing to the intended comparison bucket.";confidence="High";}
+   else if(cls==="review"&&ev&&ev[5]==="UK_VISUAL_REQUIRED"&&!effectiveEnglish){reasons.push("This identifier alone is not enough; positive packaging/gallery evidence is still required.");}
+   if(cls==="review"&&edition==="Demo / promo"){cls="separate";badge="SEPARATE";head="Do not compare with normal retail copies";copy="The text suggests a demo or promotional item.";confidence="High";reasons.push("Demo/promo wording was detected.");}
    else if(complete==="case_only"){cls="separate";badge="SEPARATE";head="Not a complete game listing";copy="Case/artwork-only listings belong outside the normal game comparison bucket.";confidence="High";reasons.push("Completeness was set to case/artwork only.");}
    else if(cls==="review"&&game.s==="NO_OFFICIAL_UK_RETAIL"){cls="separate";badge="SEPARATE MARKET";head="No normal UK retail bucket";copy="Treat this as a European/import-market listing rather than inventing a standard UK retail release.";confidence="High";reasons.push(game.n);}
    else if(cls==="review"&&game.s==="EUROPE_UNRESOLVED"){reasons.push(game.n);}
    else if(cls==="review"&&game.s==="UK_VISUAL_REQUIRED"&&!effectiveEnglish){reasons.push(game.n);reasons.push("Positive package/gallery evidence is required for this title.");}
    else if(cls==="review"&&game.s==="UK_COMPATIBLE_EU_ENGLISH"&&!effectiveEnglish){reasons.push(game.n);reasons.push("Confirm English/UK packaging before treating it as UK-market compatible.");}
    else if(cls==="review"&&game.s==="UK_EXACT"){reasons.push(game.n); if(effectiveEnglish&&complete==="complete"){cls="ready";badge="COMPARISON-READY";head="Ready for release-level comparison";copy="The title is supported, the package evidence is positive, and the copy is marked complete.";confidence="Medium";} else {reasons.push("An exact UK release exists, but this public beta does not yet verify the listing barcode/serial automatically.");}}
-   else if(cls==="review"&&game.s==="UK_SHARED_PAL"){reasons.push(game.n); if(complete==="complete"){cls="ready";badge="COMPARISON-READY";head="Ready for shared-PAL comparison";copy="This title uses a documented shared PAL bucket and the copy is marked complete.";confidence=english?"High":"Medium";} else reasons.push("Completeness must be known before like-for-like comparison.");}
+   else if(cls==="review"&&game.s==="UK_SHARED_PAL"){reasons.push(game.n); if(complete==="complete"){cls="ready";badge="COMPARISON-READY";head="Ready for shared-PAL comparison";copy="This title uses a documented shared PAL bucket and the copy is marked complete.";confidence=effectiveEnglish?"High":"Medium";} else reasons.push("Completeness must be known before like-for-like comparison.");}
    else if(cls==="review"&&game.s==="UK_COMPATIBLE_EU_ENGLISH"&&effectiveEnglish&&complete==="complete"){cls="ready";badge="COMPARISON-READY";head="Ready for UK-compatible PAL comparison";copy="English/UK package evidence is present and the copy is marked complete.";confidence="Medium";reasons.push(game.n);}
    else if(cls==="review"&&game.s==="UK_VISUAL_REQUIRED"&&effectiveEnglish&&complete==="complete"){cls="ready";badge="COMPARISON-READY";head="Package evidence resolves the listing";copy="The title requires visual evidence; you have confirmed English/UK packaging and a complete copy.";confidence="Medium";reasons.push(game.n);}
    if(editionNeedsSeparate(edition,game)&&cls==="ready"){cls="review";badge="SEPARATE EDITION";head="Edition needs its own comparison bucket";copy="This copy should not be compared with the standard original release.";reasons.push("Detected edition: "+edition+".");}
@@ -391,7 +232,7 @@ function analyse(){
    if(complete==="unknown")reasons.push("Completeness is still unknown.");
    if(condition.issues.length&&cls==="ready"){cls="review";badge="CONDITION REVIEW";head="Release identified — condition needs its own bucket";copy="The release is identified, but visible condition issues mean it should not be compared directly with cleaner copies.";confidence=confidence==="High"?"High":"Medium";}
  }
- document.querySelector("#empty").style.display="none";const r=document.querySelector("#result");r.style.display="block";const v=document.querySelector("#verdict");v.className="verdict "+cls;document.querySelector("#badge").textContent=badge;document.querySelector("#verdictTitle").textContent=head;document.querySelector("#verdictText").textContent=copy;document.querySelector("#game").textContent=game?game.t:"Not matched";document.querySelector("#plat").textContent=game?game.p:(platform||"Unknown");document.querySelector("#market").textContent=ev?evidenceMarketLabel(ev[5]):(game?marketLabel(game.s):"—");document.querySelector("#edition").textContent=edition;document.querySelector("#comp").textContent=compLabel(complete)+(selectedComplete==="unknown"&&complete!=="unknown"?" · "+completeSource:"");document.querySelector("#galleryComp").textContent=galleryComplete.value==="complete"?"Complete · gallery confirmed":galleryComplete.reason;document.querySelector("#conditionResult").textContent=condition.label;document.querySelector("#confidence").textContent=confidence;document.querySelector("#matchedId").textContent=ev?(ev[4]+" · "+ev[3]):"None";document.querySelector("#listingSource").textContent=listingSource;document.querySelector("#listingItemId").textContent=ebayMeta.id||"—";document.querySelector("#platformSignal").textContent=platformSignal.value?(platformSignal.value+" · "+platformSignal.confidence):platformSignal.reason;document.querySelector("#completeSignal").textContent=completeSignal.value!=="unknown"?(compLabel(completeSignal.value)+" · "+completeSignal.confidence):completeSignal.reason;document.querySelector("#editionSignal").textContent=edition;document.querySelector("#photoSignal").textContent=photoEvidenceSummary();document.querySelector("#galleryComponents").textContent=[gallery.case&&"case/cover",gallery.manual&&"manual",(gallery.disc||gallery.allDiscs)&&"disc(s)",gallery.allDiscs&&"all discs",gallery.barcode&&"barcode/spine",gallery.english&&"English/UK packaging"].filter(Boolean).join(", ")||"None confirmed";document.querySelector("#conditionSignal").textContent=condition.label;renderEvidencePanel(ev,candidates,complete,effectiveEnglish,identifier);const ul=document.querySelector("#reasons");ul.innerHTML="";reasons.forEach(x=>{const li=document.createElement("li");li.textContent=x;ul.appendChild(li);});const price=parseFloat(document.querySelector("#price").value||0),post=parseFloat(document.querySelector("#postage").value||0);document.querySelector("#pricebox").textContent=(price||post)?("Entered total: £"+(price+post).toFixed(2)+" (price + postage). No deal score yet."):"";
+ document.querySelector("#empty").style.display="none";const r=document.querySelector("#result");r.style.display="block";const v=document.querySelector("#verdict");v.className="verdict "+cls;document.querySelector("#badge").textContent=badge;document.querySelector("#verdictTitle").textContent=head;document.querySelector("#verdictText").textContent=copy;document.querySelector("#game").textContent=game?game.t:"Not matched";document.querySelector("#plat").textContent=game?game.p:(platform||"Unknown");document.querySelector("#market").textContent=ev?evidenceMarketLabel(ev[5]):(game?marketLabel(game.s):"—");document.querySelector("#edition").textContent=edition;document.querySelector("#comp").textContent=compLabel(complete)+(selectedComplete==="unknown"&&complete!=="unknown"?" · "+completeSource:"");document.querySelector("#galleryComp").textContent=galleryComplete.value==="complete"?"Complete · gallery confirmed":galleryComplete.reason;document.querySelector("#conditionResult").textContent=condition.label;document.querySelector("#confidence").textContent=confidence;document.querySelector("#matchedId").textContent=ev?(ev[4]+" · "+ev[3]):"None";document.querySelector("#listingSource").textContent=listingSource;document.querySelector("#listingItemId").textContent=ebayMeta.id||"—";document.querySelector("#regionSignal").textContent=regionSignal.label+" · "+regionSignal.confidence;document.querySelector("#platformSignal").textContent=platformSignal.value?(platformSignal.value+" · "+platformSignal.confidence):platformSignal.reason;document.querySelector("#completeSignal").textContent=completeSignal.value!=="unknown"?(compLabel(completeSignal.value)+" · "+completeSignal.confidence):completeSignal.reason;document.querySelector("#editionSignal").textContent=edition;document.querySelector("#photoSignal").textContent=photoEvidenceSummary();document.querySelector("#galleryComponents").textContent=[gallery.case&&"case/cover",gallery.manual&&"manual",(gallery.disc||gallery.allDiscs)&&"disc(s)",gallery.allDiscs&&"all discs",gallery.barcode&&"barcode/spine",gallery.english&&"English/UK packaging"].filter(Boolean).join(", ")||"None confirmed";document.querySelector("#conditionSignal").textContent=condition.label;renderEvidencePanel(ev,candidates,complete,effectiveEnglish,identifier);const ul=document.querySelector("#reasons");ul.innerHTML="";reasons.forEach(x=>{const li=document.createElement("li");li.textContent=x;ul.appendChild(li);});const price=parseFloat(document.querySelector("#price").value||0),post=parseFloat(document.querySelector("#postage").value||0);document.querySelector("#pricebox").textContent=(price||post)?("Entered total: £"+(price+post).toFixed(2)+" (price + postage). No deal score yet."):"";
 }
 document.querySelector("#analyse").addEventListener("click",analyse);document.querySelector("#importListing").addEventListener("click",importListingUrl);document.querySelector("#scanPhotos").addEventListener("click",scanListingPhotos);document.querySelector("#photoInput").addEventListener("change",e=>{photoFiles=[...e.target.files].filter(f=>f.type.startsWith("image/")).slice(0,6);photoOcrText="";photoOcrCandidates=[];photoSignals=[];galleryPhotoEvidence=photoFiles.map(()=>({disc:false,manual:false,case:false,barcode:false,condition:false}));["allDiscsShown","galleryEnglish","issueCase","issueDisc","issuePaper","issueWriting"].forEach(id=>{const el=document.querySelector("#"+id);if(el)el.checked=false;});renderPhotoPreviews();renderPhotoSignals();updateAutoHints();});document.querySelector("#listingUrl").addEventListener("keydown",e=>{if(e.key==="Enter"){e.preventDefault();importListingUrl();}});function updateAutoHints(){const text=document.querySelector("#title").value+" "+document.querySelector("#desc").value+" "+photoOcrText;const explicit=document.querySelector("#identifier").value.trim();const cands=extractIdentifierCandidates(text);const idHint=document.querySelector("#autoIdHint");if(explicit)idHint.textContent="Using the identifier you entered.";else if(cands.length)idHint.textContent="Auto-detected from listing text: "+cands.join(", ");else idHint.textContent="";const ps=detectPlatformSignal(text),cs=detectCompletenessSignal(text);document.querySelector("#platformHint").textContent=document.querySelector("#platform").value?"Manual selection in use.":(ps.value?"Auto-detected: "+ps.value+" · "+ps.confidence:ps.confidence==="Conflict"?ps.reason:"");document.querySelector("#completeHint").textContent=document.querySelector("#complete").value!=="unknown"?"Manual selection in use.":(cs.value!=="unknown"?"Auto-detected: "+compLabel(cs.value)+" · "+cs.confidence:"");}["title","desc","identifier"].forEach(id=>document.querySelector("#"+id).addEventListener("input",updateAutoHints));["platform","complete"].forEach(id=>document.querySelector("#"+id).addEventListener("change",updateAutoHints));["allDiscsShown","galleryEnglish","issueCase","issueDisc","issuePaper","issueWriting"].forEach(id=>document.querySelector("#"+id).addEventListener("change",()=>{updateGallerySummary();updateAutoHints();}));
 document.querySelectorAll("[data-ex]").forEach(b=>b.onclick=()=>{const e=b.dataset.ex;if(e==="ff7"){title.value="Final Fantasy 7 PS1 PAL UK complete black label";platform.value="";complete.value="unknown";desc.value="PS1 original PAL copy, complete with case and manual. SCES-00867";identifier.value="";english.checked=true;}if(e==="sh"){title.value="Silent Hill PS1 PAL complete";platform.value="";complete.value="unknown";desc.value="PlayStation 1 PAL version, complete with manual. SLES-01514";identifier.value="";english.checked=false;}if(e==="ror"){title.value="Rule of Rose PS2 PAL English";platform.value="";complete.value="unknown";desc.value="PS2 European PAL copy, complete with manual. SLES-54218";identifier.value="";english.checked=true;}analyse();});
