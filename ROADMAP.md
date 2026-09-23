@@ -25,8 +25,15 @@
 - [ ] Keep eBay integration disabled until legitimate developer access is available
 - [ ] Connect a trusted release-safe pricing source after classification
 - [x] Build Saved Hunts / wishlist foundation in the browser
-- [ ] Add autonomous scheduled monitoring once backend + authorised live inventory exist
-- [ ] Add real notification delivery after account/backend infrastructure exists
+- [x] Add provider-neutral scheduled monitor core
+- [x] Add D1/SQLite persistence schema for server-side hunts, matches, monitor runs and notification queue
+- [x] Add Cloudflare Worker-style scheduler scaffold with health/admin-test endpoints
+- [x] Regression-test new-match deduplication, paused hunts and alert-request rules
+- [ ] Add authenticated account ownership + browser-to-backend Saved Hunt sync
+- [ ] Add server-compatible PALScout + matcher execution
+- [ ] Connect an authorised live marketplace inventory adapter
+- [ ] Enable autonomous scheduled monitoring only after auth + live inventory are configured
+- [ ] Add real notification delivery after user identity/contact verification exists
 
 ## Phase 2 — "Should I buy this?"
 - [x] Core listing classifier prototype exists
