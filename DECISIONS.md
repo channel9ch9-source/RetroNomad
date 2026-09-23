@@ -456,3 +456,57 @@ Customer-facing hierarchy:
 Primary proposition:
 **Find the right copy at the right price.**
 
+
+
+## Original RetroNomad product structure — reaffirmed 23 September 2026
+
+The original product concept is a **Retro Game Hunting Assistant** combining three major capabilities in one app, built in stages rather than simultaneously.
+
+### 1. Deal Finder
+Primary launch-facing experience.
+
+Users search RetroNomad for the game they want. RetroNomad discovers current authorised marketplace listings and surfaces copies that match the user's requirements.
+
+PALScout / regional intelligence operates underneath this feature to filter and classify:
+- compatibility
+- PAL / NTSC-U / NTSC-J
+- UK vs shared-PAL vs other European territory
+- exact physical release
+- edition / reissue
+- completeness
+- language / packaging where relevant
+
+### 2. Wishlist + price alerts
+Users define an exact target, for example:
+"Silent Hill PS1 PAL — alert me below £80"
+
+RetroNomad monitors authorised listing sources and alerts only when a matching copy appears.
+
+### 3. "Should I buy this?" listing analysis
+Secondary decision-support workflow.
+
+A user submits or opens a specific listing and RetroNomad combines:
+- exact-release identification
+- compatibility
+- completeness / condition
+- trusted reference pricing
+- asking price + postage
+- evidence quality
+
+This feature should explain the evidence behind the result. It must not fabricate sold-price averages or imply certainty where pricing or classification is weak.
+
+### 4. Lot Analyzer
+Later-stage feature.
+
+A user photographs or uploads a batch / pile of games. RetroNomad identifies the titles and physical releases where possible, estimates value from trusted sources, and highlights which items may be worth closer inspection.
+
+The differentiator should remain **UK/PAL buying intelligence and release accuracy**, not a generic AI scanner.
+
+### Build order
+Phase 1: Deal Finder + Wishlist alerts
+Phase 2: "Should I buy this?" analysis
+Phase 3: Photo / Lot Analyzer
+Phase 4: More marketplaces + advanced collector features
+
+The manual listing analyser currently in the repo is therefore a prototype / supporting utility for Phase 2, not the primary launch experience.
+
