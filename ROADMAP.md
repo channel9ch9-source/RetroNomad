@@ -33,7 +33,15 @@
 - [x] Build authenticated browser-to-backend Saved Hunt sync
 - [x] Add deletion tombstones so multi-device sync cannot resurrect removed hunts
 - [x] Add Account UI + wishlist sync controls + search save/sync hook
-- [ ] Deploy/configure the account backend on a suitable same-site/custom-domain setup
+- [x] Add same-origin Cloudflare Worker + Static Assets deployment build
+- [x] Add automated D1 create/resolve + migration tooling
+- [x] Add manual GitHub Actions scaffold deployment workflow
+- [x] Keep GitHub Pages runtime local-only while Cloudflare build enables account sync
+- [ ] Add Cloudflare API token + account ID as GitHub Actions secrets
+- [ ] Run first Cloudflare scaffold deployment
+- [ ] Smoke-test workers.dev static site, /health, D1 binding and account endpoints
+- [ ] Configure auth-email delivery so passwordless sign-in becomes live
+- [ ] Later move from workers.dev to a production/custom domain when appropriate
 - [ ] Configure transactional sign-in email delivery + abuse/rate controls
 - [ ] Update privacy/account-data policy before enabling public accounts
 - [x] Add server-compatible PALScout + matcher execution
