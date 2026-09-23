@@ -114,8 +114,14 @@ Open:
 - [x] Export and inspect the first JSON report
 - [x] Identify that the original harness collapsed every result into NO_PAL_MATCH after filtering
 - [x] Add diagnostic v2 with raw candidate capture and separate platform/region mismatch states
-- [ ] Rerun all 100 titles with diagnostic v2
-- [ ] Export and upload the diagnostic-v2 JSON report
+- [x] Rerun all 100 titles with diagnostic v2
+- [x] Export and inspect the diagnostic-v2 JSON report
+- [x] Confirm provider platform-label mismatch and nullable region behaviour
+- [x] Confirm UPC catalogue coverage is extremely sparse in this test
+- [x] Add diagnostic v3 using the provider price endpoint first
+- [ ] Run all 100 titles with diagnostic v3
+- [ ] Export and upload the diagnostic-v3 JSON report
+- [ ] Decide whether RetroTechCollector is viable for the launch scope or should be replaced/limited
 
 ## Step 3 — audit results
 For every non-clean result, categorise it as one of:
