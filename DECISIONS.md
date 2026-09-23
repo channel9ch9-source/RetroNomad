@@ -255,6 +255,21 @@ Do not fabricate a provider price or convert weak identity evidence into a prici
 
 ---
 
+## PALScout hardware compatibility rule
+
+PALScout must keep **hardware compatibility** separate from **UK-market identity**.
+
+For the launch PS1/PS2/Dreamcast scope, the compatibility question means:
+“Should this physical copy run on a standard, unmodified UK/European console of the matching platform?”
+
+Rules:
+- PAL-family evidence supports UK/European hardware compatibility.
+- Explicit NTSC-U or NTSC-J evidence does not.
+- A non-UK PAL copy (for example France, Germany, Spain or Italy) may still be hardware-compatible even when it belongs outside the UK collector comparison bucket.
+- Unknown/conflicting region evidence becomes a compatibility review state rather than a guess.
+- Language/packaging suitability is reported separately.
+- Modified consoles, import adapters and bypass methods are not assumed.
+
 ## 7. PriceCharting decision
 
 PriceCharting remains a possible future provider.
