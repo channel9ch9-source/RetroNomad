@@ -176,7 +176,7 @@ Proceed only when:
 - [x] Add a 6-second timeout + graceful fallback to listing URL import
 - [x] Re-test exposed a post-fetch UI hang on the eBay path
 - [x] Replace eBay direct browser fetch with immediate URL-only fallback
-- [ ] Re-test the public analyser with a real eBay link; expected result is immediate recognition + item ID/title-from-URL when available
+- [x] Re-test the public analyser with a real eBay link: immediate recognition worked and item ID was recovered; title remains unavailable when the URL itself contains no usable title slug
 
 # Active milestone — Find a release-safe licensed pricing source
 
