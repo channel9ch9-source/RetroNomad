@@ -1,0 +1,73 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://channel9ch9-source.github.io/retronomad/saved-hunt.schema.json",
+  "title": "RetroNomad Saved Hunt",
+  "type": "object",
+  "required": ["schemaVersion", "id", "label", "target", "status", "createdAt", "updatedAt", "monitoring", "alerts", "matchHistory"],
+  "properties": {
+    "schemaVersion": {"const": 1},
+    "id": {"type": "string", "minLength": 1},
+    "label": {"type": "string", "minLength": 1},
+    "target": {
+      "type": "object",
+      "required": ["game", "platform", "compatibility", "releasePreference", "editionPreference", "completeness", "condition", "englishRequired", "excludeBundles", "excludePromo", "maxDeliveredGbp"],
+      "properties": {
+        "game": {"type": "string", "minLength": 1},
+        "platform": {"type": "string"},
+        "compatibility": {"type": "string"},
+        "releasePreference": {"type": "string"},
+        "editionPreference": {"type": "string"},
+        "completeness": {"type": "string"},
+        "condition": {"type": "string"},
+        "englishRequired": {"type": "boolean"},
+        "excludeBundles": {"type": "boolean"},
+        "excludePromo": {"type": "boolean"},
+        "maxDeliveredGbp": {"type": ["number", "null"], "minimum": 0}
+      },
+      "additionalProperties": false
+    },
+    "status": {"enum": ["ACTIVE", "PAUSED", "ARCHIVED"]},
+    "createdAt": {"type": "string", "format": "date-time"},
+    "updatedAt": {"type": "string", "format": "date-time"},
+    "monitoring": {
+      "type": "object",
+      "required": ["state", "lastCheckedAt", "lastCheckSummary"],
+      "properties": {
+        "state": {"type": "string"},
+        "lastCheckedAt": {"type": ["string", "null"], "format": "date-time"},
+        "lastCheckSummary": {"type": ["object", "null"]}
+      },
+      "additionalProperties": false
+    },
+    "alerts": {
+      "type": "object",
+      "required": ["requested", "state", "channel", "lastNotifiedAt"],
+      "properties": {
+        "requested": {"type": "boolean"},
+        "state": {"type": "string"},
+        "channel": {"type": ["string", "null"]},
+        "lastNotifiedAt": {"type": ["string", "null"], "format": "date-time"}
+      },
+      "additionalProperties": false
+    },
+    "matchHistory": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["source", "externalId", "title", "canonicalUrl", "deliveredGbp", "firstSeenAt", "lastSeenAt", "lastMatchState"],
+        "properties": {
+          "source": {"type": "string"},
+          "externalId": {"type": "string"},
+          "title": {"type": "string"},
+          "canonicalUrl": {"type": "string"},
+          "deliveredGbp": {"type": ["number", "null"], "minimum": 0},
+          "firstSeenAt": {"type": "string", "format": "date-time"},
+          "lastSeenAt": {"type": "string", "format": "date-time"},
+          "lastMatchState": {"const": "MATCH"}
+        },
+        "additionalProperties": false
+      }
+    }
+  },
+  "additionalProperties": false
+}
