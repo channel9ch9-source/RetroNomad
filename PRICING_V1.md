@@ -48,6 +48,28 @@ Provider bucket map:
 - Manual Only -> manualOnly
 - Incomplete / Condition-specific -> no automatic provider price
 
+## Coverage validation
+
+A browser-side validation runner lives at:
+
+- `pricing-coverage.html`
+
+It is an internal/developer tool for roadmap validation, not a source of fabricated coverage claims.
+
+The runner:
+- derives the 100 launch game/platform pairs from `release-evidence.js`
+- prefers a safe numeric barcode/EAN when one is present in RetroNomad evidence
+- falls back to exact game-title + mapped platform search
+- requires PAL + exact platform
+- rejects weak title agreement even when a barcode query returns a row
+- rejects multiple similarly strong PAL candidates instead of selecting one arbitrarily
+- fetches `/prices/:masterItemId` only after a safe catalogue match
+- records which of loose/CIB/new/box-only/manual-only price buckets are populated
+- paces calls below the standalone Developer API add-on's documented 60 requests/minute burst limit
+- exports a JSON report that never contains the developer key
+
+Important: creation of this runner is **not** a completed provider coverage test. A real developer key still needs to be used to run the 100-title validation and review the exported failures/ambiguities.
+
 ## Production mode
 
 A public shared provider key must never be embedded in analyze.html.
