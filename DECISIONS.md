@@ -525,3 +525,20 @@ Current static-beta decision:
 
 This prevents the browser prototype from implying that scheduled monitoring exists when it does not.
 
+
+
+## Alert backend architecture — 23 September 2026
+
+The first alert backend is provider-neutral and uses a queue/deduplication model.
+
+Rules:
+- only MATCH may trigger a saved-hunt alert
+- REVIEW and FILTERED never trigger an automatic alert
+- alert deduplication uses marketplace source + external listing ID
+- the same listing must not repeatedly alert on every scheduled check
+- paused/archived hunts are not monitored
+- a saved alert preference is not the same as an active notification channel
+- public hunt sync remains disabled until authenticated ownership exists
+- no marketplace scraping should be added merely to make the scheduler appear functional while authorised API access is unavailable
+
+The current Worker/D1 implementation is a scaffold. The data contracts and monitor logic should remain portable rather than locking the product permanently to one hosting vendor.
