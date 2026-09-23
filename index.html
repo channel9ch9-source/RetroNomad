@@ -1,21 +1,263 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="description" content="RetroNomad helps physical game collectors identify the exact release before comparing prices."><title>RetroNomad — Find the right copy</title><style>
-:root{--bg:#090b0f;--panel:#121722;--text:#f7f8fb;--muted:#9aa6b7;--line:#283244;--green:#94f7b2;--max:1180px}
-*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:radial-gradient(1000px 520px at 50% -180px,rgba(83,127,196,.22),transparent 64%),#090b0f;color:var(--text);font:16px/1.55 system-ui,-apple-system,Segoe UI,sans-serif}
-a{color:inherit}.wrap{width:min(var(--max),calc(100% - 36px));margin:auto}nav{height:72px;display:flex;align-items:center;justify-content:space-between}.brand{display:flex;gap:10px;align-items:center;text-decoration:none;font-weight:900;font-size:21px}.mark{width:30px;height:30px;border:1px solid #39506a;border-radius:9px;display:grid;place-items:center;background:#111926;color:var(--green);font-size:13px}.nav{display:flex;gap:22px;color:var(--muted);font-size:14px}.nav a{text-decoration:none}
-.hero{padding:88px 0 70px;text-align:center}.eyebrow{display:inline-block;border:1px solid var(--line);border-radius:999px;padding:7px 11px;color:var(--green);font-size:13px;font-weight:800;background:#101622}h1{font-size:clamp(48px,8vw,82px);line-height:.97;letter-spacing:-.06em;margin:24px auto 22px;max-width:980px}h1 span{color:#c9d7e8}.lead{font-size:clamp(18px,2.2vw,22px);color:var(--muted);max-width:800px;margin:0 auto 28px}.actions{display:flex;justify-content:center;gap:11px;flex-wrap:wrap}.btn{padding:12px 17px;border-radius:10px;text-decoration:none;font-weight:800;border:1px solid var(--line);background:#151c28}.btn.primary{background:var(--text);color:#0b0d12}.note{margin-top:15px;color:#728096;font-size:13px}
-.demo{margin:58px auto 0;max-width:1000px;background:#0d121a;border:1px solid #344055;border-radius:20px;overflow:hidden;text-align:left;box-shadow:0 32px 90px rgba(0,0,0,.4)}.bar{height:43px;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:7px;padding:0 15px}.dot{width:9px;height:9px;background:#394456;border-radius:50%}.demo-body{padding:18px}.search{display:grid;grid-template-columns:1fr 150px 100px;gap:9px}.fake{border:1px solid var(--line);background:#0b1017;border-radius:9px;padding:11px 12px;color:#909db0}.fake.go{background:#20304a;color:var(--text);text-align:center;font-weight:800}.summary{display:flex;gap:8px;flex-wrap:wrap;margin:15px 0}.pill{border:1px solid var(--line);border-radius:999px;padding:5px 8px;font-size:12px;color:#9dabbf}.listing{display:grid;grid-template-columns:1fr auto;gap:14px;padding:14px;border:1px solid var(--line);border-radius:12px;background:#111722;margin-top:10px}.title{font-weight:800}.tags{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}.tag{font-size:11px;padding:3px 6px;border:1px solid var(--line);border-radius:6px;color:#bac5d4}.status{font-size:12px;font-weight:900;margin-top:8px;color:var(--green)}.review{color:#ffd977}.price{text-align:right;font-size:18px;font-weight:900}.price small{display:block;color:var(--muted);font-size:11px;font-weight:500}
-section{padding:78px 0}.kicker{font-size:12px;color:var(--green);font-weight:900;text-transform:uppercase;letter-spacing:.14em}h2{font-size:clamp(34px,5vw,52px);line-height:1.04;letter-spacing:-.05em;margin:12px 0 16px;max-width:850px}.section-lead{font-size:18px;color:var(--muted);max-width:780px}.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:30px}.card{background:#111720;border:1px solid var(--line);border-radius:15px;padding:21px}.card h3{margin:4px 0 8px}.card p{margin:0;color:var(--muted);font-size:14px}.flow{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:30px}.step{border-top:1px solid var(--line);padding-top:16px}.step b{display:block;margin:7px 0}.step p{color:var(--muted);font-size:14px;margin:0}.num{font-size:12px;color:var(--green);font-weight:900}.band{margin-top:30px;border:1px solid #32415a;background:#121b29;border-radius:18px;padding:26px}.band strong{color:var(--green)}
-.palscout{background:linear-gradient(180deg,rgba(31,55,44,.22),transparent)}.pal{font-size:42px;font-weight:950;letter-spacing:-.05em}.pal span{color:var(--green)}.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:28px}.stat{background:#111720;border:1px solid var(--line);border-radius:14px;padding:18px}.stat b{display:block;font-size:28px}.stat span{color:var(--muted);font-size:13px}details{border-bottom:1px solid var(--line);padding:18px 0}summary{font-weight:800;cursor:pointer}details p{color:var(--muted)}
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="description" content="RetroNomad helps retro-game buyers check PAL compatibility, identify the exact physical release and compare the right copy.">
+<title>RetroNomad — Check the copy before you buy</title>
+<style>
+:root{
+  --bg:#090b0f;--panel:#111720;--panel2:#0d141d;--text:#f7f8fb;--muted:#98a5b7;
+  --line:#293447;--green:#94f7b2;--amber:#ffd977;--red:#ff9da6;--blue:#8cc8ff;--max:1180px
+}
+*{box-sizing:border-box}html{scroll-behavior:smooth}
+body{margin:0;background:radial-gradient(1100px 560px at 50% -220px,rgba(83,127,196,.24),transparent 65%),var(--bg);color:var(--text);font:16px/1.55 system-ui,-apple-system,Segoe UI,sans-serif}
+a{color:inherit}.wrap{width:min(var(--max),calc(100% - 36px));margin:auto}
+nav{height:72px;display:flex;align-items:center;justify-content:space-between}
+.brand{display:flex;gap:10px;align-items:center;text-decoration:none;font-weight:950;font-size:21px}
+.mark{width:31px;height:31px;border:1px solid #39506a;border-radius:9px;display:grid;place-items:center;background:#111926;color:var(--green);font-size:12px}
+.nav{display:flex;gap:22px;color:var(--muted);font-size:14px}.nav a{text-decoration:none}.nav a:hover{color:var(--text)}
+.hero{padding:76px 0 62px}.hero-grid{display:grid;grid-template-columns:1.05fr .95fr;gap:42px;align-items:center}
+.eyebrow{display:inline-flex;align-items:center;gap:7px;border:1px solid #315b43;border-radius:999px;padding:7px 11px;color:var(--green);font-size:12px;font-weight:900;background:#0f1914;text-transform:uppercase;letter-spacing:.09em}
+h1{font-size:clamp(48px,7vw,78px);line-height:.96;letter-spacing:-.06em;margin:20px 0 20px;max-width:760px}
+h1 span{color:#cbd8e8}.lead{font-size:clamp(18px,2vw,21px);color:var(--muted);max-width:720px;margin:0 0 26px}
+.actions{display:flex;gap:11px;flex-wrap:wrap}.btn{display:inline-block;padding:13px 18px;border-radius:10px;text-decoration:none;font-weight:900;border:1px solid var(--line);background:#151c28}.btn.primary{background:var(--text);color:#0b0d12}.btn:hover{transform:translateY(-1px)}
+.note{margin-top:15px;color:#728096;font-size:13px}
+.checkcard{background:linear-gradient(180deg,#121925,#0d1219);border:1px solid #344055;border-radius:20px;overflow:hidden;box-shadow:0 30px 90px rgba(0,0,0,.36)}
+.checkhead{padding:15px 18px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center;gap:14px}
+.checkhead b{font-size:14px}.live{font-size:11px;color:var(--green);border:1px solid #315b43;background:#0f1914;border-radius:999px;padding:4px 7px;font-weight:900}
+.checkbody{padding:18px}.inputmock{border:1px solid var(--line);border-radius:10px;background:#090e15;padding:12px;color:#78879a;font-size:13px;margin-bottom:12px}
+.resultcard{border:1px solid #315b43;background:#0f1914;border-radius:13px;padding:16px;margin-top:10px}
+.resulttop{display:flex;justify-content:space-between;gap:10px;align-items:flex-start}.resulttop strong{font-size:18px}
+.badge{display:inline-block;font-size:10px;font-weight:950;letter-spacing:.07em;padding:4px 7px;border-radius:999px;border:1px solid #315b43;color:var(--green);white-space:nowrap}
+.resultcard p{margin:7px 0 0;color:#aeb9c7;font-size:13px}.facts{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px}
+.fact{border:1px solid var(--line);border-radius:9px;background:#0b1118;padding:10px}.fact span{display:block;color:#718096;font-size:10px;text-transform:uppercase;letter-spacing:.08em}.fact b{display:block;margin-top:3px;font-size:13px}
+.example-note{margin-top:11px;color:#6f7d91;font-size:11px}
+section{padding:76px 0}.kicker{font-size:12px;color:var(--green);font-weight:900;text-transform:uppercase;letter-spacing:.14em}
+h2{font-size:clamp(34px,5vw,53px);line-height:1.03;letter-spacing:-.05em;margin:12px 0 16px;max-width:900px}.section-lead{font-size:18px;color:var(--muted);max-width:800px}
+.journey{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:32px}.step{border:1px solid var(--line);border-radius:15px;background:var(--panel);padding:21px;min-height:190px}
+.num{font-size:11px;color:var(--green);font-weight:950;letter-spacing:.08em}.step h3{margin:10px 0 8px;font-size:19px}.step p{margin:0;color:var(--muted);font-size:14px}
+.step.future{border-style:dashed}.futuretag{color:var(--amber);font-size:10px;font-weight:900;text-transform:uppercase;letter-spacing:.07em}
+.palscout{background:linear-gradient(180deg,rgba(31,55,44,.26),rgba(9,11,15,0))}
+.palgrid{display:grid;grid-template-columns:.9fr 1.1fr;gap:36px;align-items:start}.pal{font-size:48px;font-weight:950;letter-spacing:-.055em}.pal span{color:var(--green)}
+.palpoint{border-bottom:1px solid var(--line);padding:17px 0}.palpoint:first-child{padding-top:0}.palpoint strong{display:block;font-size:17px}.palpoint p{margin:5px 0 0;color:var(--muted);font-size:14px}
+.callout{margin-top:25px;border:1px solid #32415a;background:#111a28;border-radius:16px;padding:20px;color:#c1ccda}.callout strong{color:var(--green)}
+.featuregrid{display:grid;grid-template-columns:repeat(3,1fr);gap:13px;margin-top:30px}.feature{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:19px}.feature .state{font-size:10px;font-weight:900;color:var(--green);text-transform:uppercase;letter-spacing:.08em}.feature .state.planned{color:var(--amber)}.feature h3{margin:8px 0 7px}.feature p{margin:0;color:var(--muted);font-size:14px}
+.globalbox{display:grid;grid-template-columns:1.2fr .8fr;gap:20px;margin-top:28px}.regions{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}.region{border:1px solid var(--line);border-radius:12px;padding:16px;background:#0e141d}.region b{display:block}.region span{display:block;color:var(--muted);font-size:12px;margin-top:4px}.region.active{border-color:#315b43;background:#0f1914}.region.active b{color:var(--green)}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:11px}.stat{background:var(--panel);border:1px solid var(--line);border-radius:13px;padding:17px}.stat b{display:block;font-size:26px}.stat span{color:var(--muted);font-size:12px}
+.faq details{border-bottom:1px solid var(--line);padding:18px 0}.faq summary{font-weight:850;cursor:pointer}.faq p{color:var(--muted);max-width:850px}
+.cta{padding:36px;border:1px solid #315b43;background:linear-gradient(135deg,#101c17,#101722);border-radius:20px;display:flex;justify-content:space-between;align-items:center;gap:24px}.cta h2{font-size:clamp(30px,4vw,45px);margin:0 0 8px}.cta p{color:var(--muted);margin:0;max-width:650px}
 footer{border-top:1px solid var(--line);padding:34px 0 48px;color:var(--muted);font-size:13px}.foot{display:flex;justify-content:space-between;gap:18px;flex-wrap:wrap}.footlinks{display:flex;gap:16px}
-@media(max-width:780px){.grid3,.flow,.stats{grid-template-columns:1fr 1fr}.search{grid-template-columns:1fr}.nav{display:none}}@media(max-width:560px){.grid3,.flow,.stats{grid-template-columns:1fr}.listing{grid-template-columns:1fr}.price{text-align:left}}
-</style></head><body>
-<div class="wrap"><nav><a class="brand" href="index.html"><span class="mark">RN</span>RetroNomad</a><div class="nav"><a href="analyze.html">Analyse</a><a href="#product">Product</a><a href="#palscout">PALScout</a><a href="#roadmap">Roadmap</a><a href="#faq">FAQ</a></div></nav></div>
-<header class="wrap hero"><span class="eyebrow">Physical game discovery, without the guesswork</span><h1>Find the right copy.<br><span>Wherever it was released.</span></h1><p class="lead">RetroNomad is being built to identify the exact version of a physical game before comparing prices — region, territory, edition, completeness and more.</p><div class="actions"><a class="btn primary" href="analyze.html">Analyse a listing</a><a class="btn" href="#palscout">Meet PALScout</a></div><div class="note">Global ambition · UK/PAL launch focus · PS1, PS2 and Dreamcast first</div>
-<div class="demo" id="product"><div class="bar"><span class="dot"></span><span class="dot"></span><span class="dot"></span></div><div class="demo-body"><div class="search"><div class="fake">Silent Hill</div><div class="fake">PlayStation 1</div><div class="fake go">Search</div></div><div class="summary"><span class="pill">18 listings found</span><span class="pill">4 comparison-ready</span><span class="pill">7 review</span><span class="pill">7 filtered</span></div><div class="listing"><div><div class="title">Silent Hill — Original PAL release</div><div class="tags"><span class="tag">PAL</span><span class="tag">Original</span><span class="tag">Complete</span><span class="tag">UK package match</span></div><div class="status">COMPARISON-READY</div></div><div class="price">£—<small>trusted pricing required</small></div></div><div class="listing"><div><div class="title">Silent Hill — European PAL copy</div><div class="tags"><span class="tag">PAL</span><span class="tag">Original</span><span class="tag">Package unclear</span></div><div class="status review">NEEDS REVIEW</div></div><div class="price">£—<small>gallery evidence needed</small></div></div></div></div></header>
-<section><div class="wrap"><div class="kicker">The problem</div><h2>Cheap only matters if you’re comparing the same game.</h2><p class="section-lead">Marketplace searches mix original releases, reissues, demos, imports, incomplete copies and different regional versions.</p><div class="grid3"><div class="card"><h3>Wrong region</h3><p>PAL, NTSC-U and NTSC-J copies belong in different markets.</p></div><div class="card"><h3>Wrong edition</h3><p>Original, budget, promo and special editions can have very different collector values.</p></div><div class="card"><h3>Wrong completeness</h3><p>A complete copy should not be valued against disc-only, no-manual or case-only listings.</p></div></div></div></section>
-<section><div class="wrap"><div class="kicker">How it works</div><h2>Classify first. Compare second.</h2><div class="flow"><div class="step"><span class="num">01</span><b>Find listings</b><p>Use authorised marketplace inventory sources.</p></div><div class="step"><span class="num">02</span><b>Identify release</b><p>Resolve platform, region, territory and edition.</p></div><div class="step"><span class="num">03</span><b>Check completeness</b><p>Separate complete copies from incomplete or misleading listings.</p></div><div class="step"><span class="num">04</span><b>Compare properly</b><p>Only equivalent copies enter the same price bucket.</p></div></div><div class="band"><strong>Accuracy comes before coverage.</strong> RetroNomad is designed to return “needs review” when evidence is weak instead of pretending every listing can be classified with certainty.</div></div></section>
-<section class="palscout" id="palscout"><div class="wrap"><div class="kicker">Regional intelligence</div><div class="pal">PAL<span>Scout</span></div><h2>The first regional engine inside RetroNomad.</h2><p class="section-lead">PALScout handles UK and European physical releases using verified serials, barcodes, shared-PAL mappings and packaging evidence.</p><div class="grid3"><div class="card"><h3>Exact UK</h3><p>Country-specific identifiers or verified packaging can confirm a UK release.</p></div><div class="card"><h3>Shared PAL</h3><p>Recognises one physical SKU genuinely sold across the UK and several PAL territories.</p></div><div class="card"><h3>Package check</h3><p>When identifiers are shared too widely, PALScout asks for gallery evidence instead of guessing.</p></div></div></div></section>
-<section id="roadmap"><div class="wrap"><div class="kicker">Launch scope</div><h2>Start with one difficult market. Build outward.</h2><p class="section-lead">UK/PAL PS1, PS2 and Dreamcast are the proving ground, not the permanent boundary.</p><div class="stats"><div class="stat"><b>100</b><span>initial catalogue games</span></div><div class="stat"><b>217+</b><span>release-evidence records</span></div><div class="stat"><b>3</b><span>launch platforms</span></div><div class="stat"><b>Global</b><span>long-term scope</span></div></div></div></section>
-<section id="faq"><div class="wrap"><div class="kicker">FAQ</div><h2>Built for collectors, not just price searching.</h2><details open><summary>Is RetroNomad another collection tracker?</summary><p>No. The launch product is focused on helping buyers identify and evaluate listings.</p></details><details><summary>Does “comparison-ready” mean “good deal”?</summary><p>No. It means the listing has enough evidence to enter the correct comparison bucket. Deal grading comes only after trustworthy reference pricing.</p></details><details><summary>Will it support US and Japanese games?</summary><p>That is the intention. RetroNomad is the global product; PALScout is simply the first regional identification layer.</p></details><details><summary>Is RetroNomad affiliated with eBay or console manufacturers?</summary><p>No. RetroNomad is an independent project. Future marketplace integrations will use authorised or otherwise permitted access.</p></details></div></section>
-<footer><div class="wrap foot"><div>© 2026 RetroNomad · Independent project</div><div class="footlinks"><a href="about.html">About</a><a href="privacy.html">Privacy</a><a href="terms.html">Terms</a></div></div></footer>
-</body></html>
+@media(max-width:900px){.hero-grid,.palgrid,.globalbox{grid-template-columns:1fr}.journey{grid-template-columns:1fr 1fr}.hero{padding-top:50px}}
+@media(max-width:720px){.featuregrid,.regions,.stats{grid-template-columns:1fr 1fr}.nav{display:none}.cta{align-items:flex-start;flex-direction:column}}
+@media(max-width:540px){.journey,.featuregrid,.regions,.stats,.facts{grid-template-columns:1fr}h1{font-size:48px}.pal{font-size:40px}.wrap{width:min(var(--max),calc(100% - 24px))}}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+<nav>
+  <a class="brand" href="index.html"><span class="mark">RN</span>RetroNomad</a>
+  <div class="nav">
+    <a href="#how">How it works</a>
+    <a href="#palscout">PALScout</a>
+    <a href="#features">Features</a>
+    <a href="#faq">FAQ</a>
+    <a href="analyze.html">Analyse</a>
+  </div>
+</nav>
+</div>
+
+<header class="wrap hero">
+  <div class="hero-grid">
+    <div>
+      <span class="eyebrow">PALScout · UK &amp; Europe beta</span>
+      <h1>Check the copy<br><span>before you buy.</span></h1>
+      <p class="lead">Paste a retro-game listing and PALScout helps answer the first question that matters: <strong>will this physical copy work on standard UK/European hardware?</strong> RetroNomad then identifies the exact release, edition and completeness before any price comparison.</p>
+      <div class="actions">
+        <a class="btn primary" href="analyze.html">Check a listing</a>
+        <a class="btn" href="#palscout">What is PALScout?</a>
+      </div>
+      <div class="note">Launch beta: PS1 · PS2 · Dreamcast · UK/European PAL focus</div>
+    </div>
+
+    <div class="checkcard" aria-label="Example PALScout analysis">
+      <div class="checkhead"><b>Example listing check</b><span class="live">PALSCOUT</span></div>
+      <div class="checkbody">
+        <div class="inputmock">ebay.co.uk/itm/… Silent Hill PS1 PAL complete</div>
+        <div class="resultcard">
+          <div class="resulttop">
+            <strong>Compatible with UK/European PAL hardware</strong>
+            <span class="badge">PAL COMPATIBLE</span>
+          </div>
+          <p>A recognised PAL-family release signal supports compatibility with a standard unmodified UK/European PlayStation.</p>
+          <div class="facts">
+            <div class="fact"><span>Game</span><b>Silent Hill</b></div>
+            <div class="fact"><span>Platform</span><b>PlayStation</b></div>
+            <div class="fact"><span>Release</span><b>Shared PAL · verify package</b></div>
+            <div class="fact"><span>Completeness</span><b>Complete · seller claim</b></div>
+          </div>
+        </div>
+        <div class="example-note">Illustrative example. Real results depend on the evidence available in each listing.</div>
+      </div>
+    </div>
+  </div>
+</header>
+
+<section id="how">
+  <div class="wrap">
+    <div class="kicker">One listing, four answers</div>
+    <h2>From “will it work?” to “is it the right copy?”</h2>
+    <p class="section-lead">RetroNomad is designed around the questions a buyer actually has when looking at a physical retro-game listing.</p>
+
+    <div class="journey">
+      <div class="step">
+        <span class="num">01 · PALScout</span>
+        <h3>Check compatibility</h3>
+        <p>Detect PAL versus NTSC-U/NTSC-J evidence and tell a UK/European buyer whether the copy appears suitable for standard regional hardware.</p>
+      </div>
+      <div class="step">
+        <span class="num">02 · Release ID</span>
+        <h3>Identify the exact copy</h3>
+        <p>Use serials, barcodes, listing text and packaging evidence to separate UK, shared-PAL, European and other physical releases.</p>
+      </div>
+      <div class="step">
+        <span class="num">03 · Completeness</span>
+        <h3>Check what is included</h3>
+        <p>Separate complete copies from disc-only, missing-manual, incomplete, demo, promo and bundle listings.</p>
+      </div>
+      <div class="step future">
+        <span class="num">04 · Pricing</span>
+        <div class="futuretag">In development</div>
+        <h3>Compare the right price</h3>
+        <p>Once a trusted release-safe pricing source is connected, compare the listing only with the correct region, edition and completeness bucket.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="palscout" id="palscout">
+  <div class="wrap palgrid">
+    <div>
+      <div class="kicker">Regional intelligence</div>
+      <div class="pal">PAL<span>Scout</span></div>
+      <h2>PAL compatibility and PAL collecting are not the same question.</h2>
+      <p class="section-lead">A French, German or Spanish PAL copy may work perfectly on UK PAL hardware without being a UK-market copy. PALScout keeps those questions separate.</p>
+      <div class="callout"><strong>Launch compatibility target:</strong> a standard, unmodified UK/European console of the matching platform. Modified consoles, import adapters and bypass methods are outside the beta verdict.</div>
+    </div>
+    <div>
+      <div class="palpoint">
+        <strong>Will it run on my console?</strong>
+        <p>PALScout separates PAL-family evidence from NTSC-U and NTSC-J signals and returns a clear compatible, incompatible or unconfirmed verdict.</p>
+      </div>
+      <div class="palpoint">
+        <strong>Is it actually a UK copy?</strong>
+        <p>Hardware compatibility does not automatically make a game UK-specific. Country and shared-PAL release evidence are reported separately.</p>
+      </div>
+      <div class="palpoint">
+        <strong>Is the packaging/language right for me?</strong>
+        <p>A compatible European game can still have French, German, Spanish or Italian packaging. Language and package evidence remain visible.</p>
+      </div>
+      <div class="palpoint">
+        <strong>What if the listing is unclear?</strong>
+        <p>PALScout returns “needs review” when the evidence is weak or conflicting instead of converting uncertainty into a confident guess.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="features">
+  <div class="wrap">
+    <div class="kicker">What RetroNomad does</div>
+    <h2>A buying assistant, not just another game database.</h2>
+    <p class="section-lead">The beta already analyses user-supplied listings. Discovery and automated deal monitoring come later through authorised data sources.</p>
+
+    <div class="featuregrid">
+      <div class="feature"><span class="state">Available now</span><h3>Paste a listing URL</h3><p>Submit an eBay or other public listing URL, then supplement it with listing text when the marketplace blocks browser import.</p></div>
+      <div class="feature"><span class="state">Available now</span><h3>Upload listing photos</h3><p>Scan up to six gallery images for serials, barcodes and supporting package evidence while keeping image processing in the browser.</p></div>
+      <div class="feature"><span class="state">Available now</span><h3>PALScout compatibility</h3><p>Check whether a copy appears compatible with ordinary UK/European PAL hardware on the launch platforms.</p></div>
+      <div class="feature"><span class="state">Available now</span><h3>Exact release identification</h3><p>Distinguish UK releases, shared PAL SKUs, European variants, reissues, demos, promos and conflicting territory evidence.</p></div>
+      <div class="feature"><span class="state">Available now</span><h3>Completeness &amp; condition evidence</h3><p>Track case, manual, discs, missing components and visible condition concerns before a listing enters a comparison bucket.</p></div>
+      <div class="feature"><span class="state planned">In development</span><h3>Exact-release valuation</h3><p>Connect a licensed pricing source so a PAL copy is valued against the correct physical release and completeness state.</p></div>
+      <div class="feature"><span class="state planned">Planned</span><h3>Wishlist &amp; target-price alerts</h3><p>Save the exact release you want, the completeness you accept and the maximum landed price you are willing to pay.</p></div>
+      <div class="feature"><span class="state planned">Planned</span><h3>Marketplace discovery</h3><p>Use authorised marketplace integrations to find live listings and filter wrong regions, editions and incomplete copies automatically.</p></div>
+      <div class="feature"><span class="state planned">Long term</span><h3>Global release intelligence</h3><p>Extend the same exact-copy logic beyond PAL into North American NTSC-U and Japanese NTSC-J releases.</p></div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <div class="kicker">RetroNomad beyond PAL</div>
+    <h2>PALScout is the first regional engine, not the whole destination.</h2>
+    <p class="section-lead">RetroNomad is the global product. The UK/European market is the proving ground because regional compatibility, shared releases and language variants make it a particularly difficult buying problem.</p>
+
+    <div class="globalbox">
+      <div class="regions">
+        <div class="region active"><b>UK / Europe</b><span>PALScout · active beta</span></div>
+        <div class="region"><b>United States</b><span>NTSC-U intelligence · planned</span></div>
+        <div class="region"><b>Japan</b><span>NTSC-J intelligence · planned</span></div>
+      </div>
+      <div class="stats">
+        <div class="stat"><b>100</b><span>launch game/platform pairs</span></div>
+        <div class="stat"><b>217+</b><span>release-evidence records</span></div>
+        <div class="stat"><b>3</b><span>launch platforms</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="faq" id="faq">
+  <div class="wrap">
+    <div class="kicker">FAQ</div>
+    <h2>What the beta can — and cannot — tell you.</h2>
+
+    <details open>
+      <summary>How do I use RetroNomad today?</summary>
+      <p>Open the listing analyser and paste a listing URL or listing text. You can also upload listing photos. RetroNomad uses the available evidence to identify the game, platform, regional release, edition and completeness.</p>
+    </details>
+    <details>
+      <summary>Does PAL-compatible mean it is a UK copy?</summary>
+      <p>No. A European PAL copy can be compatible with UK hardware while belonging to another country's market or using different packaging/language. PALScout reports compatibility and release identity separately.</p>
+    </details>
+    <details>
+      <summary>Does RetroNomad guarantee compatibility?</summary>
+      <p>No. The result is evidence-dependent. Unknown or conflicting evidence is held for review. The launch verdict assumes standard, unmodified UK/European hardware and does not cover every console revision, modification or import workaround.</p>
+    </details>
+    <details>
+      <summary>Can it tell me whether a listing is a good deal?</summary>
+      <p>Not reliably yet. The exact-release pricing layer is being developed and will only be enabled with a trustworthy, licensed pricing source. RetroNomad will not fabricate a market value when one is unavailable.</p>
+    </details>
+    <details>
+      <summary>Does it automatically search eBay?</summary>
+      <p>Not currently. Users can submit listings manually. Future marketplace discovery will use authorised or otherwise permitted access; the classifier is deliberately marketplace-independent.</p>
+    </details>
+    <details>
+      <summary>Will it support US and Japanese games?</summary>
+      <p>That is the long-term plan. RetroNomad is the global brand; PALScout is the first regional intelligence layer for the UK and European market.</p>
+    </details>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <div class="cta">
+      <div>
+        <div class="kicker">Try PALScout</div>
+        <h2>Found a retro-game listing?</h2>
+        <p>Paste it into RetroNomad and check the region, compatibility, release and completeness before you buy.</p>
+      </div>
+      <a class="btn primary" href="analyze.html">Check a listing</a>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap foot">
+    <div>© 2026 RetroNomad · Independent project</div>
+    <div class="footlinks"><a href="about.html">About</a><a href="privacy.html">Privacy</a><a href="terms.html">Terms</a></div>
+  </div>
+</footer>
+
+</body>
+</html>
