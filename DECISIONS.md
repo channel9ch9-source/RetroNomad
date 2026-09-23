@@ -510,3 +510,18 @@ Phase 4: More marketplaces + advanced collector features
 
 The manual listing analyser currently in the repo is therefore a prototype / supporting utility for Phase 2, not the primary launch experience.
 
+
+
+## Saved Hunts / alert-state boundary — 23 September 2026
+
+A Saved Hunt is the durable product object for wishlist + future alert monitoring.
+
+Current static-beta decision:
+- saving a hunt does not mean it is being monitored
+- recording "I want an alert" is a user preference only
+- the UI and data model must continue to say that alerts are unavailable until a real backend and authorised inventory source exist
+- foreground checks may update last-checked and match history
+- background checks, notification delivery and account persistence remain deferred infrastructure
+
+This prevents the browser prototype from implying that scheduled monitoring exists when it does not.
+
