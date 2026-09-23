@@ -105,11 +105,13 @@ function detectCompletenessSignal(text){
  if(/\b(disc only|disk only|loose disc|loose disk|no case)\b/.test(n))return{value:"disc_only",confidence:"High",reason:"Disc-only / loose-disc wording detected"};
  if(/\b(no manual|without manual|manual missing|missing manual|manual not included|no booklets?|without booklets?)\b/.test(n))return{value:"no_manual",confidence:"High",reason:"Missing-manual wording detected"}; if(/\b(missing (?:disc|disk) ?\d*|(?:disc|disk) ?\d+ missing|missing one (?:disc|disk)|missing a (?:disc|disk)|incomplete set)\b/.test(n))return{value:"incomplete",confidence:"High",reason:"Missing-disc / incomplete-set wording detected"};
  const strongComplete=[
-  /\bcomplete in box\b/,/\bcib\b/,/\bcomplete with (?:the )?manual\b/,/\bcomplete w manual\b/,
-  /\bboxed (?:copy )?(?:(?:with|and) )?(?:the )?manuals?\b/,/\bwith (?:the )?manuals? (?:and|with) (?:the )?(?:box|case)\b/,
-  /\b(?:box|case) (?:(?:and|with) )?(?:the )?manuals?\b/,/\bmanuals? (?:(?:and|with) )?(?:the )?(?:box|case)\b/,
-  /\bmanual included\b/,/\bincludes (?:the )?manual\b/,/\binstruction booklet included\b/,
-  /\b\d+ discs? (?:(?:and|with) )?(?:the )?manuals?\b/,/\ball \d+ discs? (?:(?:and|with) )?(?:the )?manuals?\b/
+  /\bcomplete in box\b/,/\bcib\b/,/\bcomplete with (?:the )?(?:instruction )?manual\b/,/\bcomplete w (?:instruction )?manual\b/,
+  /\bboxed (?:copy )?(?:(?:with|and) )?(?:the )?(?:instruction )?manuals?\b/,/\bwith (?:the )?(?:instruction )?manuals? (?:and|with) (?:the )?(?:box|case)\b/,
+  /\b(?:box|case) (?:(?:and|with) )?(?:the )?(?:instruction )?manuals?\b/,/\b(?:instruction )?manuals? (?:(?:and|with) )?(?:the )?(?:box|case)\b/,
+  /\b(?:instruction )?manual included\b/,/\bincludes (?:the )?(?:instruction )?manual\b/,/\binstruction booklet included\b/,
+  /\b\d+ discs? (?:(?:and|with) )?(?:the )?(?:instruction )?manuals?\b/,/\ball \d+ discs? (?:(?:and|with) )?(?:the )?(?:instruction )?manuals?\b/,
+  /\bcover (?:and|with) (?:the )?(?:instruction )?manuals? (?:(?:and|with) )?(?:the )?disc\b/,
+  /\bcover (?:and|with) (?:the )?(?:instruction )?manuals? disc\b/
  ];
  if(strongComplete.some(r=>r.test(n)))return{value:"complete",confidence:"High",reason:"Box/manual or full-disc/manual wording supports a complete copy"};
  if(!/\b(incomplete|not complete|missing|without)\b/.test(n)&&/\bcomplete\b/.test(n))return{value:"complete",confidence:"Medium",reason:"Seller describes the item as complete; gallery confirmation is still stronger"}; if(/\b(new )?sealed\b/.test(n)&&!/\b(case only|box only|artwork only)\b/.test(n))return{value:"complete",confidence:"Medium",reason:"Seller describes a sealed retail copy; this supports completeness but not condition/authenticity"};
