@@ -6,6 +6,12 @@
 - [x] Define PALScout as the UK/European classification engine under search results
 - [x] Add public search.html Phase 1 shell using the 100-game launch catalogue
 - [x] Add browser-local saved-target prototype without claiming active alerts
+- [x] Replace bare saved targets with versioned Saved Hunts model
+- [x] Add wishlist.html management UI
+- [x] Add legacy saved-target migration, duplicate prevention and JSON export
+- [x] Add pause/archive/delete and future-alert preference state
+- [x] Add foreground last-checked + match-history support
+- [x] Reopen Saved Hunts directly in the Deal Finder search form
 - [x] Add marketplace-source.js provider registry and normalised listing schema
 - [x] Add reusable palscout-classifier.js for marketplace candidates
 - [x] Preserve item specifics, condition, identifiers and language signals in normalised marketplace rows
@@ -18,7 +24,9 @@
 - [x] Define the listing-normalisation / marketplace-source abstraction
 - [ ] Keep eBay integration disabled until legitimate developer access is available
 - [ ] Connect a trusted release-safe pricing source after classification
-- [ ] Build saved searches / target-price alerts once backend infrastructure exists
+- [x] Build Saved Hunts / wishlist foundation in the browser
+- [ ] Add autonomous scheduled monitoring once backend + authorised live inventory exist
+- [ ] Add real notification delivery after account/backend infrastructure exists
 
 ## Phase 2 — "Should I buy this?"
 - [x] Core listing classifier prototype exists
