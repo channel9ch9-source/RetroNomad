@@ -216,10 +216,10 @@ function renderEvidencePanel(ev,candidates,complete,english,explicitId){
 function inferredPriceBucket(text,complete,condition){
  const n=norm(text);
  if(/\bsealed\b/.test(n))return"New";
+ if(condition&&condition.issues&&condition.issues.length)return"Condition-specific";
  if(complete==="complete")return"CIB";
  if(complete==="disc_only")return"Loose";
  if(complete==="no_manual"||complete==="incomplete")return"Incomplete";
- if(condition&&condition.issues&&condition.issues.length)return"Condition-specific";
  return"Unresolved";
 }
 function money(v){return Number.isFinite(v)?"£"+v.toFixed(2):"—";}
@@ -236,7 +236,7 @@ function renderPricingV1(ctx){
  const typeLabel={market:"Market / price guide",target:"Personal target",comp:"Manual comparable"}[type]||type;
  document.querySelector("#pricingSource").textContent=typeLabel+" · "+(source||"Not supplied")+(date?" · "+date:"");
  const conf=document.querySelector("#pricingConfidence");
- if(type==="target"&&source){conf.textContent="User-defined target";conf.className="evgood";}
+ if(type==="target"){conf.textContent="User-defined target";conf.className="evgood";}
  else if(source&&date&&url){conf.textContent="Source + date + URL supplied";conf.className="evgood";}
  else if(source&&date){conf.textContent="Source + date supplied";conf.className="evgood";}
  else if(source||url){conf.textContent="Source supplied · date missing";conf.className="evwarn";}
