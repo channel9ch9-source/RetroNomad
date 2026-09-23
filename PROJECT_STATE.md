@@ -804,13 +804,28 @@ Automation:
 - deploys Worker + static assets
 
 Current deployment status:
-NOT DEPLOYED.
+DEPLOYED SUCCESSFULLY on 24 September 2026.
 
-The repository is deployment-ready, but this ChatGPT/GitHub connection cannot authorize a Cloudflare account and no Cloudflare connector is available here.
+Live scaffold:
+`https://retronomad-app.channel9ch9.workers.dev`
 
-User-side external setup still required:
-- Cloudflare account ID
-- Cloudflare API token stored directly in GitHub Actions secrets (never pasted into chat)
-- run the manual deployment workflow
+Deployment verification from GitHub Actions:
+- Cloudflare authentication succeeded
+- D1 database `retronomad-prod` was created
+- migration `0001_initial.sql` applied successfully
+- 24 static assets uploaded
+- Worker `retronomad-app` deployed successfully
+- workers.dev route created
+- hourly scheduled trigger deployed
+- deployed Worker version ID: `8f175db9-1933-4805-a53b-5da41250160b`
 
-Passwordless sign-in will additionally require a configured auth-email delivery webhook after the scaffold is live.
+The first deploy attempt failed only because the Cloudflare account had not yet registered its workers.dev subdomain. After `channel9ch9.workers.dev` became available, the failed deployment job was rerun and completed successfully.
+
+Current live limitation:
+- account/backend/D1 scaffold is deployed
+- passwordless email delivery is not configured yet
+- marketplace provider remains disabled
+- notification provider remains disabled
+
+Next deployment task:
+configure transactional email delivery for passwordless sign-in, then smoke-test real account creation/session/Saved Hunt sync end-to-end.
