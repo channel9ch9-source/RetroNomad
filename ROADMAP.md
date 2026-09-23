@@ -1,15 +1,32 @@
-# Search-first product pivot
+# Search-first product direction
 
+## Phase 1 — Deal Finder + Wishlist alerts
 - [x] Confirm RetroNomad as the primary search destination for buyers
 - [x] Reframe manual listing checker as a secondary utility
-- [x] Define customer-facing hierarchy: Search -> Filter -> Compare -> Alert
 - [x] Define PALScout as the UK/European classification engine under search results
-- [ ] Design the search-results data model and result-card fields
-- [ ] Define user search filters for launch scope
-- [ ] Build a marketplace-source abstraction that can accept authorised inventory providers later
+- [ ] Design the search form, launch filters and search-results card
+- [ ] Define the listing-normalisation / marketplace-source abstraction
 - [ ] Keep eBay integration disabled until legitimate developer access is available
-- [ ] Connect trusted pricing only after release classification
-- [ ] Add saved searches / target-price alerts after backend infrastructure exists
+- [ ] Connect a trusted release-safe pricing source after classification
+- [ ] Build saved searches / target-price alerts once backend infrastructure exists
+
+## Phase 2 — "Should I buy this?"
+- [x] Core listing classifier prototype exists
+- [x] PALScout compatibility verdict exists
+- [ ] Rework analyser UX as a secondary decision-support tool
+- [ ] Add trusted exact-release pricing comparison
+
+## Phase 3 — Photo / Lot Analyzer
+- [ ] Batch photo ingestion
+- [ ] Multi-game identification
+- [ ] Per-item release / completeness / value estimation
+- [ ] Highlight items worth closer inspection
+
+## Phase 4 — Expansion
+- [ ] More authorised marketplaces
+- [ ] NTSC-U / US regional intelligence
+- [ ] NTSC-J / Japan regional intelligence
+- [ ] Advanced collector features
 
 
 # RetroNomad Roadmap
