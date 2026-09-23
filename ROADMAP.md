@@ -174,7 +174,9 @@ Proceed only when:
 - [x] Smoke-test eBay URL item-ID/title parsing and Vinted source detection
 - [x] Browser smoke-test exposed a hanging direct eBay metadata request
 - [x] Add a 6-second timeout + graceful fallback to listing URL import
-- [ ] Re-test the public analyser with a real eBay listing after the timeout fix
+- [x] Re-test exposed a post-fetch UI hang on the eBay path
+- [x] Replace eBay direct browser fetch with immediate URL-only fallback
+- [ ] Re-test the public analyser with a real eBay link; expected result is immediate recognition + item ID/title-from-URL when available
 
 # Active milestone — Find a release-safe licensed pricing source
 
