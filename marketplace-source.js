@@ -25,6 +25,11 @@
    listedAt:raw.listedAt||null,
    fetchedAt:raw.fetchedAt||new Date().toISOString(),
    sourceRegion:String(raw.sourceRegion||""),
+   conditionText:String(raw.conditionText||raw.condition||""),
+   itemSpecifics:(raw.itemSpecifics&&typeof raw.itemSpecifics==="object")?raw.itemSpecifics:{},
+   identifiers:Array.isArray(raw.identifiers)?raw.identifiers.map(String):[],
+   englishFriendly:raw.englishFriendly===true?true:raw.englishFriendly===false?false:null,
+   ocrText:String(raw.ocrText||""),
    raw:raw.raw||null
   };
  }
