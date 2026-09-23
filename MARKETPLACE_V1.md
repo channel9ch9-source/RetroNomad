@@ -211,3 +211,45 @@ Internal ranking currently prefers:
 6. lower delivered GBP price when otherwise comparable
 
 The internal rank is not a public "deal score" and must not be presented as one.
+
+
+## Search execution pipeline
+
+Implementation:
+- `marketplace-source.js`
+- `palscout-classifier.js`
+- `search-matcher.js`
+- `search-pipeline.js`
+
+Execution order:
+
+```
+provider.search(target)
+-> normaliseListing()
+-> PALScoutClassifier.classifyMarketplaceListing()
+-> RetroNomadMatcher.evaluate()
+-> RetroNomadMatcher.sortEvaluated()
+```
+
+The public search page loads this full pipeline now. With zero registered live providers it returns no fabricated inventory and keeps the "no live source connected" state.
+
+### Additional normalised evidence fields
+
+Provider adapters may also supply:
+- `conditionText`
+- `itemSpecifics`
+- `identifiers`
+- `englishFriendly`
+- `ocrText`
+
+These fields are preserved specifically so PALScout can classify more than just a marketplace title.
+
+### Classifier safety
+
+For marketplace results:
+- game-title recognition is not release proof
+- title alone never becomes `UK_EXACT`
+- exact identifier evidence outranks seller wording
+- conflicts are retained and force review
+- seller "UK" wording without exact proof can at most produce a visual-required/review state
+- generic PAL wording does not become a strong match by itself
