@@ -78,7 +78,7 @@ function render(){
    (history.length?'<details class="history"><summary>Match history ('+history.length+')</summary><ul>'+history.map(x=>'<li>'+esc(x.title||x.externalId)+' · '+(x.deliveredGbp!=null?'£'+Number(x.deliveredGbp).toFixed(2):'price unknown')+(x.canonicalUrl?' · <a target="_blank" rel="noopener noreferrer" href="'+esc(x.canonicalUrl)+'">open</a>':'')+'</li>').join("")+'</ul></details>':'')+
    '</div>'+
    '<div class="huntfoot"><label class="alertline"><input type="checkbox" data-action="alert" data-id="'+esc(h.id)+'" '+(h.alerts.requested?"checked":"")+'> I want an alert when this becomes available</label>'+
-   '<div class="huntbuttons">'+
+   '<div class="huntbuttons"><a class="btn small" href="search.html?hunt='+encodeURIComponent(h.id)+'">Open in Search</a>'+
    (h.status==="ACTIVE"?'<button class="btn small" data-action="pause" data-id="'+esc(h.id)+'">Pause</button>':'')+
    (h.status==="PAUSED"?'<button class="btn small" data-action="resume" data-id="'+esc(h.id)+'">Resume</button>':'')+
    (h.status!=="ARCHIVED"?'<button class="btn small" data-action="archive" data-id="'+esc(h.id)+'">Archive</button>':'')+
