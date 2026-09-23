@@ -145,7 +145,7 @@ RetroNomad will turn your choices into a structured buying target. Live listings
 <div class="fact"><span>Price position</span><b>Pending licensed pricing</b></div>
 </div>
 </div>
-<div class="cardfoot">When a marketplace source is connected, each card will also carry the source listing ID, canonical URL, item price, postage, currency, image, timestamps and evidence used for classification.</div>
+<div class="cardfoot">The matching engine is ready to classify future candidates as Match, Review or Filtered. When a marketplace source is connected, each card will also carry the source listing ID, canonical URL, item price, postage, currency, image, timestamps and evidence used for classification.</div>
 </div>
 </section>
 </div>
@@ -153,6 +153,7 @@ RetroNomad will turn your choices into a structured buying target. Live listings
 
 <script src="release-evidence.js"></script>
 <script src="marketplace-source.js"></script>
+<script src="search-matcher.js"></script>
 <script>
 const evidence=window.RELEASE_EVIDENCE||[];
 const catalog=[...new Map(evidence.map(r=>[r[0]+"|"+r[1],{game:r[0],platform:r[1]}])).values()]
