@@ -1,16 +1,24 @@
 # RetroNomad Pricing v1
 
-## Current automatic provider
+## Current automatic provider status
 
-RetroTechCollector Developer/Data API is the first Pricing v1 automatic provider.
+RetroTechCollector Developer/Data API was the first Pricing v1 automatic-provider pilot.
 
-Why it was selected for the beta:
-- catalogue metadata includes release region
-- UPC/EAN search is supported
-- prices are available by completeness bucket (loose, CIB, new, box only, manual only)
-- the API is specifically documented for developer access
-- browser callers are supported, which allows a safe BYOK beta without putting a shared secret in GitHub Pages
-- a low-cost Developer API add-on is documented
+After three real-key coverage passes across the 100-title launch catalogue, it is **not suitable as RetroNomad's primary UK/PAL pricing provider**.
+
+Final diagnostic-v3 result:
+- 100/100 titles attempted
+- 1 safe exact UPC/EAN price match
+- 33 strong title/platform price matches whose catalogue region was null
+- 62 no usable provider matches
+- 4 weak matches
+- 0 title-price matches with an explicitly confirmed PAL region
+
+The single safe exact identifier hit was Rez on Dreamcast.
+
+RetroTechCollector may remain as a **limited exact-identifier supplemental source**, but RetroNomad must not use its title-only values when release region is unknown.
+
+Provider documentation states that its market values come from PriceCharting. The v3 results showed that title fallback frequently resolved to a different regional product record than RetroNomad's PAL identifier, so those values are not release-safe for the current product.
 
 ## Beta mode: BYOK
 
@@ -30,15 +38,16 @@ Required key scopes:
 Automatic flow:
 1. Listing must be Comparison-ready.
 2. RetroNomad builds the exact game/platform/release/completeness context.
-3. If a barcode/EAN exists, use it first.
-4. Otherwise search by game + exact provider platform.
-5. Require PAL catalogue candidates in the UK/PAL launch mode.
-6. Reject weak/ambiguous matches.
-7. Fetch the matched master item price.
-8. Map the RetroNomad bucket to the provider field.
-9. Convert USD to GBP using a daily central-bank reference FX rate.
-10. Populate Pricing v1 automatically.
-11. Manual source-backed references remain available as fallback.
+3. If a numeric barcode/EAN exists, query the provider price endpoint by that identifier.
+4. Require an equivalent returned barcode, an allowed provider platform label, and strong title agreement.
+5. **If the exact barcode price lookup misses, do not fall back to title pricing.** A failed PAL identifier followed by a title match can silently substitute an NTSC/other-region price.
+6. If no numeric barcode is available, title search may be attempted.
+7. A title-only price match is usable only when the provider catalogue detail explicitly identifies the matched record as PAL.
+8. Reject weak and ambiguous matches.
+9. Map the RetroNomad bucket to the provider field.
+10. Convert USD to GBP using a daily central-bank reference FX rate.
+11. Populate Pricing v1 only after a release-safe match.
+12. Manual source-backed references remain available as fallback.
 
 Provider bucket map:
 - CIB -> cib
@@ -59,16 +68,15 @@ It is an internal/developer tool for roadmap validation, not a source of fabrica
 The runner:
 - derives the 100 launch game/platform pairs from `release-evidence.js`
 - prefers a safe numeric barcode/EAN when one is present in RetroNomad evidence
-- falls back to exact game-title + mapped platform search
-- requires PAL + exact platform
-- rejects weak title agreement even when a barcode query returns a row
-- rejects multiple similarly strong PAL candidates instead of selecting one arbitrarily
-- fetches `/prices/:masterItemId` only after a safe catalogue match
-- records which of loose/CIB/new/box-only/manual-only price buckets are populated
-- paces calls below the standalone Developer API add-on's documented 60 requests/minute burst limit
+- tests the provider price endpoint by UPC/EAN first
+- falls back to title-price discovery only for diagnostics
+- records provider platform labels, UPCs, catalogue region and available price buckets
+- rejects weak or ambiguous title matches
+- distinguishes exact identifier matches from region-unknown title matches
+- paces calls below the documented provider burst limit
 - exports a JSON report that never contains the developer key
 
-Important: creation of this runner is **not** a completed provider coverage test. A real developer key still needs to be used to run the 100-title validation and review the exported failures/ambiguities.
+Real-key coverage validation is complete for the launch scope. The three diagnostic passes established that RetroTechCollector has only one release-safe exact-identifier price match in the current 100-title PAL launch set, so it is not the primary provider path going forward.
 
 ## Production mode
 
@@ -87,7 +95,23 @@ Before deploying it with one shared RetroNomad provider key:
 
 ## PriceCharting
 
-PriceCharting remains a possible future provider. Its API documentation says subscriber API/CSV data are internal-use by default; sharing it within an application used by third parties requires a commercial licence and express written permission. Do not use a standard subscriber token as a public RetroNomad data source.
+PriceCharting is now the strongest candidate to investigate for the next UK/PAL pricing route.
+
+Why:
+- its public catalogue has dedicated PAL platform namespaces
+- PAL product pages expose EAN/GTIN/model metadata
+- examples in the launch scope show PAL-specific product records for games such as Silent Hill, Silent Hill 2 and Rez
+- its condition model maps closely to RetroNomad's loose/CIB/new/box/manual buckets
+
+Constraint:
+PriceCharting's API documentation says subscriber API/CSV data are licensed for internal use by default. Sharing price data inside an application used by third parties requires a commercial licence and express written permission.
+
+Decision:
+- do not use a normal subscriber token in RetroNomad
+- do not scrape PriceCharting as a substitute for permission
+- next step is to ask PriceCharting about a commercial agreement for a public application that identifies exact PAL releases and displays attributed current guide prices
+
+MyPlayersVault is also worth monitoring because it publicly separates UK/PAL, NTSC-U and NTSC-J values, but no documented developer API suitable for RetroNomad has been established yet.
 
 ## FX
 
