@@ -7,6 +7,8 @@
 - [x] Add public search.html Phase 1 shell using the 100-game launch catalogue
 - [x] Add browser-local saved-target prototype without claiming active alerts
 - [x] Add marketplace-source.js provider registry and normalised listing schema
+- [x] Add strict Match / Review / Filtered search matcher
+- [x] Regression-test representative UK PAL, shared PAL, NTSC, edition, completeness, price and ambiguity cases
 - [x] Document the search/result contract in MARKETPLACE_V1.md
 - [x] Design the search form, launch filters and search-results card
 - [x] Define the listing-normalisation / marketplace-source abstraction
