@@ -1,5 +1,6 @@
 (function(){
  const STORAGE_KEY="retronomad_saved_hunts_v1";
+ const TOMBSTONE_KEY="retronomad_saved_hunt_tombstones_v1";
  const LEGACY_KEY="retronomad_saved_targets";
  const VERSION=1;
  const MAX_HISTORY=100;
@@ -34,6 +35,19 @@
   }catch(e){return[];}
  }
  function writeRaw(rows){localStorage.setItem(STORAGE_KEY,JSON.stringify(rows));return rows;}
+ function readTombstones(){
+  try{
+   const x=JSON.parse(localStorage.getItem(TOMBSTONE_KEY)||"[]");
+   return Array.isArray(x)?x.filter(t=>t&&t.id&&t.deletedAt):[];
+  }catch(e){return[];}
+ }
+ function writeTombstones(rows){localStorage.setItem(TOMBSTONE_KEY,JSON.stringify(rows));return rows;}
+ function tombstones(){return readTombstones().sort((a,b)=>String(b.deletedAt).localeCompare(String(a.deletedAt)));}
+ function clearTombstones(ids=[]){
+  const set=new Set((ids||[]).map(String));
+  const rows=readTombstones().filter(t=>!set.has(String(t.id)));
+  writeTombstones(rows);return rows;
+ }
  function normaliseHunt(h={}){
   const target=normaliseTarget(h.target||h);
   return{
@@ -122,8 +136,17 @@
   h.updatedAt=now();rows[i]=normaliseHunt(h);writeRaw(rows);return clone(rows[i]);
  }
  function remove(id){
-  const rows=readRaw().map(normaliseHunt),next=rows.filter(h=>h.id!==id);
+  const rows=readRaw().map(normaliseHunt),found=rows.find(h=>h.id===id),next=rows.filter(h=>h.id!==id);
+  if(found){
+   const ts=now(),stones=readTombstones().filter(t=>t.id!==id);
+   stones.push({id:String(id),deletedAt:ts});
+   writeTombstones(stones);
+  }
   writeRaw(next);return next.length!==rows.length;
+ }
+ function replaceAll(hunts=[]){
+  const rows=(Array.isArray(hunts)?hunts:[]).map(normaliseHunt);
+  writeRaw(rows);return rows.map(clone);
  }
  function setAlertRequested(id,requested){return update(id,{alerts:{requested:requested===true}});}
  function setStatus(id,status){return update(id,{status});}
@@ -152,11 +175,11 @@
   h.matchHistory=[...map.values()].sort((a,b)=>String(b.lastSeenAt).localeCompare(String(a.lastSeenAt))).slice(0,MAX_HISTORY);
   h.updatedAt=ts;hunts[i]=h;writeRaw(hunts);return clone(h);
  }
- function clearAll(){localStorage.removeItem(STORAGE_KEY);localStorage.removeItem(LEGACY_KEY);}
- function exportData(){return{schemaVersion:VERSION,exportedAt:now(),hunts:list()};}
+ function clearAll(){localStorage.removeItem(STORAGE_KEY);localStorage.removeItem(TOMBSTONE_KEY);localStorage.removeItem(LEGACY_KEY);}
+ function exportData(){return{schemaVersion:VERSION,exportedAt:now(),hunts:list(),deletions:tombstones()};}
 
  window.RetroNomadSavedHunts={
-  STORAGE_KEY,VERSION,list,get,create,update,remove,setAlertRequested,setStatus,
-  recordCheck,recordMatches,migrateLegacy,clearAll,exportData,normaliseTarget,targetSignature
+  STORAGE_KEY,TOMBSTONE_KEY,VERSION,list,get,create,update,remove,replaceAll,tombstones,clearTombstones,setAlertRequested,setStatus,
+  recordCheck,recordMatches,migrateLegacy,clearAll,exportData,normaliseTarget,targetSignature,normaliseHunt
  };
 })();
