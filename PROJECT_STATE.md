@@ -555,3 +555,58 @@ The search page now loads the matcher module. A live marketplace result still re
 2. reusable PALScout classification of each candidate listing
 
 No live inventory is fabricated while those sources are unavailable.
+
+
+## Reusable PALScout marketplace classifier
+
+Completed 23 September 2026.
+
+New modules:
+- `palscout-classifier.js`
+- `search-pipeline.js`
+
+The Deal Finder pipeline is now structurally:
+
+Authorised marketplace adapter
+-> normalised marketplace listing
+-> PALScout classification
+-> RetroNomad target matcher
+-> ranked MATCH / REVIEW / FILTERED results
+
+`palscout-classifier.js` reuses the current 100-game launch catalogue and analyser aliases and returns:
+- game
+- platform
+- item type
+- compatibility state
+- region signal
+- release market bucket
+- catalogue market context
+- edition
+- completeness
+- English/package suitability when explicit
+- bundle / promo state
+- major condition concerns
+- identifier evidence
+- confidence
+- review reasons / conflicts
+
+Safety rules added for search use:
+- title alone never proves a UK-exact release
+- generic PAL wording without stronger evidence remains review
+- identifier/title or identifier/platform conflicts force review
+- UK_VISUAL_REQUIRED cannot become a strong search match without the missing visual/package evidence
+- explicit wrong-region / wrong-edition / wrong-completeness candidates remain filterable by the matcher
+
+Marketplace normalisation now preserves item specifics, condition text, identifiers, explicit language suitability and OCR text where a future authorised provider exposes them.
+
+Synthetic end-to-end QA:
+- 6 candidate FFVII listings were passed through a synthetic provider adapter
+- outcome: 1 MATCH, 1 REVIEW, 4 FILTERED
+- exact UK CIB under ceiling -> MATCH
+- generic PAL without exact release evidence -> REVIEW
+- NTSC-U -> FILTERED
+- Platinum with original-only target -> FILTERED
+- bundle with bundles excluded -> FILTERED
+- price above delivered ceiling -> FILTERED
+
+No synthetic provider is registered in the public site. It was used only for implementation QA; the public search still correctly reports that no live source is connected.
