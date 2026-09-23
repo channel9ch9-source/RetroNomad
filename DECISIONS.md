@@ -568,3 +568,19 @@ Sync decisions:
 
 Account sync stays disabled in the public runtime configuration until the backend, database and email-delivery path are genuinely deployed.
 
+
+
+## Shared classifier/matcher architecture — 23 September 2026
+
+Deal Finder and scheduled Saved Hunt monitoring must use the same classification and target-matching logic.
+
+Decision:
+- shared pure logic lives under `shared/`
+- browser Deal Finder adapters expose the historical window APIs
+- backend monitor imports the same shared modules
+- marketplace provider adapters supply evidence only; they do not decide release identity
+- server alerts may only act on the shared matcher's MATCH state
+- any release-evidence mirror used server-side must pass parity against the public browser evidence whenever the dataset changes
+
+The richer manual listing analyser remains separate for now because it has photo/OCR/gallery-specific UI evidence. It should be migrated later by adapting that evidence into the shared core rather than maintaining permanently divergent rules.
+
