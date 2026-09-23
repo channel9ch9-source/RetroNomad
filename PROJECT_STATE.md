@@ -481,3 +481,41 @@ This is consistent with the newly confirmed search-first direction. The current 
 
 PALScout remains the UK/European release-intelligence layer underneath Deal Finder, alerts and listing analysis.
 
+
+
+## Phase 1 search shell
+
+Completed 23 September 2026.
+
+New public page:
+`search.html`
+
+The search-first shell now lets a user define:
+- game
+- platform
+- PAL/UK release preference
+- edition
+- completeness
+- condition preference
+- English-friendly packaging/materials requirement
+- bundle exclusion
+- demo/promo exclusion
+- maximum delivered GBP price
+
+The page uses the existing release-evidence catalogue and currently resolves 100 unique launch game/platform pairs.
+
+Current behaviour:
+- builds a structured buying target
+- shows the future live result-card contract
+- can save targets locally in the browser as a prototype convenience
+- explicitly states that alerts are not active
+- explicitly states that no live marketplace source is connected
+- does not fabricate listings or prices
+
+Marketplace abstraction:
+- `marketplace-source.js` provides a provider registry and normalisation layer
+- `marketplace-listing.schema.json` defines the normalised listing contract
+- `MARKETPLACE_V1.md` documents launch filters, target model, result-card fields and accuracy rules
+
+The homepage now points primarily to Search RetroNomad and presents Search -> Filter -> Compare -> Alert as the main customer journey. The listing analyser remains linked as a secondary utility.
+
