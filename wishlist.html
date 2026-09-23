@@ -1,0 +1,111 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="description" content="Manage saved RetroNomad game hunts and future price alerts.">
+<title>Saved Hunts — RetroNomad</title>
+<style>
+:root{--bg:#090b0f;--panel:#111720;--panel2:#0d141d;--text:#f7f8fb;--muted:#96a3b5;--line:#293447;--green:#94f7b2;--amber:#ffd977;--red:#ff9da6;--max:1120px}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(900px 480px at 50% -190px,rgba(83,127,196,.22),transparent 65%),var(--bg);color:var(--text);font:15px/1.5 system-ui,-apple-system,Segoe UI,sans-serif}
+a{color:inherit}.wrap{width:min(var(--max),calc(100% - 32px));margin:auto}
+nav{height:70px;display:flex;align-items:center;justify-content:space-between}.brand{display:flex;align-items:center;gap:10px;text-decoration:none;font-size:20px;font-weight:900}.mark{width:30px;height:30px;border:1px solid #39506a;border-radius:9px;display:grid;place-items:center;background:#111926;color:var(--green);font-size:12px}.navlinks{display:flex;gap:20px;color:var(--muted)}.navlinks a{text-decoration:none}
+.hero{padding:54px 0 24px}.kicker{font-size:12px;color:var(--green);font-weight:900;text-transform:uppercase;letter-spacing:.12em}h1{font-size:clamp(42px,6vw,64px);line-height:.98;letter-spacing:-.055em;margin:10px 0 13px}.lead{color:var(--muted);font-size:18px;max-width:790px}
+.notice{margin:19px 0 0;border:1px solid #5d532d;background:#19170e;border-radius:12px;padding:13px 14px;color:#e8d994;font-size:13px}
+.toolbar{display:flex;justify-content:space-between;align-items:center;gap:12px;margin:24px 0 14px;flex-wrap:wrap}.toolbar h2{margin:0}.actions{display:flex;gap:8px;flex-wrap:wrap}.btn{display:inline-block;border:1px solid var(--line);background:#172131;color:var(--text);border-radius:9px;padding:9px 12px;font:inherit;font-weight:800;cursor:pointer;text-decoration:none}.btn.primary{background:var(--text);color:#0b0d12}.btn.danger{color:var(--red)}.btn.small{padding:6px 9px;font-size:12px}
+.empty{border:1px dashed #39475b;border-radius:14px;padding:34px;text-align:center;color:var(--muted)}.empty strong{display:block;color:var(--text);font-size:18px;margin-bottom:6px}
+.grid{display:grid;gap:12px;padding-bottom:70px}.hunt{border:1px solid var(--line);border-radius:15px;background:linear-gradient(180deg,#121823,#0f141c);overflow:hidden}.hunt.archived{opacity:.68}.hunthead{padding:16px 18px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;gap:16px;align-items:flex-start}.hunthead h3{margin:0 0 4px;font-size:19px}.meta{color:var(--muted);font-size:12px}.status{font-size:10px;font-weight:900;border:1px solid #315b43;color:var(--green);border-radius:999px;padding:4px 7px;white-space:nowrap}.status.paused{border-color:#5d532d;color:var(--amber)}.status.archived{border-color:#60404a;color:var(--red)}
+.huntbody{padding:16px 18px}.chips{display:flex;gap:6px;flex-wrap:wrap}.chip{border:1px solid #334056;border-radius:999px;padding:4px 7px;color:#bec9d7;font-size:11px}.split{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:15px}.box{border:1px solid var(--line);background:#0a1017;border-radius:10px;padding:12px}.box span{display:block;color:#738298;font-size:10px;text-transform:uppercase;letter-spacing:.08em}.box b{display:block;margin-top:4px;font-size:13px}.warn{color:var(--amber)}
+.huntfoot{border-top:1px solid var(--line);padding:12px 18px;display:flex;justify-content:space-between;gap:12px;align-items:center;flex-wrap:wrap}.huntbuttons{display:flex;gap:7px;flex-wrap:wrap}.alertline{display:flex;align-items:center;gap:8px;color:#bac5d4;font-size:12px}.history{margin-top:12px}.history summary{cursor:pointer;color:#bac5d4;font-weight:800}.history ul{padding-left:18px;color:var(--muted);font-size:12px}.history a{color:#c9d8ea}
+@media(max-width:700px){.split{grid-template-columns:1fr}.navlinks{display:none}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<nav>
+<a class="brand" href="index.html"><span class="mark">RN</span>RetroNomad</a>
+<div class="navlinks"><a href="search.html">Search</a><a href="wishlist.html">Saved Hunts</a><a href="analyze.html">Listing checker</a></div>
+</nav>
+
+<header class="hero">
+<div class="kicker">Phase 1 · Wishlist</div>
+<h1>Saved Hunts.</h1>
+<p class="lead">Keep the exact physical-game targets you care about in one place. These records are ready for future marketplace monitoring and alerts without pretending that background checks are already active.</p>
+<div class="notice"><strong>Current beta limitation:</strong> hunts are stored only in this browser. RetroNomad cannot monitor marketplaces or send notifications in the background until we add a backend and an authorised live inventory source.</div>
+</header>
+
+<div class="toolbar">
+<div><div class="kicker">Your wishlist</div><h2 id="countTitle">0 saved hunts</h2></div>
+<div class="actions"><a class="btn primary" href="search.html">New hunt</a><button class="btn" id="exportBtn">Export JSON</button></div>
+</div>
+
+<div id="empty" class="empty" style="display:none">
+<strong>No saved hunts yet.</strong>
+Build a search target, then save it to your wishlist.
+</div>
+<div id="grid" class="grid"></div>
+</div>
+
+<script src="saved-hunts.js"></script>
+<script>
+const releaseLabels={"pal-compatible":"Any PAL-compatible","uk-preferred":"UK-market preferred","uk-only":"UK exact only","shared-pal":"UK/shared PAL","europe-pal":"Any European PAL"};
+const editionLabels={"original":"Original only","any":"Any edition","budget-ok":"Original or budget/reissue"};
+const completenessLabels={"cib":"CIB","manual-optional":"Manual optional","loose-ok":"Loose acceptable","any":"Any completeness"};
+const conditionLabels={"any":"Any usable condition","no-major":"No major damage","collector":"Collector-quality preferred"};
+
+function esc(s){return String(s||"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));}
+function fmtDate(v){if(!v)return"Never";try{return new Date(v).toLocaleString();}catch(e){return v;}}
+function render(){
+ const hunts=RetroNomadSavedHunts.list();
+ document.querySelector("#countTitle").textContent=hunts.length+" saved hunt"+(hunts.length===1?"":"s");
+ document.querySelector("#empty").style.display=hunts.length?"none":"block";
+ const grid=document.querySelector("#grid");grid.innerHTML="";
+ for(const h of hunts){
+  const t=h.target;
+  const chips=[
+   t.platform,releaseLabels[t.releasePreference],editionLabels[t.editionPreference],completenessLabels[t.completeness],
+   conditionLabels[t.condition],t.englishRequired&&"English-friendly",t.excludeBundles&&"No bundles",t.excludePromo&&"No demos/promos",
+   t.maxDeliveredGbp!=null&&("≤ £"+Number(t.maxDeliveredGbp).toFixed(2)+" delivered")
+  ].filter(Boolean);
+  const statusClass=h.status.toLowerCase();
+  const history=h.matchHistory||[];
+  const el=document.createElement("article");el.className="hunt "+statusClass;
+  el.innerHTML=
+   '<div class="hunthead"><div><h3>'+esc(h.label)+'</h3><div class="meta">Saved '+esc(fmtDate(h.createdAt))+' · Updated '+esc(fmtDate(h.updatedAt))+'</div></div><span class="status '+statusClass+'">'+esc(h.status)+'</span></div>'+
+   '<div class="huntbody"><div class="chips">'+chips.map(x=>'<span class="chip">'+esc(x)+'</span>').join("")+'</div>'+
+   '<div class="split"><div class="box"><span>Monitoring</span><b>'+esc(h.monitoring.state==="NOT_RUNNING"?"Not running":h.monitoring.state)+'</b><div class="meta">Last checked: '+esc(fmtDate(h.monitoring.lastCheckedAt))+'</div></div>'+
+   '<div class="box"><span>Alerts</span><b class="warn">'+(h.alerts.requested?"Wanted — not active":"Not requested")+'</b><div class="meta">Delivery unavailable in static beta</div></div></div>'+
+   (history.length?'<details class="history"><summary>Match history ('+history.length+')</summary><ul>'+history.map(x=>'<li>'+esc(x.title||x.externalId)+' · '+(x.deliveredGbp!=null?'£'+Number(x.deliveredGbp).toFixed(2):'price unknown')+(x.canonicalUrl?' · <a target="_blank" rel="noopener noreferrer" href="'+esc(x.canonicalUrl)+'">open</a>':'')+'</li>').join("")+'</ul></details>':'')+
+   '</div>'+
+   '<div class="huntfoot"><label class="alertline"><input type="checkbox" data-action="alert" data-id="'+esc(h.id)+'" '+(h.alerts.requested?"checked":"")+'> I want an alert when this becomes available</label>'+
+   '<div class="huntbuttons">'+
+   (h.status==="ACTIVE"?'<button class="btn small" data-action="pause" data-id="'+esc(h.id)+'">Pause</button>':'')+
+   (h.status==="PAUSED"?'<button class="btn small" data-action="resume" data-id="'+esc(h.id)+'">Resume</button>':'')+
+   (h.status!=="ARCHIVED"?'<button class="btn small" data-action="archive" data-id="'+esc(h.id)+'">Archive</button>':'')+
+   '<button class="btn small danger" data-action="delete" data-id="'+esc(h.id)+'">Delete</button></div></div>';
+  grid.appendChild(el);
+ }
+}
+
+document.addEventListener("change",e=>{
+ const a=e.target?.dataset?.action,id=e.target?.dataset?.id;if(a!=="alert"||!id)return;
+ RetroNomadSavedHunts.setAlertRequested(id,e.target.checked);render();
+});
+document.addEventListener("click",e=>{
+ const btn=e.target.closest("[data-action]");if(!btn)return;
+ const a=btn.dataset.action,id=btn.dataset.id;
+ if(a==="pause")RetroNomadSavedHunts.setStatus(id,"PAUSED");
+ if(a==="resume")RetroNomadSavedHunts.setStatus(id,"ACTIVE");
+ if(a==="archive")RetroNomadSavedHunts.setStatus(id,"ARCHIVED");
+ if(a==="delete"&&confirm("Delete this saved hunt from this browser?"))RetroNomadSavedHunts.remove(id);
+ render();
+});
+document.querySelector("#exportBtn").addEventListener("click",()=>{
+ const blob=new Blob([JSON.stringify(RetroNomadSavedHunts.exportData(),null,2)],{type:"application/json"});
+ const a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="retronomad-saved-hunts.json";a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000);
+});
+RetroNomadSavedHunts.migrateLegacy();
+render();
+</script>
+</body>
+</html>
