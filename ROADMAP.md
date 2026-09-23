@@ -7,6 +7,10 @@
 - [x] Add public search.html Phase 1 shell using the 100-game launch catalogue
 - [x] Add browser-local saved-target prototype without claiming active alerts
 - [x] Add marketplace-source.js provider registry and normalised listing schema
+- [x] Add reusable palscout-classifier.js for marketplace candidates
+- [x] Preserve item specifics, condition, identifiers and language signals in normalised marketplace rows
+- [x] Add search-pipeline.js: provider -> PALScout -> matcher -> ranked results
+- [x] Run synthetic end-to-end pipeline QA with MATCH / REVIEW / FILTERED outcomes
 - [x] Add strict Match / Review / Filtered search matcher
 - [x] Regression-test representative UK PAL, shared PAL, NTSC, edition, completeness, price and ambiguity cases
 - [x] Document the search/result contract in MARKETPLACE_V1.md
