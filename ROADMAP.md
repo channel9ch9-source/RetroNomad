@@ -108,11 +108,14 @@ Determine whether RetroTechCollector is sufficiently complete and reliable for R
 Open:
 `pricing-coverage.html`
 
-- [ ] Connect the developer key
-- [ ] Run/resume all 100 launch titles
-- [ ] Reach 100/100 attempted titles unless a provider quota/service error blocks the run
-- [ ] Export the JSON coverage report
-- [ ] Upload only the exported report for analysis
+- [x] Connect the developer key
+- [x] Run the first 100-title pass
+- [x] Reach 100/100 attempted titles
+- [x] Export and inspect the first JSON report
+- [x] Identify that the original harness collapsed every result into NO_PAL_MATCH after filtering
+- [x] Add diagnostic v2 with raw candidate capture and separate platform/region mismatch states
+- [ ] Rerun all 100 titles with diagnostic v2
+- [ ] Export and upload the diagnostic-v2 JSON report
 
 ## Step 3 — audit results
 For every non-clean result, categorise it as one of:
