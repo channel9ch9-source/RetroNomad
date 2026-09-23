@@ -542,3 +542,29 @@ Rules:
 - no marketplace scraping should be added merely to make the scheduler appear functional while authorised API access is unavailable
 
 The current Worker/D1 implementation is a scaffold. The data contracts and monitor logic should remain portable rather than locking the product permanently to one hosting vendor.
+
+
+## Account/session architecture — 23 September 2026
+
+RetroNomad's first account model is passwordless email sign-in.
+
+Security decisions:
+- do not store user passwords
+- one-time login tokens are random, short-lived and single-use
+- database stores only login-token hashes
+- server sessions use a separate random token and database stores only its hash
+- production browser session must use Secure + HttpOnly cookie storage
+- do not put the user session token in localStorage
+- Saved Hunt owner ID comes only from the authenticated server session; never trust a browser-supplied owner ID
+- production app/API should be same-site so cookie sessions work reliably
+- current GitHub Pages host is not considered the final authenticated-account deployment shape
+
+Sync decisions:
+- browser remains local-first
+- deletions use tombstones
+- server soft-deletion wins over stale clients for the same hunt ID
+- initial edit conflict resolution uses client updatedAt last-write comparison
+- move to explicit server revisions later if concurrent multi-device edits justify it
+
+Account sync stays disabled in the public runtime configuration until the backend, database and email-delivery path are genuinely deployed.
+
