@@ -441,3 +441,21 @@ URL-ingestion repair:
 - generic source detection still recognises eBay, Etsy and Vinted
 - direct browser page import remains subject to marketplace CORS/access restrictions; eBay's full automatic listing import still requires authorised API/server-side access
 
+
+
+## Search-first product direction
+
+Confirmed 23 September 2026.
+
+RetroNomad is now defined primarily as a **search and buying-intelligence product**.
+
+The customer should come to RetroNomad to search for the game they want. RetroNomad should eventually discover authorised marketplace listings, then use PALScout/regional intelligence to classify and filter them before showing the user the best-matching copies.
+
+Primary workflow:
+Search -> Filter -> Compare -> Alert
+
+PALScout's role:
+Compatibility -> Region -> Exact release -> Edition -> Completeness
+
+The listing analyser remains a useful secondary checker/debugging utility, but future development should not treat manual URL/text/photo submission as the main consumer experience.
+
