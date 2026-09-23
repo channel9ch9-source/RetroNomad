@@ -519,3 +519,39 @@ Marketplace abstraction:
 
 The homepage now points primarily to Search RetroNomad and presents Search -> Filter -> Compare -> Alert as the main customer journey. The listing analyser remains linked as a secondary utility.
 
+
+
+## Phase 1 matching engine
+
+Completed 23 September 2026.
+
+New module:
+`search-matcher.js`
+
+Purpose:
+Evaluate a PALScout-classified marketplace candidate against the user's structured search target.
+
+States:
+- MATCH
+- REVIEW
+- FILTERED
+
+The engine keeps hard requirements, unknown evidence and soft preferences separate.
+
+Representative regression cases passed for:
+- exact UK PAL match
+- shared PAL match
+- NTSC-U incompatibility
+- wrong edition
+- incomplete copy
+- price ceiling failure
+- unknown completeness
+- continental PAL with unknown English/package suitability
+
+UK-market preferred is deliberately treated as a ranking preference, not the same as UK exact only.
+
+The search page now loads the matcher module. A live marketplace result still requires two upstream pieces:
+1. an authorised marketplace inventory provider
+2. reusable PALScout classification of each candidate listing
+
+No live inventory is fabricated while those sources are unavailable.
