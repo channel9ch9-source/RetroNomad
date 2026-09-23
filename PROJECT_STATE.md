@@ -157,6 +157,28 @@ Current analyser includes:
 - automatic Pricing v1 connector described below
 - internal 100-title Pricing v1 coverage lab at `pricing-coverage.html`
 
+## Pricing v1 first live-provider run
+
+First real-key coverage run: 23 September 2026.
+
+Result:
+- 100/100 titles attempted
+- 0 safe matches
+- 100 initially reported as NO_PAL_MATCH
+
+Interpretation:
+- **Do not treat this as evidence that RetroTechCollector lacks all 100 PAL titles.**
+- The all-or-nothing result is a systematic diagnostic signal.
+- The original coverage lab collapsed several distinct cases into one NO_PAL_MATCH status after applying exact platform + PAL filters.
+- Diagnostic v2 now records raw catalogue candidates before filtering and distinguishes:
+  - NO_RESULTS
+  - PLATFORM_MISMATCH
+  - REGION_MISMATCH
+  - weak/ambiguous/title conflicts
+- Diagnostic v2 also removes the exact platform parameter from title discovery so provider platform labels can be observed rather than hidden by the request itself.
+
+Next action: rerun the updated coverage lab with the same limited developer key and inspect the exported diagnostic JSON before changing production platform/region mappings.
+
 ## Pricing v1
 
 Goal: only attach price data after the listing has been classified into the correct release/completeness bucket.
