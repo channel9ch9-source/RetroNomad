@@ -159,7 +159,9 @@ Proceed only when:
 ## PriceCharting commercial route
 - [x] Confirm public PAL product catalogue exists with dedicated PAL platform namespaces and PAL EAN/GTIN records
 - [x] Confirm standard API/CSV terms are internal-use only
-- [ ] Contact PriceCharting for a commercial agreement / express written permission for RetroNomad
+- [x] Identify PriceCharting's official commercial-permission route in its current Terms/API documentation
+- [x] Draft the RetroNomad commercial-data enquiry
+- [ ] Send PriceCharting the commercial agreement / express written permission enquiry
 - [ ] Ask specifically about attributed public display of current PAL loose/CIB/new/box/manual guide prices
 - [ ] Ask about API quota, caching, attribution, redistribution and launch-stage pricing
 
@@ -305,6 +307,6 @@ At every milestone:
 
 # Immediate next action
 
-**Prepare and send a concise PriceCharting commercial-data enquiry describing RetroNomad's exact-PAL-release use case and asking for permission/terms for attributed public guide-price display.**
+**Send the drafted PriceCharting commercial-data enquiry via the official commercial-permission contact route in PriceCharting's Terms/Contact page, then wait for their licensing response before purchasing API access.**
 
 Do not purchase a normal PriceCharting API subscription for RetroNomad public use unless a suitable commercial agreement is confirmed.
