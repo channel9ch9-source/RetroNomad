@@ -24,7 +24,7 @@ nav{height:70px;display:flex;align-items:center;justify-content:space-between}.b
 <div class="wrap">
 <nav>
 <a class="brand" href="index.html"><span class="mark">RN</span>RetroNomad</a>
-<div class="navlinks"><a href="search.html">Search</a><a href="wishlist.html">Saved Hunts</a><a href="analyze.html">Listing checker</a></div>
+<div class="navlinks"><a href="search.html">Search</a><a href="wishlist.html">Saved Hunts</a><a href="account.html">Account</a><a href="analyze.html">Listing checker</a></div>
 </nav>
 
 <header class="hero">
@@ -36,17 +36,20 @@ nav{height:70px;display:flex;align-items:center;justify-content:space-between}.b
 
 <div class="toolbar">
 <div><div class="kicker">Your wishlist</div><h2 id="countTitle">0 saved hunts</h2></div>
-<div class="actions"><a class="btn primary" href="search.html">New hunt</a><button class="btn" id="exportBtn">Export JSON</button></div>
+<div class="actions"><a class="btn primary" href="search.html">New hunt</a><button class="btn" id="syncBtn" disabled>Local only</button><a class="btn" id="accountBtn" href="account.html">Account</a><button class="btn" id="exportBtn">Export JSON</button></div>
 </div>
 
 <div id="empty" class="empty" style="display:none">
 <strong>No saved hunts yet.</strong>
 Build a search target, then save it to your wishlist.
 </div>
+<div id="syncStatus" class="meta" style="margin:-4px 0 14px"></div>
 <div id="grid" class="grid"></div>
 </div>
 
+<script src="runtime-config.js"></script>
 <script src="saved-hunts.js"></script>
+<script src="account-sync.js"></script>
 <script>
 const releaseLabels={"pal-compatible":"Any PAL-compatible","uk-preferred":"UK-market preferred","uk-only":"UK exact only","shared-pal":"UK/shared PAL","europe-pal":"Any European PAL"};
 const editionLabels={"original":"Original only","any":"Any edition","budget-ok":"Original or budget/reissue"};
@@ -104,8 +107,39 @@ document.querySelector("#exportBtn").addEventListener("click",()=>{
  const blob=new Blob([JSON.stringify(RetroNomadSavedHunts.exportData(),null,2)],{type:"application/json"});
  const a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="retronomad-saved-hunts.json";a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000);
 });
+async function initAccountSync(){
+ const btn=document.querySelector("#syncBtn"),status=document.querySelector("#syncStatus");
+ if(!RetroNomadAccount.state().enabled){
+  btn.disabled=true;btn.textContent="Local only";
+  status.textContent="Account sync backend is not deployed; these hunts are stored only in this browser.";
+  return;
+ }
+ try{
+  const me=await RetroNomadAccount.me();
+  if(!me.authenticated){
+   btn.disabled=true;btn.textContent="Sign in to sync";
+   status.innerHTML='Saved Hunts are local. <a href="account.html">Sign in</a> to sync across devices.';
+   return;
+  }
+  btn.disabled=false;btn.textContent="Sync now";
+  status.textContent="Signed in as "+me.user.email+".";
+ }catch(e){
+  btn.disabled=true;btn.textContent="Sync unavailable";status.textContent=e.message;
+ }
+}
+document.querySelector("#syncBtn").addEventListener("click",async()=>{
+ const btn=document.querySelector("#syncBtn"),status=document.querySelector("#syncStatus");
+ btn.disabled=true;btn.textContent="Syncing…";
+ try{
+  const result=await RetroNomadAccount.syncSavedHunts();
+  status.textContent="Synced "+(result.hunts?.length||0)+" Saved Hunt"+((result.hunts?.length||0)===1?"":"s")+" at "+new Date(result.syncedAt).toLocaleTimeString()+".";
+  render();
+ }catch(e){status.textContent=e.message;}
+ finally{btn.disabled=false;btn.textContent="Sync now";}
+});
 RetroNomadSavedHunts.migrateLegacy();
 render();
+initAccountSync();
 </script>
 </body>
 </html>
