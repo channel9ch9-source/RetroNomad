@@ -14,8 +14,21 @@
 const RTC_BASE = "https://api.retrotechcollector.app/developer/v1";
 const FX_URL = "https://api.frankfurter.dev/v1/latest?base=USD&symbols=GBP";
 
-function platformName(p) {
-  return { PS1: "PlayStation", PS2: "PlayStation 2", Dreamcast: "Sega Dreamcast" }[p] || p || "";
+function platformAliases(p) {
+  return { PS1: ["Sony PlayStation", "PlayStation"], PS2: ["Sony PlayStation 2", "PlayStation 2"], Dreamcast: ["Sega Dreamcast"] }[p] || [p || ""];
+}
+
+function platformMatches(row, platformCode) {
+  return platformAliases(platformCode).includes(row.platform || "");
+}
+
+function barcodeEquivalent(a, b) {
+  const x = String(a || "").replace(/\D/g, ""), y = String(b || "").replace(/\D/g, "");
+  if (!x || !y) return false;
+  if (x === y) return true;
+  if (x.length === 13 && x[0] === "0" && x.slice(1) === y) return true;
+  if (y.length === 13 && y[0] === "0" && y.slice(1) === x) return true;
+  return false;
 }
 
 function bucketField(b) {
@@ -26,13 +39,13 @@ function norm(s) {
   return String(s || "").toLowerCase().replace(/[^a-z0-9]+/g, " ").trim();
 }
 
-function score(row, game, platform) {
+function score(row, game, platformCode) {
   let n = 0;
   const a = norm(row.name), b = norm(game);
   if (a === b) n += 100;
   else if (a.includes(b) || b.includes(a)) n += 55;
   if (String(row.region || "").toUpperCase().includes("PAL")) n += 25;
-  if (row.platform === platform) n += 20;
+  if (platformMatches(row, platformCode)) n += 20;
   return n;
 }
 
@@ -83,38 +96,56 @@ export default {
     const upc = (u.searchParams.get("upc") || "").replace(/\D/g, "");
     const bucket = (u.searchParams.get("bucket") || "").trim();
     const field = bucketField(bucket);
-    const platform = platformName(platformCode);
-
-    if (!game || !platform || !field) {
+    if (!game || !platformCode || !field) {
       return json({ error: "invalid_request", message: "game, platform and supported bucket are required" }, 400, allowed);
     }
 
     try {
-      let path;
+      let best, p, matchBasis, matchRegion = null;
+
       if (upc.length >= 8 && upc.length <= 14) {
-        path = "/catalogue?upc=" + encodeURIComponent(upc) + "&category=GAME&limit=20";
+        const exact = await rtc("/prices?upc=" + encodeURIComponent(upc) + "&limit=20", env.RTC_API_KEY);
+        const rows = (exact.data || []).filter(r =>
+          String(r.category || "GAME").toUpperCase() === "GAME" &&
+          platformMatches(r, platformCode) &&
+          barcodeEquivalent(r.upc, upc)
+        );
+        if (!rows.length) return json({ error: "exact_identifier_price_unavailable" }, 404, allowed);
+
+        rows.sort((a, b) => score(b, game, platformCode) - score(a, game, platformCode));
+        best = rows[0];
+        const bestScore = score(best, game, platformCode);
+        const secondScore = rows[1] ? score(rows[1], game, platformCode) : -1;
+        if (bestScore < 80) return json({ error: "identifier_conflict" }, 409, allowed);
+        if (secondScore >= bestScore - 5) return json({ error: "ambiguous_match" }, 409, allowed);
+
+        p = best;
+        matchBasis = "exact_barcode";
       } else {
-        path = "/catalogue?search=" + encodeURIComponent(game) + "&platform=" + encodeURIComponent(platform) + "&category=GAME&limit=20";
+        const title = await rtc("/prices?search=" + encodeURIComponent(game) + "&limit=20", env.RTC_API_KEY);
+        const rows = (title.data || []).filter(r =>
+          String(r.category || "GAME").toUpperCase() === "GAME" &&
+          platformMatches(r, platformCode)
+        );
+        if (!rows.length) return json({ error: "no_title_platform_price_match" }, 404, allowed);
+
+        rows.sort((a, b) => score(b, game, platformCode) - score(a, game, platformCode));
+        best = rows[0];
+        const bestScore = score(best, game, platformCode);
+        const secondScore = rows[1] ? score(rows[1], game, platformCode) : -1;
+        if (bestScore < 80) return json({ error: "weak_match" }, 409, allowed);
+        if (secondScore >= bestScore - 5) return json({ error: "ambiguous_match" }, 409, allowed);
+
+        const detail = await rtc("/catalogue/" + encodeURIComponent(best.masterItemId), env.RTC_API_KEY);
+        matchRegion = detail.data?.region || null;
+        if (!String(matchRegion || "").toUpperCase().includes("PAL")) {
+          return json({ error: "region_not_confirmed_pal" }, 409, allowed);
+        }
+
+        p = best;
+        matchBasis = "title_explicit_pal";
       }
 
-      const cat = await rtc(path, env.RTC_API_KEY);
-      const rows = (cat.data || []).filter(r =>
-        r.platform === platform && String(r.region || "").toUpperCase().includes("PAL")
-      );
-      if (!rows.length) return json({ error: "no_pal_match" }, 404, allowed);
-
-      rows.sort((a, b) => score(b, game, platform) - score(a, game, platform));
-      const best = rows[0], bestScore = score(best, game, platform);
-      const secondScore = rows[1] ? score(rows[1], game, platform) : -1;
-      if (bestScore < 80) {
-        return json({ error: upc ? "identifier_conflict" : "weak_match" }, 409, allowed);
-      }
-      if (secondScore >= bestScore - 5) {
-        return json({ error: "ambiguous_match" }, 409, allowed);
-      }
-
-      const priceResult = await rtc("/prices/" + encodeURIComponent(best.masterItemId), env.RTC_API_KEY);
-      const p = priceResult.data || {};
       const usd = Number(p[field]);
       if (!(usd > 0)) return json({ error: "price_unavailable", bucket }, 404, allowed);
 
@@ -129,8 +160,9 @@ export default {
         masterItemId: best.masterItemId,
         name: best.name,
         platform: best.platform,
-        region: best.region,
+        region: matchRegion,
         upc: best.upc || null,
+        matchBasis,
         bucket,
         priceUsd: usd,
         priceGbp: Math.round(usd * rate * 100) / 100,
