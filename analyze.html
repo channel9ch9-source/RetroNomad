@@ -77,6 +77,100 @@ function detectGame(text,platform){
  }
  return bs>=8?best:null;
 }
+function cleanUrlInput(value){
+ let v=(value||"").trim();
+ if(!v)return"";
+ if(!/^https?:\/\//i.test(v))v="https://"+v;
+ try{const u=new URL(v);u.hash="";return u.toString();}catch(e){return"";}
+}
+function detectListingSource(url){
+ try{
+   const h=new URL(url).hostname.toLowerCase().replace(/^www\./,"");
+   if(h==="ebay.co.uk"||h.endsWith(".ebay.co.uk")||h==="ebay.com"||h.endsWith(".ebay.com"))return"eBay";
+   if(h==="etsy.com"||h.endsWith(".etsy.com"))return"Etsy";
+   if(h==="vinted.co.uk"||h.endsWith(".vinted.co.uk")||h==="vinted.com"||h.endsWith(".vinted.com"))return"Vinted";
+   return h||"Web";
+ }catch(e){return"Unknown";}
+}
+function parseEbayUrl(url){
+ try{
+   const u=new URL(url); const p=decodeURIComponent(u.pathname); let id="";
+   const m=p.match(/\/itm\/(?:[^/]+\/)?(\d{9,15})(?:[/?]|$)/i)||p.match(/\/(\d{9,15})(?:[/?]|$)/);
+   if(m)id=m[1];
+   if(!id){for(const k of ["item","itemid","itemId","id"]){const v=u.searchParams.get(k);if(v&&/^\d{9,15}$/.test(v)){id=v;break;}}}
+   let slug="";
+   const seg=p.split("/").filter(Boolean); const itm=seg.findIndex(x=>x.toLowerCase()==="itm");
+   if(itm>=0&&seg[itm+1]&&!/^\d+$/.test(seg[itm+1]))slug=seg[itm+1];
+   const title=slug?slug.replace(/[-_]+/g," ").replace(/\s+/g," ").trim():"";
+   return{id,title};
+ }catch(e){return{id:"",title:""};}
+}
+function metaContent(doc,selector){const el=doc.querySelector(selector);return el?(el.getAttribute("content")||el.textContent||"").trim():"";}
+function firstJsonLdProduct(doc){
+ const nodes=[...doc.querySelectorAll('script[type="application/ld+json"]')];
+ const products=[];
+ function walk(x){
+   if(!x)return;
+   if(Array.isArray(x)){x.forEach(walk);return;}
+   if(typeof x!=="object")return;
+   const t=x["@type"];
+   if(t==="Product"||(Array.isArray(t)&&t.includes("Product")))products.push(x);
+   if(x["@graph"])walk(x["@graph"]);
+ }
+ for(const n of nodes){try{walk(JSON.parse(n.textContent));}catch(e){}}
+ return products[0]||null;
+}
+function numPrice(v){
+ if(v==null)return"";
+ const s=String(v).replace(/,/g,"").match(/\d+(?:\.\d{1,2})?/);
+ return s?s[0]:"";
+}
+function parseListingHtml(html,url){
+ const doc=new DOMParser().parseFromString(html,"text/html"), p=firstJsonLdProduct(doc);
+ let title=(p&&p.name)||metaContent(doc,'meta[property="og:title"]')||metaContent(doc,'meta[name="twitter:title"]')||doc.title||"";
+ let desc=(p&&p.description)||metaContent(doc,'meta[property="og:description"]')||metaContent(doc,'meta[name="description"]')||"";
+ let price="";
+ if(p&&p.offers){
+   const o=Array.isArray(p.offers)?p.offers[0]:p.offers;
+   if(o)price=numPrice(o.price||(o.priceSpecification&&o.priceSpecification.price));
+ }
+ if(!price)price=numPrice(metaContent(doc,'meta[property="product:price:amount"]')||metaContent(doc,'meta[itemprop="price"]'));
+ title=title.replace(/\s*[|\-–—]\s*eBay\s*$/i,"").trim();
+ return{title,desc,price};
+}
+function setImportStatus(kind,text){
+ const el=document.querySelector("#importStatus");el.className="importstatus "+kind;el.textContent=text;
+}
+async function importListingUrl(){
+ const input=document.querySelector("#listingUrl"), url=cleanUrlInput(input.value);
+ if(!url){setImportStatus("bad","Enter a valid http(s) listing URL.");return;}
+ input.value=url; const source=detectListingSource(url); let itemId="",fallbackTitle="";
+ if(source==="eBay"){const x=parseEbayUrl(url);itemId=x.id;fallbackTitle=x.title;}
+ document.querySelector("#listingSource").textContent=source;
+ document.querySelector("#listingItemId").textContent=itemId||"—";
+ setImportStatus("warn","Importing public listing metadata…");
+ let imported={title:"",desc:"",price:""}; let fetched=false;
+ try{
+   const res=await fetch(url,{method:"GET",mode:"cors",redirect:"follow",credentials:"omit",headers:{"Accept":"text/html,application/xhtml+xml"}});
+   if(!res.ok)throw new Error("HTTP "+res.status);
+   const html=await res.text(); imported=parseListingHtml(html,url); fetched=true;
+ }catch(e){}
+ if(imported.title)document.querySelector("#title").value=imported.title;
+ else if(fallbackTitle&&!document.querySelector("#title").value)document.querySelector("#title").value=fallbackTitle;
+ if(imported.desc)document.querySelector("#desc").value=imported.desc;
+ if(imported.price&&!document.querySelector("#price").value)document.querySelector("#price").value=imported.price;
+ updateAutoHints();
+ if(fetched&&(imported.title||imported.desc||imported.price)){
+   const got=[imported.title&&"title",imported.desc&&"description",imported.price&&"price"].filter(Boolean).join(", ");
+   setImportStatus("good","Imported "+got+" from "+source+(itemId?" · item "+itemId:"")+". Review the fields, then analyse.");
+ }else if(source==="eBay"){
+   const extra=fallbackTitle?" A title was recovered from the URL itself.":"";
+   setImportStatus("warn","eBay blocked direct browser metadata access on this request."+(itemId?" Item ID "+itemId+" was extracted.":"")+extra+" Full automatic eBay import needs an authorised server-side/API connection.");
+ }else{
+   setImportStatus("warn",source+" did not expose importable page metadata to this browser. You can still paste the listing details manually.");
+ }
+}
+
 function detectRegionSignal(text){
  const raw=(text||"").toLowerCase(),n=norm(text);
  // Remove common explicit negations before looking for foreign-region claims,
