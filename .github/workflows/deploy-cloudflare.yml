@@ -1,0 +1,54 @@
+name: Deploy RetroNomad Cloudflare scaffold
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment: cloudflare-scaffold
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Install deployment tooling
+        run: npm install
+
+      - name: Build same-origin static assets
+        run: npm run build:cloudflare
+
+      - name: Resolve/create D1 and render Wrangler config
+        run: npm run prepare:cloudflare
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          AUTH_EMAIL_WEBHOOK_URL: ${{ secrets.AUTH_EMAIL_WEBHOOK_URL }}
+
+      - name: Apply D1 migrations
+        run: npm run db:migrate
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+
+      - name: Configure optional email webhook secret
+        if: ${{ secrets.AUTH_EMAIL_WEBHOOK_SECRET != '' }}
+        shell: bash
+        run: printf '%s' "$AUTH_EMAIL_WEBHOOK_SECRET" | npx wrangler secret put AUTH_EMAIL_WEBHOOK_SECRET --config .wrangler.deploy.jsonc
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          AUTH_EMAIL_WEBHOOK_SECRET: ${{ secrets.AUTH_EMAIL_WEBHOOK_SECRET }}
+
+      - name: Deploy Worker + static app
+        run: npm run deploy:cloudflare
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
