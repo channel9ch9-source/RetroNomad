@@ -161,7 +161,7 @@ Proceed only when:
 - [x] Confirm standard API/CSV terms are internal-use only
 - [x] Identify PriceCharting's official commercial-permission route in its current Terms/API documentation
 - [x] Draft the RetroNomad commercial-data enquiry
-- [ ] Send PriceCharting the commercial agreement / express written permission enquiry
+- [x] Send PriceCharting the commercial agreement / express written permission enquiry (23 Sep 2026)
 - [ ] Ask specifically about attributed public display of current PAL loose/CIB/new/box/manual guide prices
 - [ ] Ask about API quota, caching, attribution, redistribution and launch-stage pricing
 
@@ -307,6 +307,6 @@ At every milestone:
 
 # Immediate next action
 
-**Send the drafted PriceCharting commercial-data enquiry via the official commercial-permission contact route in PriceCharting's Terms/Contact page, then wait for their licensing response before purchasing API access.**
+**While waiting for PriceCharting's licensing response, improve the public product positioning around PALScout compatibility + exact-release identification, without changing the core classifier/pricing architecture.**
 
 Do not purchase a normal PriceCharting API subscription for RetroNomad public use unless a suitable commercial agreement is confirmed.
