@@ -106,7 +106,10 @@ export default {
       rows.sort((a, b) => score(b, game, platform) - score(a, game, platform));
       const best = rows[0], bestScore = score(best, game, platform);
       const secondScore = rows[1] ? score(rows[1], game, platform) : -1;
-      if (!upc && (bestScore < 80 || secondScore >= bestScore - 5)) {
+      if (bestScore < 80) {
+        return json({ error: upc ? "identifier_conflict" : "weak_match" }, 409, allowed);
+      }
+      if (secondScore >= bestScore - 5) {
         return json({ error: "ambiguous_match" }, 409, allowed);
       }
 
