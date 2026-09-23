@@ -36,7 +36,12 @@
 - [ ] Deploy/configure the account backend on a suitable same-site/custom-domain setup
 - [ ] Configure transactional sign-in email delivery + abuse/rate controls
 - [ ] Update privacy/account-data policy before enabling public accounts
-- [ ] Add server-compatible PALScout + matcher execution
+- [x] Add server-compatible PALScout + matcher execution
+- [x] Extract shared PALScout + matcher cores used by Deal Finder and backend monitor
+- [x] Add backend/search-engine.js to classify and rank normalised provider candidates
+- [x] Parity-test all 217 shared release-evidence rows against browser evidence
+- [x] Regression-test shared browser/server rules with representative MATCH / REVIEW / FILTERED cases
+- [ ] Later: migrate rich analyze.html Phase 2 logic onto shared core without losing photo/OCR evidence
 - [ ] Connect an authorised live marketplace inventory adapter
 - [ ] Enable autonomous scheduled monitoring only after auth + live inventory are configured
 - [ ] Add real notification delivery after user identity/contact verification exists
