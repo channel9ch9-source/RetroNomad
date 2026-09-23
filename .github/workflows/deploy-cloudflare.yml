@@ -9,7 +9,6 @@ permissions:
 jobs:
   deploy:
     runs-on: ubuntu-latest
-    environment: cloudflare-scaffold
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -39,7 +38,7 @@ jobs:
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
 
       - name: Configure optional email webhook secret
-        if: ${{ secrets.AUTH_EMAIL_WEBHOOK_SECRET != '' }}
+        if: env.AUTH_EMAIL_WEBHOOK_SECRET != ''
         shell: bash
         run: printf '%s' "$AUTH_EMAIL_WEBHOOK_SECRET" | npx wrangler secret put AUTH_EMAIL_WEBHOOK_SECRET --config .wrangler.deploy.jsonc
         env:
