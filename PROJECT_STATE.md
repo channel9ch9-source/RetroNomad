@@ -678,3 +678,60 @@ Regression QA passed for first-match notification, repeat-run deduplication, REV
 The Worker shell currently exposes readiness information and an admin-only future run hook. Public hunt sync remains intentionally disabled until real account authentication and ownership exist.
 
 This code is infrastructure only and is not deployed. Real monitoring still requires authenticated hunt ownership, server-side PALScout/matcher execution, an authorised live inventory source and a notification provider.
+
+
+## Passwordless accounts + Saved Hunt sync
+
+Implemented 23 September 2026.
+
+New files:
+- `backend/auth-core.js`
+- `runtime-config.js`
+- `account-sync.js`
+- `account.html`
+- `ACCOUNTS_SYNC_V1.md`
+
+Updated:
+- `backend/schema.sql`
+- `backend/alerts-worker.js`
+- `saved-hunts.js`
+- `search.html`
+- `wishlist.html`
+- `index.html`
+
+Authentication design:
+- passwordless email one-time link
+- raw login token is never persisted; backend stores SHA-256 hash
+- raw session token is never exposed to app JavaScript; backend stores SHA-256 hash
+- intended production session is Secure + HttpOnly + SameSite=Lax
+- 15-minute one-time login link
+- 30-day revocable session
+- account ownership derives only from authenticated session
+
+Saved Hunt sync:
+- local hunts upload to authenticated owner
+- complete server snapshot returns to browser
+- deletes create local tombstones
+- server soft-deletion prevents stale devices resurrecting deleted hunt IDs
+- ID collisions owned by another user are rejected
+- browser clears only server-acknowledged tombstones
+- search save can sync immediately when authenticated
+- wishlist provides manual Sync now
+
+QA:
+- all updated browser/backend files pass syntax validation
+- local deletion produces a tombstone
+- acknowledged tombstone clears
+- server snapshot replacement works
+- account client does not issue requests while runtime account sync is disabled
+
+Current public status:
+Account code exists but the service is not deployed. `runtime-config.js` intentionally sets accountSyncEnabled=false. Public Saved Hunts therefore remain browser-local.
+
+Deployment still needs:
+- database binding
+- app/API same-site or custom-domain setup
+- email delivery adapter
+- rate limiting / abuse controls
+- privacy-policy/account-data update
+
