@@ -1,0 +1,123 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "RetroNomad Pricing v1 Reference Export",
+  "type": "object",
+  "required": [
+    "schema_version",
+    "exported_at",
+    "currency",
+    "records"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": 1
+    },
+    "exported_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "currency": {
+      "const": "GBP"
+    },
+    "records": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "schema_version",
+          "comparison_key",
+          "currency",
+          "game",
+          "platform",
+          "release",
+          "edition",
+          "bucket",
+          "reference_type",
+          "basis",
+          "typical",
+          "reference_date",
+          "saved_at"
+        ],
+        "properties": {
+          "schema_version": {
+            "const": 1
+          },
+          "comparison_key": {
+            "type": "string"
+          },
+          "currency": {
+            "const": "GBP"
+          },
+          "game": {
+            "type": "string"
+          },
+          "platform": {
+            "type": "string"
+          },
+          "release": {
+            "type": "string"
+          },
+          "edition": {
+            "type": "string"
+          },
+          "bucket": {
+            "enum": [
+              "CIB",
+              "Loose",
+              "New",
+              "Incomplete",
+              "Condition-specific",
+              "Other",
+              "Unresolved"
+            ]
+          },
+          "reference_type": {
+            "enum": [
+              "market",
+              "target",
+              "comp"
+            ]
+          },
+          "basis": {
+            "enum": [
+              "item",
+              "landed"
+            ]
+          },
+          "low": {
+            "type": [
+              "number",
+              "null"
+            ],
+            "minimum": 0
+          },
+          "typical": {
+            "type": "number",
+            "exclusiveMinimum": 0
+          },
+          "high": {
+            "type": [
+              "number",
+              "null"
+            ],
+            "minimum": 0
+          },
+          "source": {
+            "type": "string"
+          },
+          "source_url": {
+            "type": "string"
+          },
+          "reference_date": {
+            "type": "string",
+            "format": "date"
+          },
+          "saved_at": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      }
+    }
+  }
+}
