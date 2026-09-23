@@ -79,9 +79,15 @@ function detectGame(text,platform){
 }
 function detectRegionSignal(text){
  const raw=(text||"").toLowerCase(),n=norm(text);
+ // Remove common explicit negations before looking for foreign-region claims,
+ // e.g. "UK PAL - not NTSC-US" or "European PAL, not Japanese NTSC-J".
+ const scan=raw
+  .replace(/\b(?:not|is not|isn't|isnt|non)[\s-]+(?:an?\s+)?(?:japanese(?:\s+version)?|japan|jp version)(?:[\s,/-]+ntsc[\s-]*j)?\b/g," ")
+  .replace(/\b(?:not|is not|isn't|isnt|non)[\s-]+(?:an?\s+)?(?:american(?:\s+version)?|north american(?:\s+version)?|usa|u\.s\.|us version)(?:[\s,/-]+ntsc[\s-]*(?:u\/?c|u|us))?\b/g," ")
+  .replace(/\b(?:not|is not|isn't|isnt|non)[\s-]+ntsc[\s-]*(?:j|u\/?c|u|us)\b/g," ");
  const foreign=[];
- if(/\b(ntsc[\s-]*j|jpn|japan|japanese|jp version|japanese version)\b/.test(raw))foreign.push("NTSC-J / Japan");
- if(/\b(ntsc[\s-]*(u\/?c|u|us)|usa|u\.s\.|us version|american version|north american)\b/.test(raw))foreign.push("NTSC-U/C / North America");
+ if(/\b(ntsc[\s-]*j|jpn|japan|japanese|jp version|japanese version)\b/.test(scan))foreign.push("NTSC-J / Japan");
+ if(/\b(ntsc[\s-]*(u\/?c|u|us)|usa|u\.s\.|us version|american version|north american)\b/.test(scan))foreign.push("NTSC-U/C / North America");
  if(/\b(pal[\s-]*(fr|fra)|fr[\s-]*pal|french version|french cover|french manual|version francaise|france)\b/.test(raw))foreign.push("PAL France");
  if(/\b(pal[\s-]*(it|ita)|ita[\s-]*pal|it[\s-]*pal|italian version|italian cover|italian manual|italy|italia)\b/.test(raw))foreign.push("PAL Italy");
  if(/\b(pal[\s-]*(de|ger)|de[\s-]*pal|ger[\s-]*pal|german version|german cover|germany|deutsch)\b/.test(raw))foreign.push("PAL Germany");
@@ -103,7 +109,7 @@ function palScoutCompatibility(platform,regionSignal,ev,itemType,bundleSignal){
  const exactPal=["UK_EXACT","UK_SHARED_PAL","PAL_SHARED","UK_COMPATIBLE_EU_ENGLISH","UK_VISUAL_REQUIRED","PAL_EUROPE","EUROPEAN_ENGLISH_MATERIALS"].includes(evMarket);
  const exactNonUk=evMarket==="NON_UK_EXACT";
 
- if(ntsc&&exactPal)return{state:"review",badge:"REGION CONFLICT",title:"Compatibility needs verification",text:"The listing wording says NTSC/import, but the recognised identifier points to a PAL-family release. Verify the physical disc/box identifier before buying.",meta:"Target: "+hw+"."};
+ if(ntsc&&(exactPal||explicitPal))return{state:"review",badge:"REGION CONFLICT",title:"Compatibility needs verification",text:"The listing contains conflicting PAL and NTSC/foreign-region evidence. Verify the physical disc/box identifier before buying.",meta:"Target: "+hw+"."};
  if(ntsc)return{state:"incompatible",badge:"NOT PAL COMPATIBLE",title:"Not compatible with standard UK/PAL hardware",text:"PALScout detected an NTSC-U/NTSC-J region signal. On the launch platforms, an ordinary unmodified UK/European console should not be assumed to run this copy.",meta:"Modified consoles, import adapters and other workarounds are outside this verdict."};
  if(exactPal)return{state:"compatible",badge:"PAL COMPATIBLE",title:"Compatible with UK/European PAL hardware",text:"A recognised PAL-family release identifier supports compatibility with "+hw+".",meta:"Hardware compatibility does not guarantee English packaging/text or a UK-specific release."};
  if(exactNonUk&&explicitPal)return{state:"compatible",badge:"PAL COMPATIBLE",title:"PAL-compatible non-UK release",text:"This appears to be a non-UK PAL territory copy, but the PAL evidence supports compatibility with "+hw+".",meta:"Packaging/language and collector-market classification are checked separately."};
