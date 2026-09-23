@@ -1,0 +1,193 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>RetroNomad · Pricing Coverage Lab</title>
+<style>
+:root{--bg:#0b1017;--panel:#121923;--line:#263142;--text:#edf3fb;--muted:#91a0b5;--good:#61d49a;--warn:#f2c66d;--bad:#ef7c82;--accent:#77a8ff}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+.wrap{max-width:1180px;margin:0 auto;padding:28px 18px 60px}.top{display:flex;justify-content:space-between;gap:16px;align-items:center;margin-bottom:24px}.brand{font-weight:800}.top a{color:var(--accent);text-decoration:none}
+h1{margin:0 0 8px;font-size:clamp(28px,5vw,46px)}p{color:var(--muted);line-height:1.55}.panel{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:18px;margin-top:16px}
+.row{display:grid;grid-template-columns:1fr auto auto;gap:8px}.row input{min-width:0}.btn,input{border:1px solid var(--line);background:#0e151f;color:var(--text);border-radius:10px;padding:11px 12px}.btn{cursor:pointer;font-weight:700}.btn:hover{border-color:#4d6484}.btn:disabled{opacity:.5;cursor:not-allowed}
+.note,.status{font-size:13px;color:var(--muted);margin-top:8px}.good{color:var(--good)}.warn{color:var(--warn)}.bad{color:var(--bad)}
+.stats{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:10px;margin-top:14px}.stat{border:1px solid var(--line);border-radius:12px;padding:12px}.stat span{display:block;color:var(--muted);font-size:12px}.stat b{display:block;margin-top:4px;font-size:22px}
+.progress{height:9px;background:#0e151f;border:1px solid var(--line);border-radius:999px;overflow:hidden;margin-top:14px}.bar{height:100%;width:0;background:var(--accent)}
+.tablewrap{overflow:auto;margin-top:14px;border:1px solid var(--line);border-radius:12px}table{border-collapse:collapse;width:100%;min-width:1050px;font-size:13px}th,td{padding:9px 10px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}th{position:sticky;top:0;background:#151e2a;color:#bac8da}.pill{display:inline-block;padding:3px 7px;border-radius:999px;border:1px solid var(--line);white-space:nowrap}.pill.MATCHED{color:var(--good)}.pill.AMBIGUOUS,.pill.WEAK_MATCH{color:var(--warn)}.pill.NO_PAL_MATCH,.pill.IDENTIFIER_CONFLICT,.pill.ERROR,.pill.PRICE_ERROR{color:var(--bad)}
+.small{font-size:12px;color:var(--muted)}@media(max-width:760px){.row{grid-template-columns:1fr}.stats{grid-template-columns:repeat(2,1fr)}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="top"><div class="brand">RetroNomad · internal validation</div><a href="analyze.html">Back to analyser</a></div>
+  <h1>Pricing v1 coverage lab</h1>
+  <p>Runs the 100-title launch catalogue against RetroTechCollector using the same safety principle as the analyser: PAL + exact platform, strong title agreement, and no ambiguous top match. Known release barcodes are preferred; title search is used when no safe numeric barcode exists.</p>
+
+  <div class="panel">
+    <div class="row">
+      <input id="key" type="password" autocomplete="off" placeholder="RTC developer API key (rtc_live_…)">
+      <button id="connect" class="btn">Connect</button>
+      <button id="forget" class="btn">Forget key</button>
+    </div>
+    <div id="connection" class="status">Key is kept only in sessionStorage for this browser tab.</div>
+    <div class="note">Required scopes: catalogue:read + prices:read. The exported report never contains the API key. Calls are intentionally paced below the standalone add-on burst limit.</div>
+  </div>
+
+  <div class="panel">
+    <div class="row">
+      <button id="run" class="btn">Run / resume 100-title coverage</button>
+      <button id="stop" class="btn" disabled>Stop</button>
+      <button id="export" class="btn" disabled>Export JSON report</button>
+    </div>
+    <div class="progress"><div id="bar" class="bar"></div></div>
+    <div id="runStatus" class="status">Ready. Launch catalogue will be derived from release-evidence.js.</div>
+    <div class="stats">
+      <div class="stat"><span>Completed</span><b id="completed">0/100</b></div>
+      <div class="stat"><span>Safe matches</span><b id="matched">0</b></div>
+      <div class="stat"><span>Ambiguous / weak</span><b id="review">0</b></div>
+      <div class="stat"><span>No PAL match</span><b id="missing">0</b></div>
+      <div class="stat"><span>Errors</span><b id="errors">0</b></div>
+    </div>
+    <div class="tablewrap">
+      <table>
+        <thead><tr><th>#</th><th>Game</th><th>Platform</th><th>Seed</th><th>Status</th><th>Provider match</th><th>Region</th><th>Price buckets</th><th>Snapshot</th><th>Notes</th></tr></thead>
+        <tbody id="rows"></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<script src="release-evidence.js"></script>
+<script>
+(function(){
+"use strict";
+const API="https://api.retrotechcollector.app/developer/v1";
+const SESSION_KEY="retronomad_rtc_api_key";
+const MIN_CALL_GAP_MS=1250;
+let connected=false, stopRequested=false, running=false, lastCallAt=0, results=[];
+
+const $=s=>document.querySelector(s);
+function platformName(p){return {PS1:"PlayStation",PS2:"PlayStation 2",Dreamcast:"Sega Dreamcast"}[p]||p||""}
+function norm(s){return String(s||"").toLowerCase().replace(/[’']/g,"").replace(/[^a-z0-9]+/g," ").trim().replace(/\bvii\b/g,"7").replace(/\bviii\b/g,"8").replace(/\bix\b/g,"9").replace(/\biii\b/g,"3").replace(/\bii\b/g,"2")}
+function candidateScore(row,item){
+  let n=0,a=norm(row.name),b=norm(item.game);
+  if(a===b)n+=100;else if(a.includes(b)||b.includes(a))n+=55;
+  if(String(row.region||"").toUpperCase().includes("PAL"))n+=25;
+  if(row.platform===platformName(item.platform))n+=20;
+  return n;
+}
+function evidenceRank(r){
+  const bucket={UK_EXACT:60,UK_SHARED_PAL:50,UK_COMPATIBLE_EU_ENGLISH:40,PAL_SHARED:30,PAL_EUROPE:20}[r[5]]||0;
+  const quality={high:8,verified_v2:6,medium:4,low:2}[r[6]]||0;
+  return bucket+quality;
+}
+function launchItems(){
+  const seen=new Set(), out=[];
+  for(const r of (window.RELEASE_EVIDENCE||[])){
+    const k=r[0]+"\u0000"+r[1];
+    if(!seen.has(k)){seen.add(k);out.push({game:r[0],platform:r[1]});}
+  }
+  return out;
+}
+const items=launchItems();
+function preferredBarcode(item){
+  return (window.RELEASE_EVIDENCE||[])
+    .filter(r=>r[0]===item.game&&r[1]===item.platform&&r[3]==="barcode"&&/^\d{8,14}$/.test(String(r[4]))&&r[5]!=="NON_UK_EXACT")
+    .sort((a,b)=>evidenceRank(b)-evidenceRank(a))[0]?.[4]||"";
+}
+function sleep(ms){return new Promise(r=>setTimeout(r,ms))}
+async function pacedJson(path,key){
+  const wait=Math.max(0,MIN_CALL_GAP_MS-(Date.now()-lastCallAt));if(wait)await sleep(wait);
+  lastCallAt=Date.now();
+  const res=await fetch(API+path,{headers:{Authorization:"Bearer "+key,Accept:"application/json"}});
+  let data={};try{data=await res.json()}catch(e){}
+  if(!res.ok){const err=new Error(data.message||data.error||("HTTP "+res.status));err.status=res.status;err.code=data.error||"";throw err}
+  return data;
+}
+function key(){return ($("#key").value||sessionStorage.getItem(SESSION_KEY)||"").trim()}
+function setConnection(t,c){$("#connection").textContent=t;$("#connection").className="status "+(c||"")}
+function setRunStatus(t,c){$("#runStatus").textContent=t;$("#runStatus").className="status "+(c||"")}
+async function connect(){
+  const k=key();if(!k){setConnection("Enter a developer key first.","warn");return false}
+  setConnection("Checking key…","warn");
+  try{
+    const r=await pacedJson("/me",k), scopes=r.scopes||[];
+    if(!scopes.includes("catalogue:read")||!scopes.includes("prices:read"))throw new Error("Key needs catalogue:read and prices:read scopes");
+    sessionStorage.setItem(SESSION_KEY,k);$("#key").value="";connected=true;
+    setConnection("Connected · "+(r.usage?.remaining??"?")+" calls remaining in the current quota period.","good");return true;
+  }catch(e){connected=false;sessionStorage.removeItem(SESSION_KEY);setConnection("Connection failed: "+e.message,"bad");return false}
+}
+function forget(){
+  sessionStorage.removeItem(SESSION_KEY);$("#key").value="";connected=false;setConnection("Developer key forgotten from this browser tab.",""); 
+}
+async function runOne(item,index){
+  const k=key(), upc=preferredBarcode(item), providerPlatform=platformName(item.platform);
+  const path=upc?"/catalogue?upc="+encodeURIComponent(upc)+"&category=GAME&limit=20":"/catalogue?search="+encodeURIComponent(item.game)+"&platform="+encodeURIComponent(providerPlatform)+"&category=GAME&limit=20";
+  const base={index:index+1,game:item.game,platform:item.platform,seed:upc?("UPC "+upc):"title",queryMethod:upc?"upc":"title"};
+  try{
+    const cat=await pacedJson(path,k);
+    const rows=(cat.data||[]).filter(r=>r.platform===providerPlatform&&String(r.region||"").toUpperCase().includes("PAL"));
+    if(!rows.length)return {...base,status:"NO_PAL_MATCH",note:"Provider returned no PAL row on the exact platform"};
+    rows.sort((a,b)=>candidateScore(b,item)-candidateScore(a,item));
+    const best=rows[0],bestScore=candidateScore(best,item),secondScore=rows[1]?candidateScore(rows[1],item):-1;
+    if(bestScore<80)return {...base,status:upc?"IDENTIFIER_CONFLICT":"WEAK_MATCH",providerName:best.name||"",region:best.region||"",masterItemId:best.masterItemId||null,note:"Best candidate does not agree strongly enough with the classified title"};
+    if(secondScore>=bestScore-5)return {...base,status:"AMBIGUOUS",providerName:best.name||"",region:best.region||"",masterItemId:best.masterItemId||null,note:"Two PAL candidates score too closely to auto-select"};
+    let price;
+    try{price=await pacedJson("/prices/"+encodeURIComponent(best.masterItemId),k)}
+    catch(e){return {...base,status:"PRICE_ERROR",providerName:best.name||"",region:best.region||"",masterItemId:best.masterItemId||null,note:"Catalogue matched safely but price fetch failed: "+e.message,httpStatus:e.status||null}}
+    const p=price.data||{}, available=["loose","cib","new","boxOnly","manualOnly"].filter(x=>Number(p[x])>0);
+    return {...base,status:"MATCHED",providerName:best.name||"",region:best.region||"",masterItemId:best.masterItemId||null,providerUpc:best.upc||null,score:bestScore,priceBuckets:available,priceSnapshotDate:(p.scrapeDate||"").slice(0,10)||null,note:available.length?("Price fields available: "+available.join(", ")):"Safe catalogue match; no positive price buckets"};
+  }catch(e){
+    return {...base,status:"ERROR",note:e.message,httpStatus:e.status||null,errorCode:e.code||null,haltSuggested:e.status===429||e.status===503};
+  }
+}
+function esc(s){return String(s??"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]))}
+function rowHtml(r){
+  return "<tr><td>"+r.index+"</td><td>"+esc(r.game)+"</td><td>"+esc(r.platform)+"</td><td class='small'>"+esc(r.seed)+"</td><td><span class='pill "+esc(r.status)+"'>"+esc(r.status)+"</span></td><td>"+esc(r.providerName||"—")+(r.masterItemId?" <span class='small'>#"+esc(r.masterItemId)+"</span>":"")+"</td><td>"+esc(r.region||"—")+"</td><td>"+esc((r.priceBuckets||[]).join(", ")||"—")+"</td><td>"+esc(r.priceSnapshotDate||"—")+"</td><td class='small'>"+esc(r.note||"")+"</td></tr>";
+}
+function render(){
+  const map=new Map(results.map(r=>[r.game+"\u0000"+r.platform,r]));
+  const ordered=items.map((it,i)=>map.get(it.game+"\u0000"+it.platform)||{index:i+1,game:it.game,platform:it.platform,seed:preferredBarcode(it)?("UPC "+preferredBarcode(it)):"title",status:"PENDING"});
+  $("#rows").innerHTML=ordered.map(rowHtml).join("");
+  const done=results.length,matched=results.filter(r=>r.status==="MATCHED").length;
+  const review=results.filter(r=>["AMBIGUOUS","WEAK_MATCH","IDENTIFIER_CONFLICT"].includes(r.status)).length;
+  const missing=results.filter(r=>r.status==="NO_PAL_MATCH").length;
+  const errors=results.filter(r=>["ERROR","PRICE_ERROR"].includes(r.status)).length;
+  $("#completed").textContent=done+"/"+items.length;$("#matched").textContent=matched;$("#review").textContent=review;$("#missing").textContent=missing;$("#errors").textContent=errors;
+  $("#bar").style.width=(items.length?Math.round(done/items.length*100):0)+"%";
+  $("#export").disabled=!results.length;
+}
+function summary(){
+  const counts={};for(const r of results)counts[r.status]=(counts[r.status]||0)+1;
+  return {completed:results.length,total:items.length,statusCounts:counts,safeMatches:counts.MATCHED||0};
+}
+async function run(){
+  if(running)return;
+  if(!key()||!connected){if(!(await connect()))return}
+  running=true;stopRequested=false;$("#run").disabled=true;$("#stop").disabled=false;
+  const doneKeys=new Set(results.map(r=>r.game+"\u0000"+r.platform));
+  for(let i=0;i<items.length;i++){
+    const it=items[i],id=it.game+"\u0000"+it.platform;
+    if(doneKeys.has(id))continue;
+    if(stopRequested)break;
+    setRunStatus("Checking "+(i+1)+"/"+items.length+": "+it.game+" ("+it.platform+")…","warn");
+    const r=await runOne(it,i);results.push(r);render();
+    if(r.haltSuggested){setRunStatus("Run paused after provider rate/service response: "+r.note,"bad");stopRequested=true;break}
+  }
+  running=false;$("#run").disabled=false;$("#stop").disabled=true;
+  if(stopRequested)setRunStatus("Stopped. Run again to resume unfinished titles.","warn");
+  else setRunStatus("Coverage run complete. Review ambiguous, missing and error rows before changing matcher rules.","good");
+}
+function stop(){stopRequested=true;setRunStatus("Stopping after the current request…","warn")}
+function exportReport(){
+  const report={generatedAt:new Date().toISOString(),provider:"RetroTechCollector Developer API",method:"RetroNomad Pricing v1 coverage lab",keyIncluded:false,launchTitles:items.length,summary:summary(),results:results};
+  const blob=new Blob([JSON.stringify(report,null,2)],{type:"application/json"}),url=URL.createObjectURL(blob),a=document.createElement("a");
+  a.href=url;a.download="retronomad-pricing-coverage-"+new Date().toISOString().slice(0,10)+".json";a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);
+}
+$("#connect").addEventListener("click",connect);$("#forget").addEventListener("click",forget);$("#run").addEventListener("click",run);$("#stop").addEventListener("click",stop);$("#export").addEventListener("click",exportReport);
+if(sessionStorage.getItem(SESSION_KEY)){setConnection("A developer key is present in this browser tab. Click Connect to validate it.","warn")}
+render();
+})();
+</script>
+</body>
+</html>
