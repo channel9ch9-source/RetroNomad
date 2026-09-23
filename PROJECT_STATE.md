@@ -767,3 +767,50 @@ Parity QA:
 
 Important scope:
 The Deal Finder and scheduled backend now share one classification/matching implementation. The richer Phase 2 `analyze.html` listing checker still contains embedded photo/UI-specific logic and has not yet been fully migrated to the shared core.
+
+
+## Cloudflare scaffold deployment package
+
+Prepared 23 September 2026.
+
+New deployment files:
+- `package.json`
+- `scripts/build-cloudflare.mjs`
+- `scripts/prepare-cloudflare.mjs`
+- `backend/migrations/0001_initial.sql`
+- `.github/workflows/deploy-cloudflare.yml`
+- `.gitignore`
+- `CLOUDFLARE_DEPLOYMENT.md`
+
+Deployment design:
+- one Cloudflare Worker serves both static RetroNomad assets and API routes
+- same-origin deployment preserves Secure + HttpOnly cookie session architecture
+- D1 is bound as `env.DB`
+- first migration creates users, auth tokens, sessions, Saved Hunts, match history, monitor runs and notification queue
+- hourly cron trigger is configured
+- marketplace and notification providers remain disabled
+- GitHub Pages remains local-only
+- Cloudflare build generates runtime config with account sync enabled and same-origin API
+
+Automation:
+- manual GitHub Actions workflow
+- installs Wrangler
+- builds `dist/public`
+- lists D1 databases
+- creates `retronomad-prod` in the Western Europe location if missing
+- generates deployment Wrangler config with the discovered database ID
+- applies D1 migrations
+- optionally configures the auth-email webhook secret
+- deploys Worker + static assets
+
+Current deployment status:
+NOT DEPLOYED.
+
+The repository is deployment-ready, but this ChatGPT/GitHub connection cannot authorize a Cloudflare account and no Cloudflare connector is available here.
+
+User-side external setup still required:
+- Cloudflare account ID
+- Cloudflare API token stored directly in GitHub Actions secrets (never pasted into chat)
+- run the manual deployment workflow
+
+Passwordless sign-in will additionally require a configured auth-email delivery webhook after the scaffold is live.
