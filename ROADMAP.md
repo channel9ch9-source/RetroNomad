@@ -172,7 +172,9 @@ Proceed only when:
 - [x] Run serial-prefix regression cases for SLES/SCES, SLUS/SCUS and Japan/Asia-family prefixes
 - [x] Restore listing URL ingestion helpers that had been dropped from the current analyser
 - [x] Smoke-test eBay URL item-ID/title parsing and Vinted source detection
-- [ ] Browser smoke-test the public analyser with real user-style listing URLs/text/photos
+- [x] Browser smoke-test exposed a hanging direct eBay metadata request
+- [x] Add a 6-second timeout + graceful fallback to listing URL import
+- [ ] Re-test the public analyser with a real eBay listing after the timeout fix
 
 # Active milestone — Find a release-safe licensed pricing source
 
