@@ -415,3 +415,29 @@ Accuracy/marketing changes:
 - PAL compatibility is explicitly separated from UK-market identity and packaging/language
 - compatibility scope is explicitly standard, unmodified UK/European hardware
 
+
+
+## PALScout compatibility QA and URL-ingestion repair
+
+Completed 23 September 2026.
+
+Compatibility QA:
+- representative UK exact PAL, continental PAL, NTSC-U, NTSC-J, unknown and conflicting-region cases were exercised
+- mixed PAL + NTSC evidence now becomes review rather than an outright compatibility verdict
+- common negated seller wording such as "UK PAL - not NTSC-US" no longer falsely triggers the NTSC path
+- PlayStation serial prefixes are now used as hardware-region evidence:
+  - SLES/SCES -> PAL Europe signal
+  - SLUS/SCUS -> North America/non-PAL signal
+  - SLPS/SLPM/SCPS/SCPM -> Japan/Asia-family non-PAL signal
+- PAL-Europe serial evidence does not by itself claim a UK-specific release
+- region detection now considers listing text, OCR-derived text and an explicitly supplied identifier
+- the compatibility regression cases passed after the fixes
+
+URL-ingestion repair:
+- the current analyser still referenced `cleanUrlInput`, `detectListingSource`, `parseEbayUrl` and `importListingUrl`, but their definitions had disappeared during later analyser changes
+- the helper block was restored from the earlier repository commit that introduced marketplace URL ingestion rather than reconstructed from memory
+- syntax validation passes
+- representative eBay URL parsing recovers item IDs and title slugs
+- generic source detection still recognises eBay, Etsy and Vinted
+- direct browser page import remains subject to marketplace CORS/access restrictions; eBay's full automatic listing import still requires authorised API/server-side access
+
