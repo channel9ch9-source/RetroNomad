@@ -44,8 +44,12 @@ function json(body, status = 200, env = {}, request = new Request("https://inval
 
 function originAllowed(request, env) {
   const allowed = String(env.APP_ORIGIN || "").replace(/\/$/, "");
+  if (!allowed) return false;
   const origin = request.headers.get("origin") || "";
-  return Boolean(allowed && origin === allowed);
+  if (origin) return origin === allowed;
+  // Same-origin GETs may omit Origin entirely. Only accept that case when the
+  // request itself is hosted on the configured app origin.
+  return new URL(request.url).origin === allowed;
 }
 
 function parseJson(text, fallback = null) {
