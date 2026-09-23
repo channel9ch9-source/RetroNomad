@@ -24,8 +24,14 @@ import {
   safeReturnUrl, opaqueId
 } from "./auth-core.js";
 
+function effectiveAppOrigin(request, env) {
+  const configured = String(env.APP_ORIGIN || "").replace(/\/$/, "");
+  if (configured && configured !== "self") return configured;
+  return new URL(request.url).origin;
+}
+
 function corsHeaders(env, request) {
-  const allowed = String(env.APP_ORIGIN || "").replace(/\/$/, "");
+  const allowed = effectiveAppOrigin(request, env);
   const origin = request.headers.get("origin") || "";
   const h = {
     "content-type": "application/json; charset=utf-8",
@@ -44,7 +50,7 @@ function json(body, status = 200, env = {}, request = new Request("https://inval
 }
 
 function originAllowed(request, env) {
-  const allowed = String(env.APP_ORIGIN || "").replace(/\/$/, "");
+  const allowed = effectiveAppOrigin(request, env);
   if (!allowed) return false;
   const origin = request.headers.get("origin") || "";
   if (origin) return origin === allowed;
@@ -193,7 +199,8 @@ async function requireSession(request, env) {
 }
 
 async function verifyMagicLink(request, env) {
-  if (!env.DB || !env.APP_ORIGIN) return json({ error: "account_backend_not_configured" }, 503, env, request);
+  if (!env.DB) return json({ error: "account_backend_not_configured" }, 503, env, request);
+  const appOrigin = effectiveAppOrigin(request, env);
   const u = new URL(request.url);
   const token = u.searchParams.get("token") || "";
   if (!token) return json({ error: "invalid_or_expired_link" }, 400, env, request);
@@ -232,11 +239,11 @@ async function verifyMagicLink(request, env) {
     "INSERT INTO sessions (id, user_id, token_hash, created_at, expires_at, last_seen_at, revoked_at) VALUES (?, ?, ?, ?, ?, ?, NULL)"
   ).bind(sessionId, user.id, sessionHash, now, isoAfterDays(30), now).run();
 
-  const dest = safeReturnUrl(row.return_to, env.APP_ORIGIN);
+  const dest = safeReturnUrl(row.return_to, appOrigin);
   return new Response(null, {
     status: 302,
     headers: {
-      location: dest || String(env.APP_ORIGIN).replace(/\/$/, "") + "/wishlist.html",
+      location: dest || appOrigin + "/wishlist.html",
       "set-cookie": sessionCookie(rawSession, 30 * 86400),
       "cache-control": "no-store"
     }
@@ -506,7 +513,7 @@ export default {
         service: "retronomad-account-monitor",
         status: "scaffold_only",
         databaseConfigured: Boolean(env.DB),
-        appOriginConfigured: Boolean(env.APP_ORIGIN),
+        appOriginMode: String(env.APP_ORIGIN || "self"),
         authEmailConfigured: Boolean(env.AUTH_EMAIL_WEBHOOK_URL),
         serverClassificationReady: true,
         marketplaceConfigured: Boolean(env.MARKETPLACE_PROVIDER && env.MARKETPLACE_PROVIDER !== "disabled"),
@@ -520,11 +527,11 @@ export default {
 
     if (request.method === "POST" && u.pathname === "/api/auth/request-link") {
       if (!originAllowed(request, env)) return json({ error: "origin_not_allowed" }, 403, env, request);
-      if (!env.DB || !env.APP_ORIGIN) return json({ error: "account_backend_not_configured" }, 503, env, request);
+      if (!env.DB) return json({ error: "account_backend_not_configured" }, 503, env, request);
       const body = await request.json().catch(() => ({}));
       const email = String(body.email || "").trim();
       if (!validEmail(email)) return json({ error: "invalid_email" }, 400, env, request);
-      const returnTo = safeReturnUrl(body.returnTo, env.APP_ORIGIN);
+      const returnTo = safeReturnUrl(body.returnTo, effectiveAppOrigin(request, env));
       let created;
       try {
         created = await createLoginToken(env, email, returnTo, request);
