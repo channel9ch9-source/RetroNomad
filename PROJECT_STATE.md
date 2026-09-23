@@ -147,6 +147,7 @@ Current analyser includes:
 - Comparison-ready / Review / Separate classification
 - manual Pricing v1 references saved locally by exact comparison bucket
 - automatic Pricing v1 connector described below
+- internal 100-title Pricing v1 coverage lab at `pricing-coverage.html`
 
 ## Pricing v1
 
@@ -177,11 +178,12 @@ Automatic matching:
 3. Otherwise search by exact game title + mapped platform.
 4. Require PAL catalogue rows for the current UK/PAL launch mode.
 5. Reject weak or ambiguous catalogue matches.
-6. Fetch price by matched masterItemId.
-7. Map CIB→cib, Loose→loose, New→new, Box Only→boxOnly, Manual Only→manualOnly.
-8. Do not auto-price Incomplete or Condition-specific copies.
-9. Convert USD→GBP with a daily central-bank reference rate via Frankfurter.
-10. Populate the existing Pricing v1 form and comparison panel; do not label a purchase 'good' or 'bad'.
+6. Barcode/UPC lookup is not trusted blindly: a provider row that conflicts with the classified game, or multiple similarly strong PAL rows, is rejected for manual review.
+7. Fetch price by matched masterItemId.
+8. Map CIB→cib, Loose→loose, New→new, Box Only→boxOnly, Manual Only→manualOnly.
+9. Do not auto-price Incomplete or Condition-specific copies.
+10. Convert USD→GBP with a daily central-bank reference rate via Frankfurter.
+11. Populate the existing Pricing v1 form and comparison panel; do not label a purchase 'good' or 'bad'.
 
 Production shared-key mode:
 - do not put a service API key in GitHub Pages.
@@ -249,14 +251,15 @@ PALScout is not the parent brand because the product is intended to expand globa
 
 ## Roadmap from this point
 
-1. Test the new automatic RetroTechCollector BYOK pricing connector with a real developer key.
-2. Verify coverage/matching for the 100 launch titles, especially PAL PS1/PS2/Dreamcast variants.
-3. Ask/confirm provider terms for a production public shared-key integration.
-4. If approved, deploy a server-side pricing proxy with secret storage and rate limiting.
-5. Add wishlist + target-price alerts.
-6. Add authorised marketplace discovery/connectors.
-7. Expand reference data to NTSC-U, NTSC-J and more platforms.
-8. Add accounts/cloud persistence only when a backend exists.
+1. Run `pricing-coverage.html` with a real RetroTechCollector developer key and export the 100-title report. **This real-key run has not yet been completed.**
+2. Review every ambiguous, weak, missing and price-error row; fix mapping rules/data only where evidence supports the change, then rerun until the remaining gaps are understood rather than guessed away.
+3. Spot-check the normal analyser with real listings against a sample of successful provider matches.
+4. Ask/confirm provider terms for a production public shared-key integration.
+5. If approved, deploy the server-side pricing proxy with secret storage, cache and rate limiting.
+6. Add wishlist + target-price alerts.
+7. Add authorised marketplace discovery/connectors.
+8. Expand reference data to NTSC-U, NTSC-J and more platforms.
+9. Add accounts/cloud persistence only when a backend exists.
 
 ## Accuracy/transparency requirements
 
