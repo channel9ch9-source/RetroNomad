@@ -1,6 +1,8 @@
 (function(){
  async function run(target){
   if(!window.RetroNomadMarketplace)throw new Error("Marketplace source layer is unavailable");
+  if(window.PALScoutClassifierReady)await window.PALScoutClassifierReady;
+  if(window.RetroNomadMatcherReady)await window.RetroNomadMatcherReady;
   if(!window.PALScoutClassifier)throw new Error("PALScout classifier is unavailable");
   if(!window.RetroNomadMatcher)throw new Error("Search matcher is unavailable");
 
