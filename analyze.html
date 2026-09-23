@@ -144,43 +144,53 @@ function setImportStatus(kind,text){
 async function importListingUrl(){
  const input=document.querySelector("#listingUrl"), button=document.querySelector("#importListing"), url=cleanUrlInput(input.value);
  if(!url){setImportStatus("bad","Enter a valid http(s) listing URL.");return;}
- input.value=url; const source=detectListingSource(url); let itemId="",fallbackTitle="";
- if(source==="eBay"){const x=parseEbayUrl(url);itemId=x.id;fallbackTitle=x.title;}
+ input.value=url;
+ const source=detectListingSource(url);
+ let itemId="",fallbackTitle="";
+ if(source==="eBay"){
+   const x=parseEbayUrl(url);itemId=x.id;fallbackTitle=x.title;
+   document.querySelector("#listingSource").textContent="eBay";
+   document.querySelector("#listingItemId").textContent=itemId||"—";
+   if(fallbackTitle&&!document.querySelector("#title").value)document.querySelector("#title").value=fallbackTitle;
+   const recovered=[itemId&&("item ID "+itemId),fallbackTitle&&"title from URL"].filter(Boolean).join(" and ");
+   setImportStatus("warn",
+     "eBay link recognised"+(recovered?"; recovered "+recovered:"")+
+     ". Direct automatic eBay page import is not available from this browser without authorised eBay API access. "+
+     "Paste the listing title/description or upload the listing photos, then click Analyse listing."
+   );
+   try{updateAutoHints();}catch(e){}
+   return;
+ }
  document.querySelector("#listingSource").textContent=source;
- document.querySelector("#listingItemId").textContent=itemId||"—";
+ document.querySelector("#listingItemId").textContent="—";
  if(button){button.disabled=true;button.textContent="Importing…";}
  setImportStatus("warn","Trying to import public listing metadata…");
- let imported={title:"",desc:"",price:""}; let fetched=false, timedOut=false, fetchError="";
+ let imported={title:"",desc:"",price:""};let fetched=false,timedOut=false;
  const controller=new AbortController();
  const timer=setTimeout(()=>{timedOut=true;controller.abort();},6000);
  try{
    const res=await fetch(url,{method:"GET",mode:"cors",redirect:"follow",credentials:"omit",signal:controller.signal,headers:{"Accept":"text/html,application/xhtml+xml"}});
    if(!res.ok)throw new Error("HTTP "+res.status);
-   const html=await res.text(); imported=parseListingHtml(html,url); fetched=true;
+   const html=await res.text();imported=parseListingHtml(html,url);fetched=true;
  }catch(e){
-   fetchError=String(e?.message||e||"");
  }finally{
    clearTimeout(timer);
    if(button){button.disabled=false;button.textContent="Import listing";}
  }
  if(imported.title)document.querySelector("#title").value=imported.title;
- else if(fallbackTitle&&!document.querySelector("#title").value)document.querySelector("#title").value=fallbackTitle;
  if(imported.desc)document.querySelector("#desc").value=imported.desc;
  if(imported.price&&!document.querySelector("#price").value)document.querySelector("#price").value=imported.price;
- updateAutoHints();
  if(fetched&&(imported.title||imported.desc||imported.price)){
    const got=[imported.title&&"title",imported.desc&&"description",imported.price&&"price"].filter(Boolean).join(", ");
-   setImportStatus("good","Imported "+got+" from "+source+(itemId?" · item "+itemId:"")+". Review the fields, then analyse.");
- }else if(source==="eBay"){
-   const extra=fallbackTitle?" A title was recovered from the URL itself.":"";
-   const why=timedOut?"eBay did not allow the browser import to finish within 6 seconds.":"eBay blocked direct browser metadata access on this request.";
-   setImportStatus("warn",why+(itemId?" Item ID "+itemId+" was extracted.":"")+extra+" Paste the listing title/description or upload photos for analysis. Full automatic eBay import needs authorised API/server-side access.");
+   setImportStatus("good","Imported "+got+" from "+source+". Review the fields, then analyse.");
  }else{
-   const why=timedOut?(source+" did not return browser-accessible metadata within 6 seconds."):(source+" did not expose importable page metadata to this browser.");
-   setImportStatus("warn",why+" You can still paste the listing details manually or upload photos.");
+   setImportStatus("warn",
+     (timedOut?source+" did not return browser-accessible metadata within 6 seconds.":source+" did not expose importable page metadata to this browser.")+
+     " Paste the listing details manually or upload photos, then analyse."
+   );
  }
+ try{updateAutoHints();}catch(e){}
 }
-
 function detectRegionSignal(text){
  const raw=(text||"").toLowerCase(),n=norm(text);
  // Remove common explicit negations before looking for foreign-region claims,
