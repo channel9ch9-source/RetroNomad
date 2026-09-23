@@ -11,6 +11,11 @@
  function lower(v){return String(v||"").toLowerCase();}
  function classificationOf(candidate){return candidate.classification||candidate.palScout||{};}
  function addUnique(arr,msg){if(msg&&!arr.includes(msg))arr.push(msg);}
+ function classifierReviewCheck(c){
+  if(Array.isArray(c.conflicts)&&c.conflicts.length)return{state:"review",reason:c.conflicts[0]};
+  if(String(c.marketBucket||"").toUpperCase()==="UK_VISUAL_REQUIRED")return{state:"review",reason:"UK package/release still requires visual confirmation."};
+  return{state:"ok"};
+ }
 
  function gameCheck(target,c){
   if(!c.game)return{state:"review",reason:"Game identity is not confirmed."};
@@ -159,6 +164,7 @@
   const c=classificationOf(candidate);
   const filtered=[],review=[],soft=[];
   const checks=[
+   classifierReviewCheck(c),
    gameCheck(target,c),
    platformCheck(target,c),
    compatibilityCheck(target,c),
