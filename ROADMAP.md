@@ -119,18 +119,19 @@ Open:
 - [x] Confirm provider platform-label mismatch and nullable region behaviour
 - [x] Confirm UPC catalogue coverage is extremely sparse in this test
 - [x] Add diagnostic v3 using the provider price endpoint first
-- [ ] Run all 100 titles with diagnostic v3
-- [ ] Export and upload the diagnostic-v3 JSON report
-- [ ] Decide whether RetroTechCollector is viable for the launch scope or should be replaced/limited
+- [x] Run all 100 titles with diagnostic v3
+- [x] Export and inspect the diagnostic-v3 JSON report
+- [x] Decide provider fit: RetroTechCollector is limited to exact-identifier supplemental use, not the primary UK/PAL source
+- [x] Harden analyser and worker so failed exact PAL barcode lookups cannot fall back to another region's title price
 
 ## Step 3 — audit results
-For every non-clean result, categorise it as one of:
-- [ ] RetroNomad mapping/data defect
-- [ ] provider catalogue gap
-- [ ] genuinely ambiguous physical release
-- [ ] identifier conflict
-- [ ] provider price gap
-- [ ] API/service error
+Final v3 outcome:
+- [x] 1 safe exact UPC/EAN price match
+- [x] 33 strong title/platform matches rejected because region was unknown
+- [x] 62 no usable provider matches
+- [x] 4 weak matches
+- [x] no explicitly PAL title-price matches
+- [x] provider limitation documented rather than hidden
 
 Rules:
 - do not force 100% coverage by weakening ambiguity thresholds
@@ -138,11 +139,11 @@ Rules:
 - do not relabel foreign editions to improve coverage
 - preserve review states where evidence is genuinely ambiguous
 
-## Step 4 — fix and rerun
-- [ ] fix only evidence-supported mapping/data defects
-- [ ] rerun affected titles
-- [ ] document remaining provider gaps
-- [ ] record final launch-scope coverage statistics in PROJECT_STATE.md
+## Step 4 — close provider pilot
+- [x] fix evidence-supported platform mapping defects
+- [x] document provider gaps
+- [x] record final launch-scope coverage statistics in PROJECT_STATE.md
+- [x] preserve strict ambiguity/region rules instead of forcing coverage
 
 ### Exit criteria for active milestone
 Proceed only when:
@@ -153,14 +154,36 @@ Proceed only when:
 
 ---
 
-# Next milestone — End-to-end listing → price validation
+# Active milestone — Find a release-safe licensed pricing source
 
-After provider coverage is understood:
+## PriceCharting commercial route
+- [x] Confirm public PAL product catalogue exists with dedicated PAL platform namespaces and PAL EAN/GTIN records
+- [x] Confirm standard API/CSV terms are internal-use only
+- [ ] Contact PriceCharting for a commercial agreement / express written permission for RetroNomad
+- [ ] Ask specifically about attributed public display of current PAL loose/CIB/new/box/manual guide prices
+- [ ] Ask about API quota, caching, attribution, redistribution and launch-stage pricing
+
+## Other candidates
+- [x] Note MyPlayersVault as a region-aware public-price candidate
+- [ ] Establish whether it offers a documented developer API or commercial data feed
+- [ ] Research additional UK/PAL physical-game pricing providers with legitimate API/licensing paths
+
+## Provider acceptance test
+Any replacement provider must:
+- distinguish PAL from NTSC-U/NTSC-J
+- support enough of the 100-title launch set to be useful
+- expose exact identifiers or release-specific product IDs
+- provide a documented public-app/licensing path
+- survive the 100-title coverage benchmark before production use
+
+# Later milestone — End-to-end listing → price validation
+
+After a provider passes the launch benchmark:
 
 - [ ] take a sample of real listing inputs
 - [ ] classify through the normal analyser
 - [ ] verify exact release/completeness key
-- [ ] verify provider catalogue match
+- [ ] verify provider release match
 - [ ] verify correct completeness price field
 - [ ] verify GBP conversion
 - [ ] verify ambiguous listings do not receive automatic prices
@@ -168,8 +191,6 @@ After provider coverage is understood:
 
 Exit criterion:
 A representative sample must complete the full chain without known identity-to-price mismatches.
-
----
 
 # Provider production decision
 
@@ -284,6 +305,6 @@ At every milestone:
 
 # Immediate next action
 
-**Create or sign into the user's RetroTechCollector account, inspect the currently available API/trial option, then create a limited beta key and run the 100-title coverage lab.**
+**Prepare and send a concise PriceCharting commercial-data enquiry describing RetroNomad's exact-PAL-release use case and asking for permission/terms for attributed public guide-price display.**
 
-Do not purchase a plan until the currently available trial/API access path has been checked.
+Do not purchase a normal PriceCharting API subscription for RetroNomad public use unless a suitable commercial agreement is confirmed.
