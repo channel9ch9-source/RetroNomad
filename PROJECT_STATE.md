@@ -735,3 +735,35 @@ Deployment still needs:
 - rate limiting / abuse controls
 - privacy-policy/account-data update
 
+
+
+## Shared browser/server classification core
+
+Completed 23 September 2026.
+
+New files:
+- `shared/palscout-core.js`
+- `shared/search-matcher-core.js`
+- `shared/release-evidence-data.js`
+- `backend/search-engine.js`
+- `SHARED_CLASSIFIER_V1.md`
+
+Updated:
+- `palscout-classifier.js` is now a browser adapter to the shared PALScout core
+- `search-matcher.js` is now a browser adapter to the shared matcher core
+- `search-pipeline.js` waits for those shared modules before evaluating results
+- `backend/alerts-worker.js` routes authorised provider candidates through `backend/search-engine.js`
+
+Backend scheduled-search path is now:
+authorised marketplace candidates -> shared PALScout -> shared matcher -> ranked MATCH/REVIEW/FILTERED -> alert monitor.
+
+Parity QA:
+- shared release-evidence mirror contains 217 rows
+- serialized shared evidence exactly matched browser release-evidence.js
+- representative six-candidate regression produced 1 MATCH, 1 REVIEW and 4 FILTERED as expected
+- exact UK CIB under target -> MATCH
+- generic PAL with insufficient release proof -> REVIEW
+- NTSC-U, wrong edition, bundle and over-price candidates -> FILTERED
+
+Important scope:
+The Deal Finder and scheduled backend now share one classification/matching implementation. The richer Phase 2 `analyze.html` listing checker still contains embedded photo/UI-specific logic and has not yet been fully migrated to the shared core.
