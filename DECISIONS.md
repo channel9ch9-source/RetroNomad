@@ -431,3 +431,28 @@ Any substantial future RetroNomad session should update these files before endin
 - `PRICING_V1.md` when pricing behaviour changes
 
 The repository is the authoritative handoff. Chat memory is supplementary, not the project database.
+
+
+## RetroNomad primary customer workflow — 23 September 2026
+
+RetroNomad's **primary consumer experience is search-first**, not checker-first.
+
+The intended customer journey is:
+
+1. The user comes to RetroNomad and searches for a game they want.
+2. They can optionally set constraints such as platform, region compatibility, exact release, edition, completeness, language/packaging and maximum delivered price.
+3. RetroNomad uses authorised marketplace inventory sources to discover candidate listings.
+4. PALScout / regional intelligence classifies each candidate by compatibility, region, exact release, edition and completeness.
+5. Wrong-region, wrong-edition, incomplete, demo/promo, bundle or otherwise unsuitable listings are filtered or separated.
+6. Release-safe pricing compares only equivalent copies.
+7. Users can save the search / exact target and receive alerts when suitable listings appear.
+
+The manual listing analyser remains useful as a **secondary utility** for listings found elsewhere, but it is not the main product proposition.
+
+Customer-facing hierarchy:
+- **RetroNomad** = search, filter, compare, alert
+- **PALScout** = UK/European compatibility + exact-release intelligence underneath the search results
+
+Primary proposition:
+**Find the right copy at the right price.**
+
