@@ -164,3 +164,50 @@ Current behaviour:
 - clearly reports that no live inventory provider is connected
 
 Future authorised marketplace adapters can register through `marketplace-source.js` without changing the core search target or result-card contract.
+
+
+## Matching engine
+
+Implementation:
+`search-matcher.js`
+
+The engine evaluates a classified marketplace candidate against the user's search target and returns one of:
+
+- `MATCH` — no known hard mismatch and no unresolved requirement
+- `REVIEW` — candidate may fit, but one or more required facts are missing/ambiguous
+- `FILTERED` — candidate definitely violates at least one hard requirement
+
+Current hard filters include:
+- wrong game
+- wrong platform
+- known incompatible region/hardware
+- UK-only target with non-UK release
+- original-only target with budget/reissue/promo copy
+- CIB target with incomplete/loose copy
+- English-required target with confirmed non-English-friendly packaging/materials
+- excluded bundles
+- excluded demos/promos
+- known major damage when disallowed
+- delivered GBP price above the user's ceiling
+
+Current review triggers include:
+- unknown game/platform identity
+- unconfirmed PAL compatibility
+- ambiguous release territory
+- unknown edition when edition matters
+- unknown completeness when completeness matters
+- unknown English/package suitability when required
+- unknown delivered GBP price when a price ceiling is set
+
+Soft preferences do not become hard filters. Example:
+- `UK-market preferred` ranks UK exact / UK-shared results above other valid PAL-family copies, but does not automatically reject a suitable non-UK PAL copy.
+
+Internal ranking currently prefers:
+1. MATCH over REVIEW over FILTERED
+2. stronger UK-market fit when UK is preferred
+3. higher classification confidence
+4. confirmed English-friendly packaging/materials
+5. collector-quality evidence when preferred
+6. lower delivered GBP price when otherwise comparable
+
+The internal rank is not a public "deal score" and must not be presented as one.
