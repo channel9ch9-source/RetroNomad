@@ -21,7 +21,7 @@ nav{height:70px;display:flex;align-items:center;justify-content:space-between}.b
 .resultshead{display:flex;justify-content:space-between;gap:14px;align-items:end;margin-bottom:13px}.resultshead h2{margin:0}.sourcebadge{font-size:10px;font-weight:900;color:var(--amber);border:1px solid #5d532d;border-radius:999px;padding:4px 7px}
 .cardpreview{display:none;border:1px solid var(--line);border-radius:14px;background:#0d141d;overflow:hidden}.cardtop{padding:15px 16px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;gap:10px}.cardtop b{font-size:16px}.cardbody{padding:15px}.facts{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.fact{border:1px solid var(--line);border-radius:9px;background:#0a1017;padding:10px}.fact span{display:block;color:#758398;font-size:10px;text-transform:uppercase;letter-spacing:.07em}.fact b{display:block;margin-top:3px;font-size:12px}.muted{color:var(--muted)}
 .cardfoot{padding:12px 15px;border-top:1px solid var(--line);color:#7d8a9c;font-size:11px}
-.saved{display:none;margin-top:10px;color:var(--green);font-size:12px}
+.saved{display:none;margin-top:10px;color:var(--green);font-size:12px}.live-results{display:grid;gap:10px;margin-bottom:15px}.live-card{border:1px solid var(--line);border-radius:12px;background:#0d141d;padding:14px}.live-card.match{border-color:#315b43}.live-card.review{border-color:#5d532d}.live-card.filtered{border-color:#60404a;opacity:.72}.live-card h3{margin:0 0 5px;font-size:16px}.live-meta{display:flex;gap:7px;flex-wrap:wrap;color:var(--muted);font-size:11px}.live-state{font-size:10px;font-weight:900;letter-spacing:.06em;border:1px solid var(--line);border-radius:999px;padding:3px 6px}.live-card.match .live-state{color:var(--green);border-color:#315b43}.live-card.review .live-state{color:var(--amber);border-color:#5d532d}.live-card.filtered .live-state{color:var(--red);border-color:#60404a}.live-reasons{margin-top:8px;color:var(--muted);font-size:12px}
 @media(max-width:900px){.layout{grid-template-columns:1fr}.facts{grid-template-columns:1fr 1fr}}@media(max-width:560px){.row,.facts{grid-template-columns:1fr}.navlinks{display:none}}
 </style>
 </head>
@@ -116,7 +116,7 @@ nav{height:70px;display:flex;align-items:center;justify-content:space-between}.b
 </section>
 
 <section class="panel">
-<div class="resultshead"><div><div class="kicker">Results</div><h2>Matching copies</h2></div><span class="sourcebadge">NO LIVE SOURCE CONNECTED</span></div>
+<div class="resultshead"><div><div class="kicker">Results</div><h2>Matching copies</h2></div><span class="sourcebadge" id="sourceBadge">NO LIVE SOURCE CONNECTED</span></div>
 
 <div id="target" class="target">
 <div class="kicker">Your target</div>
@@ -129,6 +129,8 @@ nav{height:70px;display:flex;align-items:center;justify-content:space-between}.b
 <strong>Define your target and search.</strong>
 RetroNomad will turn your choices into a structured buying target. Live listings will appear here only after an authorised inventory source is connected.
 </div>
+
+<div id="liveResults" class="live-results"></div>
 
 <div id="cardPreview" class="cardpreview">
 <div class="cardtop"><div><b>Future live result card</b><div class="muted">One normalised marketplace listing after PALScout classification</div></div><span class="sourcebadge">STRUCTURE PREVIEW</span></div>
@@ -153,7 +155,9 @@ RetroNomad will turn your choices into a structured buying target. Live listings
 
 <script src="release-evidence.js"></script>
 <script src="marketplace-source.js"></script>
+<script src="palscout-classifier.js"></script>
 <script src="search-matcher.js"></script>
+<script src="search-pipeline.js"></script>
 <script>
 const evidence=window.RELEASE_EVIDENCE||[];
 const catalog=[...new Map(evidence.map(r=>[r[0]+"|"+r[1],{game:r[0],platform:r[1]}])).values()]
@@ -205,10 +209,46 @@ function renderTarget(t){
  chips.forEach(x=>{const s=document.createElement("span");s.className="chip";s.textContent=x;box.appendChild(s);});
  window.currentTarget=t;
 }
-document.querySelector("#searchBtn").addEventListener("click",()=>{
+function renderLiveResults(rows){
+ const box=document.querySelector("#liveResults");box.innerHTML="";
+ const summary=window.RetroNomadSearchPipeline.summarize(rows);
+ document.querySelector("#sourceBadge").textContent=summary.total+" LIVE CANDIDATE"+(summary.total===1?"":"S")+" · "+summary.MATCH+" MATCH · "+summary.REVIEW+" REVIEW";
+ for(const row of rows){
+  const card=document.createElement("div");card.className="live-card "+row.match.state.toLowerCase();
+  const title=document.createElement("h3");title.textContent=row.title||"Untitled listing";
+  const meta=document.createElement("div");meta.className="live-meta";
+  const price=row.match.deliveredGbp!=null?"£"+row.match.deliveredGbp.toFixed(2)+" delivered":(row.total!=null&&row.currency?row.currency+" "+Number(row.total).toFixed(2):"price unavailable");
+  const bits=[row.source,price,row.classification.game,row.classification.platform,row.classification.marketBucket||"release unresolved"].filter(Boolean);
+  bits.forEach(x=>{const s=document.createElement("span");s.textContent=x;meta.appendChild(s);});
+  const state=document.createElement("span");state.className="live-state";state.textContent=row.match.state;
+  meta.appendChild(state);
+  card.appendChild(title);card.appendChild(meta);
+  const reasons=[...(row.match.reasons||[]),...(row.match.notes||[])];
+  if(reasons.length){const r=document.createElement("div");r.className="live-reasons";r.textContent=reasons.join(" · ");card.appendChild(r);}
+  if(row.canonicalUrl){const a=document.createElement("a");a.href=row.canonicalUrl;a.target="_blank";a.rel="noopener noreferrer";a.textContent="Open source listing";a.style.display="inline-block";a.style.marginTop="8px";a.style.fontSize="12px";card.appendChild(a);}
+  box.appendChild(card);
+ }
+}
+document.querySelector("#searchBtn").addEventListener("click",async()=>{
  const t=buildTarget();
  if(!t){alert("Enter a game title first.");return;}
  renderTarget(t);
+ document.querySelector("#liveResults").innerHTML="";
+ const providers=window.RetroNomadMarketplace?.providerNames?.()||[];
+ if(!providers.length){
+  document.querySelector("#sourceBadge").textContent="NO LIVE SOURCE CONNECTED";
+  return;
+ }
+ const btn=document.querySelector("#searchBtn");btn.disabled=true;btn.textContent="Searching…";
+ try{
+  const rows=await window.RetroNomadSearchPipeline.run(t);
+  renderLiveResults(rows);
+ }catch(e){
+  document.querySelector("#sourceBadge").textContent="SEARCH SOURCE ERROR";
+  const box=document.querySelector("#liveResults");box.textContent="Live search could not be completed: "+e.message;
+ }finally{
+  btn.disabled=false;btn.textContent="Search RetroNomad";
+ }
 });
 document.querySelector("#saveBtn").addEventListener("click",()=>{
  if(!window.currentTarget)return;
