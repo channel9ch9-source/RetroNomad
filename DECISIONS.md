@@ -178,6 +178,39 @@ References are stored by the exact comparison key rather than just the game titl
 - browser CORS support
 - developer-key access
 
+### RetroTechCollector validation decision — 23 September 2026
+
+Three real-key launch-scope diagnostics were completed.
+
+Final v3:
+- 1/100 safe exact UPC/EAN price match
+- 33 title/platform price matches with unknown region
+- 62 no usable provider match
+- 4 weak matches
+- 0 title-price matches explicitly confirmed PAL
+
+Permanent decision:
+- RetroTechCollector is **not** the primary UK/PAL pricing provider.
+- Keep it only as a possible exact-identifier supplemental source.
+- If RetroNomad has an exact barcode/EAN and the provider does not return that exact/equivalent barcode, do not fall back to a title price.
+- A title-only match is usable only if the provider explicitly confirms PAL on that exact matched record.
+- Unknown provider region is not evidence of PAL.
+- Do not weaken this rule to improve apparent coverage.
+
+The live analyser and production-worker template were updated to enforce this.
+
+### Next pricing-provider direction
+
+PriceCharting is the strongest next candidate because its public catalogue contains dedicated PAL products with EAN/GTIN metadata and region-specific guide prices.
+
+However, its standard API/CSV licence is internal-use only. Public third-party application display requires a commercial agreement and express written permission.
+
+Decision:
+- seek permission/commercial terms before integration
+- do not expose a normal PriceCharting token
+- do not scrape around the licence
+- continue manual Pricing v1 fallback until a release-safe licensed source is available
+
 ### Beta key model
 Use BYOK (bring your own key).
 
