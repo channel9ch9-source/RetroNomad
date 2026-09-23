@@ -1,0 +1,25 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://channel9ch9-source.github.io/retronomad/marketplace-listing.schema.json",
+  "title": "RetroNomad Normalised Marketplace Listing",
+  "type": "object",
+  "required": ["source", "externalId", "canonicalUrl", "title", "currency"],
+  "properties": {
+    "source": {"type": "string", "minLength": 1},
+    "externalId": {"type": "string", "minLength": 1},
+    "canonicalUrl": {"type": "string", "format": "uri"},
+    "title": {"type": "string", "minLength": 1},
+    "description": {"type": "string"},
+    "imageUrl": {"type": "string"},
+    "currency": {"type": "string", "minLength": 3, "maxLength": 3},
+    "itemPrice": {"type": ["number", "null"], "minimum": 0},
+    "postage": {"type": ["number", "null"], "minimum": 0},
+    "total": {"type": ["number", "null"], "minimum": 0},
+    "seller": {"type": "string"},
+    "listedAt": {"type": ["string", "null"], "format": "date-time"},
+    "fetchedAt": {"type": "string", "format": "date-time"},
+    "sourceRegion": {"type": "string"},
+    "raw": {}
+  },
+  "additionalProperties": false
+}
