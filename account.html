@@ -1,0 +1,107 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="description" content="RetroNomad account and Saved Hunts sync.">
+<title>Account — RetroNomad</title>
+<style>
+:root{--bg:#090b0f;--panel:#111720;--text:#f7f8fb;--muted:#96a3b5;--line:#293447;--green:#94f7b2;--amber:#ffd977;--red:#ff9da6;--max:760px}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(850px 460px at 50% -170px,rgba(83,127,196,.22),transparent 65%),var(--bg);color:var(--text);font:15px/1.5 system-ui,-apple-system,Segoe UI,sans-serif}
+a{color:inherit}.wrap{width:min(var(--max),calc(100% - 32px));margin:auto}
+nav{height:70px;display:flex;align-items:center;justify-content:space-between}.brand{display:flex;align-items:center;gap:10px;text-decoration:none;font-size:20px;font-weight:900}.mark{width:30px;height:30px;border:1px solid #39506a;border-radius:9px;display:grid;place-items:center;background:#111926;color:var(--green);font-size:12px}.navlinks{display:flex;gap:18px;color:var(--muted)}.navlinks a{text-decoration:none}
+.hero{padding:55px 0 24px}.kicker{font-size:12px;color:var(--green);font-weight:900;text-transform:uppercase;letter-spacing:.12em}h1{font-size:clamp(42px,7vw,64px);line-height:.98;letter-spacing:-.055em;margin:10px 0 12px}.lead{color:var(--muted);font-size:18px}
+.card{margin:18px 0 70px;border:1px solid var(--line);background:linear-gradient(180deg,#121823,#0f141c);border-radius:16px;padding:22px}.state{border:1px solid #5d532d;background:#19170e;color:#e8d994;border-radius:11px;padding:12px 13px;margin-bottom:18px}.state.good{border-color:#315b43;background:#0f1914;color:#b9efc9}.state.bad{border-color:#60404a;background:#1a1115;color:#ffc0c6}
+.field{margin:14px 0}.field label{display:block;font-size:12px;font-weight:800;color:#bac5d4;margin-bottom:6px}.field input{width:100%;background:#0b1017;border:1px solid var(--line);border-radius:9px;padding:12px;color:var(--text);font:inherit}.btn{border:1px solid var(--line);background:#172131;color:var(--text);border-radius:9px;padding:10px 13px;font:inherit;font-weight:850;cursor:pointer}.btn.primary{background:var(--text);color:#0b0d12}.btn:disabled{opacity:.5;cursor:not-allowed}.actions{display:flex;gap:8px;flex-wrap:wrap}.muted{color:var(--muted);font-size:13px}.hidden{display:none}.user{font-size:18px;font-weight:850;margin:0 0 5px}
+@media(max-width:600px){.navlinks{display:none}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<nav>
+<a class="brand" href="index.html"><span class="mark">RN</span>RetroNomad</a>
+<div class="navlinks"><a href="search.html">Search</a><a href="wishlist.html">Saved Hunts</a><a href="account.html">Account</a></div>
+</nav>
+
+<header class="hero">
+<div class="kicker">Account sync</div>
+<h1>Your hunts, beyond one browser.</h1>
+<p class="lead">RetroNomad accounts are designed to sync Saved Hunts to the backend so future scheduled monitoring can keep running when your browser is closed.</p>
+</header>
+
+<main class="card">
+<div id="state" class="state">Checking account-service status…</div>
+
+<section id="disabled" class="hidden">
+<h2>Account backend not deployed yet</h2>
+<p class="muted">The passwordless account and Saved Hunt sync code is built, but the public site is still running on static GitHub Pages with account sync disabled. Your Saved Hunts remain local in this browser until the backend is deployed on a suitable app/API domain.</p>
+<a class="btn" href="wishlist.html">Back to Saved Hunts</a>
+</section>
+
+<section id="signin" class="hidden">
+<h2>Sign in by email</h2>
+<p class="muted">No password. RetroNomad sends a one-time sign-in link that creates a secure server session.</p>
+<div class="field"><label for="email">Email address</label><input id="email" type="email" autocomplete="email" placeholder="you@example.com"></div>
+<div class="actions"><button id="sendLink" class="btn primary">Send sign-in link</button></div>
+<p id="signinMessage" class="muted"></p>
+</section>
+
+<section id="signedin" class="hidden">
+<div class="kicker">Signed in</div>
+<p id="userEmail" class="user"></p>
+<p class="muted">You can sync the Saved Hunts stored in this browser with your RetroNomad account.</p>
+<div class="actions"><button id="syncBtn" class="btn primary">Sync Saved Hunts now</button><button id="logoutBtn" class="btn">Sign out</button></div>
+<p id="syncMessage" class="muted"></p>
+</section>
+</main>
+</div>
+
+<script src="runtime-config.js"></script>
+<script src="saved-hunts.js"></script>
+<script src="account-sync.js"></script>
+<script>
+const q=s=>document.querySelector(s);
+function show(id){for(const x of ["#disabled","#signin","#signedin"])q(x).classList.add("hidden");q(id).classList.remove("hidden");}
+async function refresh(){
+ const cfg=RetroNomadAccount.state();
+ if(!cfg.enabled){
+  q("#state").className="state";q("#state").textContent="LOCAL-ONLY BETA · account backend is not deployed";
+  show("#disabled");return;
+ }
+ try{
+  const me=await RetroNomadAccount.me();
+  if(me.authenticated){
+   q("#state").className="state good";q("#state").textContent="ACCOUNT CONNECTED";
+   q("#userEmail").textContent=me.user.email;show("#signedin");
+  }else{
+   q("#state").className="state";q("#state").textContent="ACCOUNT SERVICE READY · not signed in";show("#signin");
+  }
+ }catch(e){
+  q("#state").className="state bad";q("#state").textContent="ACCOUNT SERVICE ERROR · "+e.message;show("#signin");
+ }
+}
+q("#sendLink").addEventListener("click",async()=>{
+ const btn=q("#sendLink"),email=q("#email").value.trim();q("#signinMessage").textContent="";
+ btn.disabled=true;
+ try{
+  const r=await RetroNomadAccount.requestSignIn(email,location.origin+location.pathname);
+  q("#signinMessage").textContent=r.message||"Check your email for the one-time sign-in link.";
+ }catch(e){q("#signinMessage").textContent=e.message;}
+ finally{btn.disabled=false;}
+});
+q("#syncBtn").addEventListener("click",async()=>{
+ const btn=q("#syncBtn");btn.disabled=true;q("#syncMessage").textContent="Syncing…";
+ try{
+  const r=await RetroNomadAccount.syncSavedHunts();
+  q("#syncMessage").textContent="Synced "+(r.hunts?.length||0)+" Saved Hunt"+((r.hunts?.length||0)===1?"":"s")+".";
+ }catch(e){q("#syncMessage").textContent=e.message;}
+ finally{btn.disabled=false;}
+});
+q("#logoutBtn").addEventListener("click",async()=>{
+ try{await RetroNomadAccount.logout();}catch(e){}
+ await refresh();
+});
+refresh();
+</script>
+</body>
+</html>
