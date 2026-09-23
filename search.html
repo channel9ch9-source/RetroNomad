@@ -29,7 +29,7 @@ nav{height:70px;display:flex;align-items:center;justify-content:space-between}.b
 <div class="wrap">
 <nav>
 <a class="brand" href="index.html"><span class="mark">RN</span>RetroNomad</a>
-<div class="navlinks"><a href="search.html">Search</a><a href="analyze.html">Check a listing</a><a href="index.html#palscout">PALScout</a></div>
+<div class="navlinks"><a href="search.html">Search</a><a href="wishlist.html">Saved Hunts</a><a href="analyze.html">Check a listing</a><a href="index.html#palscout">PALScout</a></div>
 </nav>
 
 <header class="hero">
@@ -111,8 +111,8 @@ nav{height:70px;display:flex;align-items:center;justify-content:space-between}.b
 <label class="check"><input id="excludePromo" type="checkbox" checked><span>Exclude demo / promo copies</span></label>
 
 <button class="btn" id="searchBtn">Search RetroNomad</button>
-<button class="btn secondary" id="saveBtn" disabled>Save this target locally</button>
-<div id="saved" class="saved">Target saved in this browser. Alerts are not active yet.</div>
+<button class="btn secondary" id="saveBtn" disabled>Save to Saved Hunts</button>
+<div id="saved" class="saved"></div>
 </section>
 
 <section class="panel">
@@ -158,6 +158,7 @@ RetroNomad will turn your choices into a structured buying target. Live listings
 <script src="palscout-classifier.js"></script>
 <script src="search-matcher.js"></script>
 <script src="search-pipeline.js"></script>
+<script src="saved-hunts.js"></script>
 <script>
 const evidence=window.RELEASE_EVIDENCE||[];
 const catalog=[...new Map(evidence.map(r=>[r[0]+"|"+r[1],{game:r[0],platform:r[1]}])).values()]
@@ -233,6 +234,8 @@ document.querySelector("#searchBtn").addEventListener("click",async()=>{
  const t=buildTarget();
  if(!t){alert("Enter a game title first.");return;}
  renderTarget(t);
+ const existingHunt=resolveExistingHunt(t);
+ if(existingHunt)window.currentHuntId=existingHunt.id;
  document.querySelector("#liveResults").innerHTML="";
  const providers=window.RetroNomadMarketplace?.providerNames?.()||[];
  if(!providers.length){
@@ -243,6 +246,10 @@ document.querySelector("#searchBtn").addEventListener("click",async()=>{
  try{
   const rows=await window.RetroNomadSearchPipeline.run(t);
   renderLiveResults(rows);
+  if(window.currentHuntId){
+   RetroNomadSavedHunts.recordCheck(window.currentHuntId,RetroNomadSearchPipeline.summarize(rows));
+   RetroNomadSavedHunts.recordMatches(window.currentHuntId,rows);
+  }
  }catch(e){
   document.querySelector("#sourceBadge").textContent="SEARCH SOURCE ERROR";
   const box=document.querySelector("#liveResults");box.textContent="Live search could not be completed: "+e.message;
@@ -250,13 +257,43 @@ document.querySelector("#searchBtn").addEventListener("click",async()=>{
   btn.disabled=false;btn.textContent="Search RetroNomad";
  }
 });
+function fillFormFromTarget(t){
+ if(!t)return;
+ document.querySelector("#game").value=t.game||"";
+ document.querySelector("#platform").value=t.platform||"";
+ document.querySelector("#release").value=t.releasePreference||"pal-compatible";
+ document.querySelector("#edition").value=t.editionPreference||"any";
+ document.querySelector("#complete").value=t.completeness||"any";
+ document.querySelector("#condition").value=t.condition||"any";
+ document.querySelector("#maxPrice").value=t.maxDeliveredGbp!=null?t.maxDeliveredGbp:"";
+ document.querySelector("#english").checked=t.englishRequired===true;
+ document.querySelector("#excludeBundles").checked=t.excludeBundles!==false;
+ document.querySelector("#excludePromo").checked=t.excludePromo!==false;
+}
+function resolveExistingHunt(t){
+ if(!window.RetroNomadSavedHunts||!t)return null;
+ const sig=RetroNomadSavedHunts.targetSignature(t);
+ return RetroNomadSavedHunts.list().find(h=>RetroNomadSavedHunts.targetSignature(h.target)===sig&&h.status!=="ARCHIVED")||null;
+}
 document.querySelector("#saveBtn").addEventListener("click",()=>{
  if(!window.currentTarget)return;
- const saved=JSON.parse(localStorage.getItem("retronomad_saved_targets")||"[]");
- saved.push({...window.currentTarget,savedAt:new Date().toISOString()});
- localStorage.setItem("retronomad_saved_targets",JSON.stringify(saved.slice(-50)));
- document.querySelector("#saved").style.display="block";
+ const result=RetroNomadSavedHunts.create(window.currentTarget);
+ window.currentHuntId=result.hunt.id;
+ const msg=document.querySelector("#saved");msg.style.display="block";
+ msg.innerHTML=(result.created?"Saved to your hunts. ":"This target was already saved. ")+'<a href="wishlist.html">Open Saved Hunts</a>. Alerts are not active yet.';
 });
+(function restoreHuntFromUrl(){
+ RetroNomadSavedHunts.migrateLegacy();
+ const id=new URLSearchParams(location.search).get("hunt");
+ if(!id)return;
+ const hunt=RetroNomadSavedHunts.get(id);
+ if(!hunt)return;
+ window.currentHuntId=hunt.id;
+ fillFormFromTarget(hunt.target);
+ renderTarget(hunt.target);
+ const msg=document.querySelector("#saved");msg.style.display="block";
+ msg.textContent="Loaded from Saved Hunts. Live monitoring is not active in the static beta.";
+})();
 </script>
 </body>
 </html>
