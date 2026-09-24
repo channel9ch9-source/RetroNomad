@@ -898,3 +898,18 @@ Next live test:
 - sync PC
 - confirm only the intended Silent Hill hunt remains on both devices
 - this will validate cross-device deletion/tombstone behaviour end-to-end
+
+
+Cross-device deletion/tombstone smoke test passed — 24 September 2026:
+- user deleted the old `SH1` hunt on phone
+- phone sync completed
+- PC sync then removed `SH1` there as well
+- only the intended Silent Hill hunt remained
+- this confirms local deletion -> tombstone -> server soft-delete -> second-device removal works end-to-end
+
+Account milestone status:
+- passwordless email sign-in works live
+- secure session flow works live
+- Saved Hunts sync works PC <-> D1 <-> phone
+- cross-device deletion propagation works live
+- repeated sign-in email rendering issue is fixed
