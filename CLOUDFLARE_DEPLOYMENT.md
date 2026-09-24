@@ -76,24 +76,35 @@ Your Cloudflare account ID.
 
 Do not put either value into repository files.
 
-## Optional authentication-email secrets
+## Authentication-email configuration
 
-Passwordless sign-in is implemented, but it needs a transactional email adapter before users can receive their one-time links.
+Passwordless sign-in now supports Resend directly.
 
-Optional GitHub secrets:
+### RESEND_API_KEY
 
-### AUTH_EMAIL_WEBHOOK_URL
+Create a Resend API key with sending-only permission and store it as a GitHub Actions repository secret named exactly:
 
-HTTPS endpoint that accepts the auth email payload.
+`RESEND_API_KEY`
 
-### AUTH_EMAIL_WEBHOOK_SECRET
+The deployment workflow copies that value into the Cloudflare Worker secret store using Wrangler. It is never written to the repository or exposed to browser JavaScript.
 
-Optional bearer secret used when calling that endpoint.
+Optional repository variable:
 
-If these are absent:
-- the app/backend/database can still be deployed
-- `/health` will show auth email delivery as not configured
-- sign-in email requests will fail safely rather than exposing a login token
+### AUTH_EMAIL_FROM
+
+Custom sender identity, for example:
+`RetroNomad <signin@example.com>`
+
+Leave this unset during initial Resend development-sender testing. Before general-user launch, set it to an address on a verified sending domain.
+
+Legacy/fallback webhook support remains available through:
+- `AUTH_EMAIL_WEBHOOK_URL`
+- `AUTH_EMAIL_WEBHOOK_SECRET`
+
+If neither Resend nor the webhook is configured:
+- the app/backend/database still deploy
+- `/health` reports auth email delivery as not configured
+- sign-in requests fail safely without exposing the one-time token
 
 ## First deployment
 
@@ -120,9 +131,10 @@ Without email configured:
 - hourly scheduled handler exists
 - marketplace monitor remains dormant
 
-After the auth-email adapter is configured:
+After `RESEND_API_KEY` is configured and the Worker is redeployed:
+- `/health` reports `authEmailConfigured=true` and `authEmailProvider="resend"`
 - request passwordless sign-in link
-- consume one-time link
+- consume the 15-minute one-time link
 - establish Secure + HttpOnly session
 - create/sync Saved Hunts under authenticated account
 - reopen synced hunts across browsers/devices after sign-in
