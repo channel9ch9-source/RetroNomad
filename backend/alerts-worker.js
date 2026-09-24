@@ -6,7 +6,9 @@
 // DB                         - D1 database created from backend/schema.sql
 // APP_ORIGIN                 - public app origin, e.g. https://www.retronomad.example
 // ADMIN_TOKEN                - internal scheduler test secret
-// AUTH_EMAIL_WEBHOOK_URL     - email-delivery adapter endpoint
+// RESEND_API_KEY             - preferred transactional email secret
+// AUTH_EMAIL_FROM            - optional sender; defaults to Resend test sender
+// AUTH_EMAIL_WEBHOOK_URL     - legacy/fallback email-delivery adapter endpoint
 // AUTH_EMAIL_WEBHOOK_SECRET  - optional bearer secret for that endpoint
 // MARKETPLACE_PROVIDER       - "disabled" until authorised inventory access exists
 // NOTIFICATION_PROVIDER      - "disabled" until real notification delivery exists
@@ -120,12 +122,52 @@ function mapMonitorHunt(row) {
   };
 }
 
-async function sendMagicLink(env, to, magicLink) {
-  if (!env.AUTH_EMAIL_WEBHOOK_URL) {
-    const e = new Error("Authentication email delivery is not configured.");
-    e.code = "auth_email_not_configured";
+function authEmailProvider(env) {
+  if (env.RESEND_API_KEY) return "resend";
+  if (env.AUTH_EMAIL_WEBHOOK_URL) return "webhook";
+  return "none";
+}
+
+function escapeHtml(v) {
+  return String(v || "").replace(/[&<>"']/g, ch => ({
+    "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;"
+  })[ch]);
+}
+
+async function sendViaResend(env, to, magicLink) {
+  const from = String(env.AUTH_EMAIL_FROM || "RetroNomad <onboarding@resend.dev>").trim();
+  const safeLink = escapeHtml(magicLink);
+  const r = await fetch("https://api.resend.com/emails", {
+    method: "POST",
+    headers: {
+      "content-type": "application/json",
+      "authorization": "Bearer " + env.RESEND_API_KEY
+    },
+    body: JSON.stringify({
+      from,
+      to: [to],
+      subject: "Sign in to RetroNomad",
+      text:
+        "Use this one-time link to sign in to RetroNomad:\n\n" +
+        magicLink +
+        "\n\nThis link expires in 15 minutes and can only be used once. " +
+        "If you did not request it, you can ignore this email.",
+      html:
+        "<p>Use this one-time link to sign in to RetroNomad:</p>" +
+        '<p><a href="' + safeLink + '">Sign in to RetroNomad</a></p>' +
+        "<p>This link expires in 15 minutes and can only be used once.</p>" +
+        "<p>If you did not request it, you can ignore this email.</p>",
+      tags: [{ name: "category", value: "sign_in" }]
+    })
+  });
+  if (!r.ok) {
+    const e = new Error("Authentication email delivery failed.");
+    e.code = "auth_email_failed";
     throw e;
   }
+}
+
+async function sendViaWebhook(env, to, magicLink) {
   const headers = { "content-type": "application/json" };
   if (env.AUTH_EMAIL_WEBHOOK_SECRET) headers.authorization = "Bearer " + env.AUTH_EMAIL_WEBHOOK_SECRET;
   const r = await fetch(env.AUTH_EMAIL_WEBHOOK_URL, {
@@ -141,6 +183,42 @@ async function sendMagicLink(env, to, magicLink) {
   if (!r.ok) {
     const e = new Error("Authentication email delivery failed.");
     e.code = "auth_email_failed";
+    throw e;
+  }
+}
+
+async function sendMagicLink(env, to, magicLink) {
+  const provider = authEmailProvider(env);
+  if (provider === "resend") return sendViaResend(env, to, magicLink);
+  if (provider === "webhook") return sendViaWebhook(env, to, magicLink);
+  const e = new Error("Authentication email delivery is not configured.");
+  e.code = "auth_email_not_configured";
+  throw e;
+}
+
+async function enforceLoginRequestRate(env, email) {
+  const emailNorm = normalizeEmail(email);
+  const now = Date.now();
+  const oneMinuteAgo = new Date(now - 60 * 1000).toISOString();
+  const fifteenMinutesAgo = new Date(now - 15 * 60 * 1000).toISOString();
+
+  const recent = await env.DB.prepare(
+    "SELECT COUNT(*) AS n FROM auth_tokens WHERE email_norm = ? AND created_at >= ?"
+  ).bind(emailNorm, oneMinuteAgo).first();
+  if (Number(recent?.n || 0) >= 1) {
+    const e = new Error("Please wait a minute before requesting another sign-in link.");
+    e.code = "rate_limited";
+    e.status = 429;
+    throw e;
+  }
+
+  const windowed = await env.DB.prepare(
+    "SELECT COUNT(*) AS n FROM auth_tokens WHERE email_norm = ? AND created_at >= ?"
+  ).bind(emailNorm, fifteenMinutesAgo).first();
+  if (Number(windowed?.n || 0) >= 5) {
+    const e = new Error("Too many sign-in-link requests. Please try again later.");
+    e.code = "rate_limited";
+    e.status = 429;
     throw e;
   }
 }
@@ -514,7 +592,8 @@ export default {
         status: "scaffold_only",
         databaseConfigured: Boolean(env.DB),
         appOriginMode: String(env.APP_ORIGIN || "self"),
-        authEmailConfigured: Boolean(env.AUTH_EMAIL_WEBHOOK_URL),
+        authEmailConfigured: authEmailProvider(env) !== "none",
+        authEmailProvider: authEmailProvider(env),
         serverClassificationReady: true,
         marketplaceConfigured: Boolean(env.MARKETPLACE_PROVIDER && env.MARKETPLACE_PROVIDER !== "disabled"),
         notificationsConfigured: Boolean(env.NOTIFICATION_PROVIDER && env.NOTIFICATION_PROVIDER !== "disabled")
@@ -534,11 +613,17 @@ export default {
       const returnTo = safeReturnUrl(body.returnTo, effectiveAppOrigin(request, env));
       let created;
       try {
+        await enforceLoginRequestRate(env, email);
         created = await createLoginToken(env, email, returnTo, request);
         await sendMagicLink(env, email, created.magicLink);
       } catch (e) {
         if (created?.tokenId) await env.DB.prepare("DELETE FROM auth_tokens WHERE id = ?").bind(created.tokenId).run();
-        return json({ error: e.code || "auth_delivery_failed", message: String(e.message || e) }, 503, env, request);
+        return json(
+          { error: e.code || "auth_delivery_failed", message: String(e.message || e) },
+          e.status || 503,
+          env,
+          request
+        );
       }
       return json({ ok: true, message: "If delivery is available, a one-time sign-in link has been sent." }, 202, env, request);
     }
