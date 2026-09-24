@@ -47,7 +47,7 @@
 - [x] Complete first passwordless sign-in + Saved Hunt sync smoke test
 - [x] Deploy cross-device auto-sync and email-threading fixes
 - [x] Re-test cloud Saved Hunt appearing on phone and repeated sign-in email rendering
-- [ ] Verify Saved Hunt deletion/tombstone propagation across devices
+- [x] Verify Saved Hunt deletion/tombstone propagation across devices
 - [ ] Before public account launch, verify a RetroNomad-owned sending domain and add stronger abuse protection
 - [ ] Later move from workers.dev to a production/custom domain when appropriate
 - [ ] Configure transactional sign-in email delivery + abuse/rate controls
@@ -414,8 +414,8 @@ At every milestone:
 
 # Immediate next action
 
-**Finish the first live account loop: configure the Resend API key, redeploy, verify a real magic-link session and sync a Saved Hunt across browsers/devices.**
+**The first live account loop is complete. Next, move toward real Deal Finder data by evaluating legitimate authorised marketplace/inventory sources while the PriceCharting commercial-permission response is pending.**
 
-The search-first marketplace and pricing architecture remains blocked on legitimate provider access/licensing; do not fabricate inventory while those external dependencies are pending.
+Do not fabricate inventory, scrape around marketplace restrictions, or weaken release identity rules merely to make results appear live.
 
 Do not purchase a normal PriceCharting API subscription for RetroNomad public use unless a suitable commercial agreement is confirmed.
