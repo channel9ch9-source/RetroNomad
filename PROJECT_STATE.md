@@ -874,3 +874,13 @@ Saved Hunt UX fix — 24 September 2026:
 - search page now enables Save as soon as a valid game target exists
 - Save now builds the target directly even if Search has not been run first
 - requires Cloudflare redeploy before live verification
+
+
+Cross-device sync/email UX findings — 24 September 2026:
+- live phone sign-in succeeded
+- user saw an old local Saved Hunt label (`SH1`) after sign-in; code review confirmed signing in did not automatically run Saved Hunt sync, so the phone could still show pre-existing local browser data before the cloud snapshot was merged
+- wishlist now automatically runs Saved Hunt sync after authenticated account detection
+- existing manual `Sync now` remains available
+- wishlist beta copy updated to reflect that account sync is live while marketplace monitoring/notification delivery is still unavailable
+- repeated Resend sign-in emails were being collapsed behind Gmail-style `Show quoted text`; email subject/body now include a per-request marker and the HTML has a clearer CTA so repeated sign-in messages are less likely to be collapsed as duplicate/threaded content
+- these changes require a fresh Cloudflare deployment before live verification
