@@ -121,8 +121,17 @@ async function initAccountSync(){
    status.innerHTML='Saved Hunts are local. <a href="account.html">Sign in</a> to sync across devices.';
    return;
   }
-  btn.disabled=false;btn.textContent="Sync now";
-  status.textContent="Signed in as "+me.user.email+".";
+  btn.disabled=true;btn.textContent="Syncing…";
+  status.textContent="Signed in as "+me.user.email+". Syncing Saved Hunts…";
+  try{
+   const result=await RetroNomadAccount.syncSavedHunts();
+   status.textContent="Signed in as "+me.user.email+". Synced "+(result.hunts?.length||0)+" Saved Hunt"+((result.hunts?.length||0)===1?"":"s")+".";
+   render();
+  }catch(syncError){
+   status.textContent="Signed in as "+me.user.email+". Automatic sync failed: "+syncError.message;
+  }finally{
+   btn.disabled=false;btn.textContent="Sync now";
+  }
  }catch(e){
   btn.disabled=true;btn.textContent="Sync unavailable";status.textContent=e.message;
  }
