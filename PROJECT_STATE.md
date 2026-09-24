@@ -837,5 +837,21 @@ Smoke test completed 24 September 2026:
 
 Mobile QA found that top navigation links were intentionally hidden by existing responsive CSS. A mobile-navigation fix was committed across index/search/wishlist/account/analyze so the links remain visible in a horizontally scrollable mobile row. This fix still requires a fresh Cloudflare deployment before it is live on workers.dev.
 
+Mobile navigation was deployed and confirmed working on phone on 24 September 2026.
+
+Passwordless email implementation update:
+- Resend selected as the first transactional-email provider
+- Worker now sends magic links directly through the Resend REST API when `RESEND_API_KEY` exists
+- API key remains a Cloudflare Worker secret
+- default development sender is `RetroNomad <onboarding@resend.dev>`
+- optional `AUTH_EMAIL_FROM` supports a future verified RetroNomad domain
+- legacy generic email webhook remains as fallback
+- /health now reports both authEmailConfigured and authEmailProvider
+- basic abuse guard added: one request/email/minute and five requests/email/15 minutes
+- GitHub Actions now copies `RESEND_API_KEY` into the Worker secret store
+
+Current blocker:
+the user must create a Resend account/API key and add `RESEND_API_KEY` to GitHub Actions secrets, then redeploy.
+
 Next deployment task:
-deploy the mobile-navigation fix, then configure transactional email delivery for passwordless sign-in and smoke-test real account creation/session/Saved Hunt sync end-to-end.
+configure the Resend secret, redeploy, confirm `/health` shows authEmailConfigured=true/authEmailProvider=resend, then perform the first real account/session/Saved Hunt sync test.
