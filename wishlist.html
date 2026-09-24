@@ -31,7 +31,7 @@ nav{height:70px;display:flex;align-items:center;justify-content:space-between}.b
 <div class="kicker">Phase 1 · Wishlist</div>
 <h1>Saved Hunts.</h1>
 <p class="lead">Keep the exact physical-game targets you care about in one place. These records are ready for future marketplace monitoring and alerts without pretending that background checks are already active.</p>
-<div class="notice"><strong>Current beta limitation:</strong> hunts are stored only in this browser. RetroNomad cannot monitor marketplaces or send notifications in the background until we add a backend and an authorised live inventory source.</div>
+<div class="notice"><strong>Current beta limitation:</strong> account sync is live when you are signed in, but marketplace monitoring and alerts remain unavailable until an authorised inventory source and notification provider are connected.</div>
 </header>
 
 <div class="toolbar">
@@ -77,7 +77,7 @@ function render(){
    '<div class="hunthead"><div><h3>'+esc(h.label)+'</h3><div class="meta">Saved '+esc(fmtDate(h.createdAt))+' · Updated '+esc(fmtDate(h.updatedAt))+'</div></div><span class="status '+statusClass+'">'+esc(h.status)+'</span></div>'+
    '<div class="huntbody"><div class="chips">'+chips.map(x=>'<span class="chip">'+esc(x)+'</span>').join("")+'</div>'+
    '<div class="split"><div class="box"><span>Monitoring</span><b>'+esc(h.monitoring.state==="NOT_RUNNING"?"Not running":h.monitoring.state)+'</b><div class="meta">Last checked: '+esc(fmtDate(h.monitoring.lastCheckedAt))+'</div></div>'+
-   '<div class="box"><span>Alerts</span><b class="warn">'+(h.alerts.requested?"Wanted — not active":"Not requested")+'</b><div class="meta">Delivery unavailable in static beta</div></div></div>'+
+   '<div class="box"><span>Alerts</span><b class="warn">'+(h.alerts.requested?"Wanted — not active":"Not requested")+'</b><div class="meta">Marketplace alert delivery is not configured yet</div></div></div>'+
    (history.length?'<details class="history"><summary>Match history ('+history.length+')</summary><ul>'+history.map(x=>'<li>'+esc(x.title||x.externalId)+' · '+(x.deliveredGbp!=null?'£'+Number(x.deliveredGbp).toFixed(2):'price unknown')+(x.canonicalUrl?' · <a target="_blank" rel="noopener noreferrer" href="'+esc(x.canonicalUrl)+'">open</a>':'')+'</li>').join("")+'</ul></details>':'')+
    '</div>'+
    '<div class="huntfoot"><label class="alertline"><input type="checkbox" data-action="alert" data-id="'+esc(h.id)+'" '+(h.alerts.requested?"checked":"")+'> I want an alert when this becomes available</label>'+
