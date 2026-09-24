@@ -40,8 +40,12 @@
 - [x] Add Cloudflare API token + account ID as GitHub Actions secrets
 - [x] Run first Cloudflare scaffold deployment
 - [x] Smoke-test workers.dev static site, /health, D1 binding and account endpoints
-- [ ] Deploy mobile navigation fix to Cloudflare
-- [ ] Configure auth-email delivery so passwordless sign-in becomes live
+- [x] Deploy mobile navigation fix to Cloudflare
+- [x] Implement Resend auth-email delivery in Worker
+- [ ] Create Resend sending-only API key and add GitHub secret `RESEND_API_KEY`
+- [ ] Redeploy and confirm /health reports Resend configured
+- [ ] Complete first passwordless sign-in + Saved Hunt sync smoke test
+- [ ] Before public account launch, verify a RetroNomad-owned sending domain and add stronger abuse protection
 - [ ] Later move from workers.dev to a production/custom domain when appropriate
 - [ ] Configure transactional sign-in email delivery + abuse/rate controls
 - [ ] Update privacy/account-data policy before enabling public accounts
@@ -407,6 +411,8 @@ At every milestone:
 
 # Immediate next action
 
-**While waiting for PriceCharting's licensing response, design the search-first RetroNomad experience: launch filters, result-card data model and marketplace-source abstraction, while keeping the existing analyser as a secondary utility.**
+**Finish the first live account loop: configure the Resend API key, redeploy, verify a real magic-link session and sync a Saved Hunt across browsers/devices.**
+
+The search-first marketplace and pricing architecture remains blocked on legitimate provider access/licensing; do not fabricate inventory while those external dependencies are pending.
 
 Do not purchase a normal PriceCharting API subscription for RetroNomad public use unless a suitable commercial agreement is confirmed.
