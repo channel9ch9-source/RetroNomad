@@ -827,5 +827,15 @@ Current live limitation:
 - marketplace provider remains disabled
 - notification provider remains disabled
 
+Smoke test completed 24 September 2026:
+- live main app loads on desktop
+- Search, Saved Hunts and Account pages load on desktop
+- `/health` reports databaseConfigured=true
+- `/health` reports appOriginMode="self"
+- `/health` reports serverClassificationReady=true
+- expected disabled services remain false: authEmailConfigured, marketplaceConfigured, notificationsConfigured
+
+Mobile QA found that top navigation links were intentionally hidden by existing responsive CSS. A mobile-navigation fix was committed across index/search/wishlist/account/analyze so the links remain visible in a horizontally scrollable mobile row. This fix still requires a fresh Cloudflare deployment before it is live on workers.dev.
+
 Next deployment task:
-configure transactional email delivery for passwordless sign-in, then smoke-test real account creation/session/Saved Hunt sync end-to-end.
+deploy the mobile-navigation fix, then configure transactional email delivery for passwordless sign-in and smoke-test real account creation/session/Saved Hunt sync end-to-end.
