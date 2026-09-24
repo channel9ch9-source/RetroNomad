@@ -277,9 +277,23 @@ function resolveExistingHunt(t){
  const sig=RetroNomadSavedHunts.targetSignature(t);
  return RetroNomadSavedHunts.list().find(h=>RetroNomadSavedHunts.targetSignature(h.target)===sig&&h.status!=="ARCHIVED")||null;
 }
+function refreshSaveButton(){
+ const t=buildTarget();
+ document.querySelector("#saveBtn").disabled=!t;
+}
+
+["#game","#platform","#release","#edition","#complete","#condition","#maxPrice","#english","#excludeBundles","#excludePromo"]
+ .forEach(sel=>{
+  const el=document.querySelector(sel);
+  el.addEventListener("input",refreshSaveButton);
+  el.addEventListener("change",refreshSaveButton);
+ });
+
 document.querySelector("#saveBtn").addEventListener("click",async()=>{
- if(!window.currentTarget)return;
- const result=RetroNomadSavedHunts.create(window.currentTarget);
+ const target=window.currentTarget||buildTarget();
+ if(!target){alert("Enter a game title first.");return;}
+ if(!window.currentTarget)renderTarget(target);
+ const result=RetroNomadSavedHunts.create(target);
  window.currentHuntId=result.hunt.id;
  const msg=document.querySelector("#saved");msg.style.display="block";
  msg.innerHTML=(result.created?"Saved to your hunts. ":"This target was already saved. ")+'<a href="wishlist.html">Open Saved Hunts</a>.';
@@ -299,6 +313,8 @@ document.querySelector("#saveBtn").addEventListener("click",async()=>{
   msg.innerHTML+=' Stored in this browser only.';
  }
 });
+refreshSaveButton();
+
 (function restoreHuntFromUrl(){
  RetroNomadSavedHunts.migrateLegacy();
  const id=new URLSearchParams(location.search).get("hunt");
