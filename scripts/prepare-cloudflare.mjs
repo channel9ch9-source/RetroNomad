@@ -40,6 +40,7 @@ const vars={
   NOTIFICATION_PROVIDER:"disabled",
   CHECK_INTERVAL_MINUTES:"60"
 };
+if(process.env.AUTH_EMAIL_FROM)vars.AUTH_EMAIL_FROM=process.env.AUTH_EMAIL_FROM;
 if(process.env.AUTH_EMAIL_WEBHOOK_URL)vars.AUTH_EMAIL_WEBHOOK_URL=process.env.AUTH_EMAIL_WEBHOOK_URL;
 
 const config={
