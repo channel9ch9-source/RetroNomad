@@ -39,7 +39,8 @@
 - [x] Keep GitHub Pages runtime local-only while Cloudflare build enables account sync
 - [x] Add Cloudflare API token + account ID as GitHub Actions secrets
 - [x] Run first Cloudflare scaffold deployment
-- [ ] Smoke-test workers.dev static site, /health, D1 binding and account endpoints
+- [x] Smoke-test workers.dev static site, /health, D1 binding and account endpoints
+- [ ] Deploy mobile navigation fix to Cloudflare
 - [ ] Configure auth-email delivery so passwordless sign-in becomes live
 - [ ] Later move from workers.dev to a production/custom domain when appropriate
 - [ ] Configure transactional sign-in email delivery + abuse/rate controls
