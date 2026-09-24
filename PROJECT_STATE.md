@@ -850,8 +850,14 @@ Passwordless email implementation update:
 - basic abuse guard added: one request/email/minute and five requests/email/15 minutes
 - GitHub Actions now copies `RESEND_API_KEY` into the Worker secret store
 
-Current blocker:
-the user must create a Resend account/API key and add `RESEND_API_KEY` to GitHub Actions secrets, then redeploy.
+Live auth-email milestone completed 24 September 2026:
+- `RESEND_API_KEY` added to GitHub Actions secrets
+- Resend-enabled Worker redeployed successfully
+- live `/health` confirms `authEmailConfigured=true`
+- live `/health` confirms `authEmailProvider="resend"`
+- D1 remains configured
+- server classification remains ready
+- marketplace and notification providers remain intentionally disabled
 
-Next deployment task:
-configure the Resend secret, redeploy, confirm `/health` shows authEmailConfigured=true/authEmailProvider=resend, then perform the first real account/session/Saved Hunt sync test.
+Next live test:
+perform the first real passwordless sign-in, confirm Secure + HttpOnly session creation, save/sync a Hunt, then verify it reappears after signing in from another browser/device.
