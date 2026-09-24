@@ -602,3 +602,20 @@ The existing GitHub Pages deployment remains a local-only prototype and does not
 Permanent deployment rule:
 Do not weaken session-cookie security or move session tokens into localStorage merely to make GitHub Pages talk cross-site to the account backend.
 
+
+
+## Transactional auth email provider — 24 September 2026
+
+Use Resend as the first deployed passwordless-login email provider.
+
+Decision:
+- call the Resend REST API directly from the Cloudflare Worker
+- keep `RESEND_API_KEY` only in the Cloudflare Worker secret store, populated from GitHub Actions
+- keep `AUTH_EMAIL_FROM` configurable so a verified RetroNomad sender domain can replace the development sender later
+- retain the existing generic authenticated webhook adapter as a fallback, not the primary path
+- never expose the API key or raw session token to browser JavaScript
+- keep magic links single-use and 15 minutes
+- add basic per-email request throttling now; add stronger public abuse protection before general account launch
+
+Reason:
+the account backend is already on Cloudflare Workers, Resend has a straightforward Worker-compatible API and a small-project free tier, and this avoids operating a separate email webhook service solely for authentication.
