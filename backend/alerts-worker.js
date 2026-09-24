@@ -137,6 +137,9 @@ function escapeHtml(v) {
 async function sendViaResend(env, to, magicLink) {
   const from = String(env.AUTH_EMAIL_FROM || "RetroNomad <onboarding@resend.dev>").trim();
   const safeLink = escapeHtml(magicLink);
+  const requestedAt = new Date();
+  const requestRef = requestedAt.toISOString().replace(/[-:TZ.]/g, "").slice(0, 14);
+  const subjectTime = requestedAt.toISOString().slice(11, 16) + " UTC";
   const r = await fetch("https://api.resend.com/emails", {
     method: "POST",
     headers: {
@@ -146,15 +149,18 @@ async function sendViaResend(env, to, magicLink) {
     body: JSON.stringify({
       from,
       to: [to],
-      subject: "Sign in to RetroNomad",
+      subject: "RetroNomad sign-in link · " + subjectTime,
       text:
-        "Use this one-time link to sign in to RetroNomad:\n\n" +
+        "RetroNomad sign-in request " + requestRef + "\n\n" +
+        "Use this one-time link to sign in:\n\n" +
         magicLink +
         "\n\nThis link expires in 15 minutes and can only be used once. " +
         "If you did not request it, you can ignore this email.",
       html:
-        "<p>Use this one-time link to sign in to RetroNomad:</p>" +
-        '<p><a href="' + safeLink + '">Sign in to RetroNomad</a></p>' +
+        '<div style="display:none;max-height:0;overflow:hidden">RetroNomad sign-in request ' + requestRef + '</div>' +
+        "<h2>Sign in to RetroNomad</h2>" +
+        "<p>Use the button below to finish signing in.</p>" +
+        '<p><a href="' + safeLink + '" style="display:inline-block;padding:12px 18px;background:#111827;color:#ffffff;text-decoration:none;border-radius:8px;font-weight:700">Sign in to RetroNomad</a></p>' +
         "<p>This link expires in 15 minutes and can only be used once.</p>" +
         "<p>If you did not request it, you can ignore this email.</p>",
       tags: [{ name: "category", value: "sign_in" }]
