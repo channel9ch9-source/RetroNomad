@@ -44,7 +44,7 @@
 - [x] Implement Resend auth-email delivery in Worker
 - [x] Create Resend sending-only API key and add GitHub secret `RESEND_API_KEY`
 - [x] Redeploy and confirm /health reports Resend configured
-- [ ] Complete first passwordless sign-in + Saved Hunt sync smoke test
+- [~] Complete first passwordless sign-in + Saved Hunt sync smoke test (sign-in passed; cross-device Saved Hunt sync still to verify)
 - [ ] Before public account launch, verify a RetroNomad-owned sending domain and add stronger abuse protection
 - [ ] Later move from workers.dev to a production/custom domain when appropriate
 - [ ] Configure transactional sign-in email delivery + abuse/rate controls
