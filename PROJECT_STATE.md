@@ -859,5 +859,11 @@ Live auth-email milestone completed 24 September 2026:
 - server classification remains ready
 - marketplace and notification providers remain intentionally disabled
 
+Live passwordless sign-in smoke test passed 24 September 2026:
+- user requested a sign-in link from the live Cloudflare account page
+- Resend delivered the email successfully
+- one-time magic link was accepted
+- secure authenticated session was established successfully
+
 Next live test:
-perform the first real passwordless sign-in, confirm Secure + HttpOnly session creation, save/sync a Hunt, then verify it reappears after signing in from another browser/device.
+save and sync a Hunt while signed in, then verify that the same Hunt appears after signing in from another browser/device.
