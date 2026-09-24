@@ -193,21 +193,40 @@ If account sync is unavailable, the hunt still saves locally.
 
 The page remains fully usable offline/local-only.
 
-## Email delivery abstraction
+## Email delivery
 
-The Worker expects:
+The first deployed transactional-email provider is Resend.
+
+Preferred Worker secret/config:
+- `RESEND_API_KEY` — Cloudflare Worker secret, never exposed to browser code
+- `AUTH_EMAIL_FROM` — optional non-secret sender override
+
+If `AUTH_EMAIL_FROM` is absent, the Worker uses the Resend development sender:
+`RetroNomad <onboarding@resend.dev>`
+
+That development sender is for initial testing. A verified RetroNomad-owned sending domain must be configured before general-user sign-in is treated as production-ready.
+
+The older generic webhook path remains as a fallback:
 - `AUTH_EMAIL_WEBHOOK_URL`
 - optional `AUTH_EMAIL_WEBHOOK_SECRET`
 
-The adapter receives the recipient, subject and one-time sign-in link.
+Email priority:
+1. Resend when `RESEND_API_KEY` exists
+2. generic webhook when configured
+3. fail safely when no provider exists
 
-This deliberately avoids hard-coding an email vendor before deployment.
+The Worker calls Resend's email API directly with `fetch`; no API key is shipped to the browser.
 
-Production requirements for the email adapter:
-- authenticated API/webhook
+Initial abuse guard:
+- at most one sign-in-link request per email address per minute
+- at most five per email address per fifteen minutes
+
+A stronger public-launch abuse layer such as Turnstile and/or edge rate limiting should be added before opening sign-in broadly.
+
+Production requirements:
 - verified sender domain
 - delivery/error visibility
-- rate limiting/abuse controls
+- stronger abuse controls
 - no logging of raw one-time tokens beyond what is required for delivery
 
 ## Current status
@@ -222,14 +241,21 @@ Implemented in source code:
 - search save -> sync hook
 - wishlist manual sync control
 
-Not deployed/configured:
-- database binding
-- same-site/custom account API host
-- email-delivery adapter
-- production rate limiting
-- abuse protection
+Deployed/configured:
+- same-origin Cloudflare Worker + static application
+- D1 database binding and initial schema
+- secure HttpOnly session architecture
+- browser runtime account sync enabled on the Cloudflare deployment
+- Resend email-delivery code path
+- basic per-email sign-in request throttling
+
+Still pending:
+- `RESEND_API_KEY` deployment secret
+- first real passwordless-email smoke test
+- verified RetroNomad sending domain for general-user email
+- stronger public abuse protection
 - account privacy-policy update
 - authorised marketplace source
 - real notifications
 
-Therefore the public site correctly remains in local-only account mode.
+The GitHub Pages build remains local-only; the Cloudflare deployment is the account-capable environment.
