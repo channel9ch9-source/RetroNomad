@@ -913,3 +913,12 @@ Account milestone status:
 - Saved Hunts sync works PC <-> D1 <-> phone
 - cross-device deletion propagation works live
 - repeated sign-in email rendering issue is fixed
+
+
+PriceCharting business-development update — 23/24 September 2026:
+- JJ Hendricks replied to the RetroNomad commercial-data enquiry on 23 September 2026
+- JJ described RetroNomad as a cool idea and introduced Brady, who handles business development arrangements
+- no commercial permission or pricing terms have been granted yet
+- current PriceCharting documentation confirms public/third-party display of price data requires a commercial license and express written permission
+- PriceCharting also documents a Marketplace API with available-offer queries by product/console/condition; whether RetroNomad may surface those offers in a third-party buyer app must be explicitly confirmed with Brady
+- next PriceCharting step is to wait for Brady's response and then clarify both pricing-display rights and live Marketplace-offer usage
