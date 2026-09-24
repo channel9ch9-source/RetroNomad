@@ -867,3 +867,10 @@ Live passwordless sign-in smoke test passed 24 September 2026:
 
 Next live test:
 save and sync a Hunt while signed in, then verify that the same Hunt appears after signing in from another browser/device.
+
+
+Saved Hunt UX fix — 24 September 2026:
+- live sync smoke test exposed that `Save to Saved Hunts` stayed disabled until `Search RetroNomad` had been pressed once
+- search page now enables Save as soon as a valid game target exists
+- Save now builds the target directly even if Search has not been run first
+- requires Cloudflare redeploy before live verification
