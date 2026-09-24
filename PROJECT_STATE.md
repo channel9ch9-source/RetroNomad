@@ -884,3 +884,17 @@ Cross-device sync/email UX findings — 24 September 2026:
 - wishlist beta copy updated to reflect that account sync is live while marketplace monitoring/notification delivery is still unavailable
 - repeated Resend sign-in emails were being collapsed behind Gmail-style `Show quoted text`; email subject/body now include a per-request marker and the HTML has a clearer CTA so repeated sign-in messages are less likely to be collapsed as duplicate/threaded content
 - these changes require a fresh Cloudflare deployment before live verification
+
+
+Cross-device account/sync smoke test passed — 24 September 2026:
+- user signed in successfully on phone via Resend magic link
+- repeated sign-in email body now renders visibly instead of being collapsed behind quoted text
+- Saved Hunts sync on phone showed the Silent Hill hunt created on PC, confirming PC -> D1 -> phone propagation
+- an older phone-local hunt labelled `SH1` also appeared; this is consistent with the local-first merge/upload model and will be used to test deletion/tombstone propagation next
+
+Next live test:
+- delete `SH1` on phone
+- sync phone
+- sync PC
+- confirm only the intended Silent Hill hunt remains on both devices
+- this will validate cross-device deletion/tombstone behaviour end-to-end
