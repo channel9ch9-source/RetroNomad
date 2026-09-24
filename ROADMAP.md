@@ -42,8 +42,8 @@
 - [x] Smoke-test workers.dev static site, /health, D1 binding and account endpoints
 - [x] Deploy mobile navigation fix to Cloudflare
 - [x] Implement Resend auth-email delivery in Worker
-- [ ] Create Resend sending-only API key and add GitHub secret `RESEND_API_KEY`
-- [ ] Redeploy and confirm /health reports Resend configured
+- [x] Create Resend sending-only API key and add GitHub secret `RESEND_API_KEY`
+- [x] Redeploy and confirm /health reports Resend configured
 - [ ] Complete first passwordless sign-in + Saved Hunt sync smoke test
 - [ ] Before public account launch, verify a RetroNomad-owned sending domain and add stronger abuse protection
 - [ ] Later move from workers.dev to a production/custom domain when appropriate
